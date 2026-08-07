@@ -21,7 +21,7 @@ common/
 |-- machine/
 |   |-- cover/                    # CreativeEnergyCover
 |   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine, MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine
-|   |   |-- electric/             # 33 machines: WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, VoidMinerProcessingMachine (+VoidMinerRecipeLogic), INFFluidDrillMachine (+INFFluidDrillLogic), MegaLCRMachine, NeuroMatrixCompiler, ScalableReservoirComputingMachine, Superconducting_Penning_Trap, ...
+|   |   |-- electric/             # 30 machines: WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, VoidMinerProcessingMachine (+VoidMinerRecipeLogic), INFFluidDrillMachine (+INFFluidDrillLogic), MegaLCRMachine, NeuroMatrixCompiler, ScalableReservoirComputingMachine, Superconducting_Penning_Trap, ...
 |   |   |   `-- multithread/      # CNCAlloySmelter
 |   |   |-- generator/            # 12 machines: Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine, LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator, NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine, WaterPowerStationMachine, WindPowerArrayMachine
 |   |   |-- kinetic/              # IndustrialPrimitiveBlastFurnaceMachine, MeadowMachine, NoEnergyMachine
@@ -46,7 +46,7 @@ common/
 | Entities | `common/entity/monster/` |
 | GUIs | `common/gui/`, `common/gui/terminal/`, `common/gui/widget/` |
 | Items | `common/item/`, `common/item/debug/` |
-| Electric multiblocks | `common/machine/multiblock/electric/` (33) |
+| Electric multiblocks | `common/machine/multiblock/electric/` (30) |
 | Generator multiblocks | `common/machine/multiblock/generator/` (12) |
 | Kinetic multiblocks | `common/machine/multiblock/kinetic/` (3) |
 | Machine parts | `common/machine/multiblock/part/` (12) |

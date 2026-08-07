@@ -9,7 +9,8 @@ Client-side bootstrap for CEI.
 | Client proxy | `client/ClientProxy.java` |
 
 ## CONVENTIONS
-- ClientProxy handles client-side init; common registration stays in `common/CommonProxy.java`.
+- ClientProxy handles client-side init; common server stays in `common/CommonProxy.java`.
+- `ClientProxy` constructor calls `CEICollapsibleGroups.loadRules()` to load sidebar grouping rules early.
 
 ## ANTI-PATTERNS
 - Do not make client-only classes reachable from common paths.

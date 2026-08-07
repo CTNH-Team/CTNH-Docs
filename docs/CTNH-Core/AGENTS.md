@@ -27,7 +27,7 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- gui/                  # WPAAcceleratorGui, terminal/widget widgets
 |   |-- item/                 # ArkOfHomoItem, AstronomyCircuitItem, MEAdvancedTerminalItem, ...
 |   |-- machine/cover/        # CreativeEnergyCover
-|   |-- machine/multiblock/   # 5 top-level + electric/ (33) + generator/ (12) + kinetic/ + part/ (12) + quantum/
+|   |-- machine/multiblock/   # 5 top-level + electric/ (30) + generator/ (12) + kinetic/ + part/ (12) + quantum/
 |   |   |-- electric/         # WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, ...
 |   |   |-- generator/        # Arc_Reactor, HyperPlasmaTurbineMachine, MegaTurbineMachine, ...
 |   |   |-- kinetic/          # IndustrialPrimitiveBlastFurnaceMachine, MeadowMachine, NoEnergyMachine
@@ -42,14 +42,14 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- CreateRecipeTypes.java
 |   |-- item/                 # CrystalItems
 |   |-- machines/             # GTNNMachines
-|   |-- materials/            # 23 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
-|   |-- recipe/               # 31 top-level + age/ chain/ create/ migrated/ modmodify/ multiblock/ ...
+|   |-- materials/            # 25 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
+|   |-- recipe/               # 31 top-level + age/ chain/ create/ migrated/ multiblock/ ...
 |   |-- tags/                 # biome/entity/block/fluid/item tag providers, TagClearHelper
 |   `-- worldgen/             # CTNHBiomeModifiers
 |-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
 |-- integration/              # EMI (2 plugins) + Legendary Survival (2 modifiers)
 |-- mixin/                    # 34 mixins across 17 target mods; mc/ RecipeManagerApplyMixin
-|-- registry/                 # 30 root classes + adventure/ jade/ machines/ material/
+|-- registry/                 # 27 root classes + adventure/ jade/ machines/ material/
 `-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
 ```
 
@@ -59,13 +59,13 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Mod entry | `CTNHCore.java` |
 | GT addon | `CTNHCoreGTAddon.java` |
 | Config | `CTNHConfig.java` |
-| Registries | `registry/` (30 root classes) |
+| Registries | `registry/` (27 root classes) |
 | Recipe generation root | `data/recipe/CTNHCoreRecipeAddition.java` (dispatched from `addRecipes()`) |
-| Multiblocks (electric) | `common/machine/multiblock/electric/` (33 machines) |
+| Multiblocks (electric) | `common/machine/multiblock/electric/` (30 machines) |
 | Multiblocks (generator) | `common/machine/multiblock/generator/` (12 machines) |
 | Multiblocks (parts) | `common/machine/multiblock/part/` (12 machines) |
 | Machine traits/net | `common/machine/trait/providable_net/` |
-| Materials | `data/materials/` (23 sets), `registry/material/` |
+| Materials | `data/materials/` (25 sets), `registry/material/` |
 | Ponder/client | `client/ponder/`, `client/renderer/` |
 | Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
 
@@ -92,7 +92,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Some generated recipe Java lives under `data/recipe/generated`; distinguish Java recipe generators from JSON generated resources.
 - Ponder `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
 - `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
-- Spelling quirk: mixin package is `dategen` (not `datagen`); `data/recipe/tconstruct/` is an empty leftover directory.
+- Spelling quirk: mixin package is `dategen` (not `datagen`).
 
 ## ANTI-PATTERNS
 - Do not manually reformat huge multiblock registry sections protected by Spotless toggles.
@@ -114,7 +114,7 @@ Read the matching domain guide before editing the corresponding source area.
 Applies to `modules/CTNH-Core` and the CI release artifacts it aggregates. It is a reference guide loaded through the root routing table, not an additional source-tree instruction file.
 
 ## READ WHEN
-- Adding or changing cross-mod recipes, Core-owned gameplay systems, or GTCEu machine registries.
+- Adding or changing cross-mod recipes, Core-owned gameplay systems, or GTCEu machine registrations.
 - Changing Core Ponder scenes/tags or datagen providers that produce `src/generated/resources`.
 - A change affects aggregation behavior validated by `:modules:CTNH-Core:build`.
 
