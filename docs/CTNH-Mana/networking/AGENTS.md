@@ -1,7 +1,7 @@
 # CTNH-MANA NETWORKING DOMAIN
 
 ## OVERVIEW
-Mana networking (5 Java files): Caduceus and Index Fortuna/target packets.
+Mana networking (6 Java files): Caduceus, Index Fortuna/target, and Zenith invasion packets.
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -9,6 +9,7 @@ Mana networking (5 Java files): Caduceus and Index Fortuna/target packets.
 | Networking init | `networking/packets/CMNetworking.java` |
 | Caduceus packet | `networking/packets/CaduceusPacket.java` |
 | Index packets | `networking/packets/IndexFortunaPacket.java`, `IndexTargetBlockPacket.java`, `IndexTargetParticlePacket.java` |
+| Zenith invasion packet | `networking/packets/ZenithInvadePacket.java` |
 
 ## CONVENTIONS
 - Packets are initialized from `event/EventHandler.commonSetup()`.

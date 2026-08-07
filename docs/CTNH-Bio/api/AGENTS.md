@@ -25,8 +25,12 @@ api/
 `-- recipe/
     |-- CBRecipeModifiers.java, CBRecipeType.java
     |-- customlogic/             # BasicLivingLogic, DigestRecipeLogic
-    |-- ingredient/              # EntityIngredient, ModelIngredient (+ChancedEntityIngredient)
-    |   `-- entity/              # property/ (IAutoGetValueEntityProperty, I*EntityProperty interfaces), property/data/ (EntityProperties, EntityPropertyDetector, EntityPropertyValue), property/utils/ (EntityPropertyBuilder)
+    |-- ingredient/
+    |   |-- entity/              # ChancedEntityIngredient, EntityIngredient
+    |   |   `-- property/        # IAutoGetValueEntityProperty, I*EntityProperty interfaces
+    |   |       |-- data/        # EntityProperties, EntityPropertyDetector, EntityPropertyValue
+    |   |       `-- utils/       # EntityPropertyBuilder
+    |   `-- model/               # ModelIngredient
     |-- lookup/                  # EntityTagMapIngredient, EntityTypeMapIngredient
     `-- matcher/                 # PropertyOperator, PropertyOperators
 ```

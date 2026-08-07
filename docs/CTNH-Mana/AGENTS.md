@@ -1,26 +1,26 @@
 # CTNH-MANA MODULE
 
 ## OVERVIEW
-CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (253 Java files, the second-largest module).
+CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (271 Java files, the second-largest module).
 
 ## STRUCTURE
 ```text
 src/main/java/com/moguang/ctnhmana/
 |-- CTNHMana.java / CTNHManaGTAddon.java / CMConfig.java   # mod entry, GT addon, config
-|-- api/                      # 16: pattern/ (CMBlockMaps, CMPredicates), effect/ (7), networks/ (Botania packets), recipe/condition/ (4)
-|-- client/                   # 32: Caduceus radial menu (gui/radial/), Ponder (plugin + mana/ scenes), models, renderers (11), particles
-|-- common/                   # 97: CommonProxy, DigitalWosMachine, blocks, blockentities, entities, gui, items (8 subpackages), machines, multiblocks (28), parts, rituals
-|   |-- item/                 # bloodmagicjade/ bosssummoner/ caduceus/ equipment/ manafuelstick/ manamachineupgrade/ (8) rune/ (3)
-|   |-- multiblock/           # 28: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, ...
+|-- api/                      # 18: effect/ (8), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (1)
+|-- client/                   # 33: ZenithInvadeClient, radial menu, Ponder, models, renderers (11), particles
+|-- common/                   # 104: CommonProxy, DigitalWosMachine, blocks, blockentities, entities, events, items, machines, multiblocks (29), parts, rituals
+|   |-- item/                 # bloodmagicjade/ bosssummoner/ caduceus/ equipment/ manafuelstick/ manamachineupgrade/ (8) rune/ (3) + ZenithDebugToolItem
+|   |-- multiblock/           # 29: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, IndustrialSalvagingMachine, ...
 |   |-- parts/                # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch + ManaHatches/ (3)
 |   |-- ritualtypes/          # 5: RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
 |   `-- ritual/               # MachineRitualSoulNetwork, MachineRitualStoneHost
-|-- data/                     # 47: CMDatagen, ManaData, recipes (30 + builder/bloodmagic/ + builder/botania/ + utils/BotaniaIngredients), lang (3), materials, tags
-|-- event/                    # 7: EventHandler, ForgeEventHandler, CMKeyBindings, IndexEventHandler, SoulLeechEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
-|-- integration/              # 6: emi/ (CTNHManaEmiPlugin), jade/ (5 providers)
-|-- mixin/                    # 10: ars/ bloodmagic/ botania/ emi/
-|-- networking/               # 5: CMNetworking, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket
-|-- registry/                 # 27: CMRegistrate + items/ (CMFuelItems) + multiblock/ (5) + sounds/ (2)
+|-- data/                     # 50: CMDatagen, ManaData, recipes (31 + builders), lang (3), materials, tags
+|-- event/                    # 8: EventHandler, ForgeEventHandler, CMKeyBindings, IndexEventHandler, SoulLeechEventHandler, TaintedBloodWeepingEyeEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
+|-- integration/              # 6: emi/ (1), jade/ (5)
+|-- mixin/                    # 15: ae2/ (2), ars/ (4), bloodmagic/ (2), botania/ (6), emi/ (1)
+|-- networking/               # 6: CMNetworking, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket, ZenithInvadePacket
+|-- registry/                 # 27: CMRegistrate + items/ (1) + multiblock/ (5) + sounds/ (2)
 `-- utils/                    # 3: CTNHManaUtils, EnvUtils, ModUtils
 ```
 
@@ -31,14 +31,15 @@ src/main/java/com/moguang/ctnhmana/
 | GT addon | `CTNHManaGTAddon.java` |
 | Config | `CMConfig.java` |
 | Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
-| Multiblocks | `common/multiblock/` (28 machines) |
+| Multiblocks | `common/multiblock/` (29 machines) |
 | Rituals | `common/ritualtypes/` (5), `common/ritual/` (2) |
 | Magic items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, ...) |
 | Registries | `registry/` (27) |
-| Recipe builders | `data/recipe/builder/bloodmagic/`, `data/recipe/builder/botania/` |
-| Networking | `networking/packets/` (5) |
+| Recipe builders | `data/recipe/builder/bloodmagic/`, `data/recipe/builder/botania/`, `data/recipe/builder/apotheosis/` |
+| Networking | `networking/packets/` (6) |
 | Client UI/Ponder | `client/` (radial menu, ponder/mana/ scenes) |
 | Mixins/integrations | `mixin/`, `integration/emi/`, `integration/jade/` |
+| Zenith invasion | `common/event/zenith/`, `client/ZenithInvadeClient.java` |
 
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
@@ -46,7 +47,7 @@ Read the matching domain guide before editing the corresponding source area.
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
 | `api` | `docs/CTNH-Mana/api/AGENTS.md` | Pattern helpers, effects, recipe/network APIs |
-| `client` | `docs/CTNH-Mana/client/AGENTS.md` | Caduceus radial menu, Ponder plugin/scenes/tags |
+| `client` | `docs/CTNH-Mana/client/AGENTS.md` | Caduceus radial menu, Ponder plugin/scenes/tags, ZenithInvadeClient |
 | `common` | `docs/CTNH-Mana/common/AGENTS.md` | Proxy, rituals, items, machines, multiblocks, recipe builders |
 | `data` | `docs/CTNH-Mana/data/AGENTS.md` | Recipe generators, lang, materials, tags |
 | `event` | `docs/CTNH-Mana/event/AGENTS.md` | EventHandler wiring |

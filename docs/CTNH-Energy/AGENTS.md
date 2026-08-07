@@ -1,7 +1,7 @@
 # CTNH-ENERGY MODULE
 
 ## OVERVIEW
-CTNH-Energy adds AE2/energy integration, pattern buffer machinery, quantum computer systems, AE2 mixins, EMI/Jade integration, and generated resources under mod id `ctnhenergy` (171 Java files).
+CTNH-Energy adds AE2/energy integration, pattern buffer machinery, quantum computer systems, AE2 mixins, EMI/Jade integration, and generated resources under mod id `ctnhenergy` (168 Java files).
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,7 @@ src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 |-- api/                      # 6: CEPredicates, EUItemContext, IAutoMultiplyCPU, IBlockStateChangeIgnored, IGhostKeyTarget, IPatternProviderLogic
 |-- client/                   # ClientProxy, EUKeyRenderHandler, Ponder (plugin/scenes/tags + 15 ae2 scenes)
 |-- common/                   # CommonProxy, CESettings, AE2/EU logic (me/), machines, quantum computer
-|   |-- me/                   # EUKey/VoltageKey (key/), EU cells (cell/), EU P2P (parts/p2p/), EnergyDistributeService (service/), EUContainerItemStrategy (strategy/)
+|   |-- me/                   # key/ (EUKey, EUKeyType, VoltageKey, VoltageKeyType), cell/ (EUCellInventory, EuCellHandler), parts/p2p/ (EUP2PTunnelPart), service/ (EnergyDistributeService, IEnergyDistributor), strategy/ (EUContainerItemStrategy + context/ CarriedContextEU, PlayerInvContextEU)
 |   |-- machine/              # energyhatch/ (3), gui/ (6 widgets), handler/ (3), iohatch/ (3), patternbuffer/ (MEPatternBuffer), utils/ (2)
 |   |-- quantumcomputer/      # cpu/ (5), gui/ (4), machine/ (QuantumComputerMultiblockMachine), port/ (2)
 |   |-- block/                # QuantumComputerCasingBlock
@@ -19,11 +19,11 @@ src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 |   `-- pattern/              # DynamicProcessingPattern
 |-- data/                     # CEDatagen, lang/ (ChineseLangHandler, EnglishLangHandler)
 |-- event/                    # ForgeEventHandler, ForgeClientEventHandler
-|-- integration/              # emi/ (CEEMIPlugin, EUEmiStack, ...), jade/ (4 providers), ldlib/ (CELDLibPlugin)
+|-- integration/              # emi/ (CEEMIPlugin, EUEmiStack, EUEmiStackSerializer, EUStackConverter), jade/ (AEDeviceEUProvider, AdMEPatternBufferProvider, AdMEPatternBufferProxyProvider, CTNHEnergyJadePlugin), ldlib/ (CELDLibPlugin)
 |-- mixin/                    # 49 files: ae2/ (8 subpackages), aecs/, betterP2P/, gtm/, omni/, pcc/, datagen/
 |-- network/                  # packets/QCOpenCPUMenuPacket, syncdata/AEKeyPayLoad
 |-- registry/                 # 9: CERegistrate, CEItems, CEBlocks, CEMachines, CEMultiblock, CERecipeTypes, AEMenus, CENetWorking, CECreativeModeTabs
-`-- utils/                    # 12: CEDrawHelper, MEConfigUtil, ProviderRecord, button/ (4), ...
+`-- utils/                    # 12: CEDrawHelper, CEUtil, MEConfigUtil, CEPatternProviderTarget, ProviderRecord, FakePccCard, FakeSizedIntList, TempColorSprayBehaviour, button/ (BlitterButton, Blitters, CETextures, ToggleBlitterButton)
 ```
 
 ## WHERE TO LOOK

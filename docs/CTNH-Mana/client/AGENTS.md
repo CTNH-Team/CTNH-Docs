@@ -1,12 +1,12 @@
 # CTNH-MANA CLIENT DOMAIN
 
 ## OVERVIEW
-Caduceus radial menu plus Mana-owned Ponder plugin, tags, scenes, adapter builder, models, and rendering (32 Java files).
+Caduceus radial menu plus Mana-owned Ponder plugin, tags, scenes, adapter builder, models, rendering, and Zenith invasion client mirror (33 Java files).
 
 ## STRUCTURE
 ```text
 client/
-|-- ClientProxy.java, ZenithMatrixEffect.java
+|-- ClientProxy.java, ZenithInvadeClient.java, ZenithMatrixEffect.java
 |-- gui/radial/                # CaduceusRadialMenu, RadialMenu, RadialMenuScreen, RadialMenuSlot
 |-- model/                     # CMModels, MagicCubeModel, ModelBase, ModelDefinition, StarCakeBlockModel, StarCakeItemModel
 |-- ponder/                    # CTNHManaPonderPlugin, CTNHManaPonderSceneBuilder, CTNHManaPonderScenes, CTNHManaPonderTags
@@ -26,6 +26,7 @@ client/
 | Ponder adapter builder | `client/ponder/CTNHManaPonderSceneBuilder.java` |
 | Models | `client/model/` (CMModels, MagicCubeModel, StarCake models) |
 | Renderers | `client/render/` (11 renderers) |
+| Zenith invasion client | `client/ZenithInvadeClient.java` |
 
 ## CONVENTIONS
 - Ponder scenes use `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` with text embedded directly in scene files.
@@ -41,6 +42,7 @@ Applies to `src/main/java/com/moguang/ctnhmana/client` and its child packages.
 
 ## READ WHEN
 - Adding or changing Mana Ponder scenes, the Caduceus radial menu, or rendering.
+- Working on Zenith invasion client effects.
 
 ## SOURCE OF TRUTH
 - `client/ponder/CTNHManaPonderPlugin.java` and `event/EventHandler.gatherData()` wiring.

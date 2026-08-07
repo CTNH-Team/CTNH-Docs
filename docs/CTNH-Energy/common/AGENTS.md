@@ -1,7 +1,7 @@
 # CTNH-ENERGY COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Energy (55 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
+Shared implementation for Energy (52 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
 
 ## STRUCTURE
 ```text
@@ -41,7 +41,7 @@ common/
 | Settings | `common/CESettings.java` |
 | AE2/EU keys/cells/P2P | `common/me/key/`, `common/me/cell/`, `common/me/parts/p2p/` |
 | Energy distribution | `common/me/service/` (EnergyDistributeService, IEnergyDistributor) |
-| Container strategy | `common/me/strategy/` (+ context/) |
+| Container strategy | `common/me/strategy/` (+ `context/`) |
 | Machine EU handler | `common/me/MEMachineEUHandler.java` |
 | Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
 | Energy hatches | `common/machine/energyhatch/` (MEEnergyPartMachine, MESubstationHatch) |
