@@ -30,7 +30,11 @@ def _write_github_output(kv: Dict[str, str]) -> None:
         return
     with open(out_path, "a", encoding="utf-8") as f:
         for k, v in kv.items():
-            f.write(f"{k}={v}\n")
+            if "\n" in v:
+                # 多行值必须用 heredoc 语法，否则 GitHub 无法解析后续行
+                f.write(f"{k}<<CTNH_DOCS_EOF\n{v}\nCTNH_DOCS_EOF\n")
+            else:
+                f.write(f"{k}={v}\n")
 
 
 def _today_utc() -> str:
