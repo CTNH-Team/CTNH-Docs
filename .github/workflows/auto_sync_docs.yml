@@ -38,6 +38,23 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update submodules to latest dev
+        run: |
+          # actions/checkout 只会把子模块切到主仓库 master 记录的 gitlink 提交；
+          # 而同步脚本轮询的是各子模块 dev 分支的最新提交。
+          # 这里把每个子模块强制切到其分支最新，保证 LLM 扫描的源码与检测到的提交一致。
+          cd workspace/modules-src
+          for m in CTNH-Core CTNH-Lib CTNH-Bio CTNH-Energy CTNH-Mana CTNH-Astral CTPP Create-Enough-Items; do
+            echo "== updating $m =="
+            git -C "modules/$m" fetch origin dev
+            git -C "modules/$m" checkout -B dev origin/dev
+          done
+          # GregTech-Modern 是 vendored 依赖，不参与 LLM 扫描，但保持源码树完整。
+          # 注意：其远程默认分支是 ctnh（.gitmodules 中声明的 dev 已过时）。
+          echo "== updating GregTech-Modern =="
+          git -C "modules/GregTech-Modern" fetch origin ctnh
+          git -C "modules/GregTech-Modern" checkout -B ctnh origin/ctnh
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -59,12 +76,13 @@ jobs:
         id: sync_script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # LLM 凭据：任选一种风格。OpenAI 兼容: LLM_API_KEY + BASE_URL + MODEL_NAME;
+          # LLM 凭据：任选一种风格。OpenAI 兼容: LLM_API_KEY + OPENAI_API_BASE + MODEL_NAME;
           # Gemini 原生: LLM_API_KEY + (可选 BASE_URL=https://generativelanguage.googleapis.com)
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BASE_URL: ${{ secrets.BASE_URL }}
+          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
           MODEL_NAME: ${{ secrets.MODEL_NAME }}
           GEMINI_API_VERSION: ${{ vars.GEMINI_API_VERSION || 'v1beta' }}
           LLM_API_STYLE: ${{ vars.LLM_API_STYLE || 'auto' }}

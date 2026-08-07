@@ -14,8 +14,18 @@ def _get_int_env(name: str, default: int) -> int:
 
 class Config:
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
-    GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
-    BASE_URL = (os.getenv("BASE_URL") or os.getenv("OPENAI_API_BASE") or "https://generativelanguage.googleapis.com").strip()
+    # API Key 优先级: LLM_API_KEY > GEMINI_API_KEY > OPENAI_API_KEY
+    LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
+    GEMINI_API_KEY = (LLM_API_KEY or os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+    # BASE_URL 优先级: BASE_URL > OPENAI_API_BASE > 自动推断
+    _base_url = os.getenv("BASE_URL") or os.getenv("OPENAI_API_BASE") or ""
+    if not _base_url:
+        # 未显式指定端点时：有 GEMINI_API_KEY 走 Gemini 官方，否则默认 OpenAI 兼容端点
+        if os.getenv("GEMINI_API_KEY") and not os.getenv("OPENAI_API_KEY"):
+            _base_url = "https://generativelanguage.googleapis.com"
+        else:
+            _base_url = "https://api.openai.com/v1"
+    BASE_URL = _base_url.strip()
     GEMINI_API_VERSION = os.getenv("GEMINI_API_VERSION", "v1beta").strip()
     MODEL_NAME = (os.getenv("MODEL_NAME") or "gemini-2.0-flash").strip()
     LLM_API_STYLE = os.getenv("LLM_API_STYLE", "auto").strip()

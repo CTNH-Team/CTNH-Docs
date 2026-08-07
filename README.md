@@ -61,9 +61,12 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_API_KEY` 或 `OPENAI_API_KEY` 或 `GEMINI_API_KEY` | 是 | LLM 凭据（OpenAI 兼容或 Gemini 均可） |
-| `BASE_URL` | 否 | LLM API 基址，默认 `https://generativelanguage.googleapis.com` |
-| `MODEL_NAME` | 否 | 默认 `gemini-2.0-flash` |
+| `LLM_API_KEY` 或 `OPENAI_API_KEY` 或 `GEMINI_API_KEY` | 是 | LLM 凭据（优先级：`LLM_API_KEY` > `GEMINI_API_KEY` > `OPENAI_API_KEY`） |
+| `OPENAI_API_BASE` | 否 | OpenAI 兼容 API 基址（聚合站/代理），如 `https://my-proxy.example.com/v1` |
+| `BASE_URL` | 否 | 显式覆盖 API 基址（优先于 `OPENAI_API_BASE`） |
+| `MODEL_NAME` | 否 | 默认 `gemini-2.0-flash`；用 OpenAI 时设为你使用的模型名 |
+
+端点自动推断：显式 `BASE_URL`/`OPENAI_API_BASE` > 仅 `GEMINI_API_KEY` 时用 Gemini 官方 > 其余默认 OpenAI 兼容（`https://api.openai.com/v1`）。
 | `GITHUB_TOKEN` | 自动 | PR 创建与子模块 checkout（公开仓库够用） |
 
 ### 手动触发
