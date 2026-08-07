@@ -1,8 +1,9 @@
 name: Auto Sync Docs
 
 on:
-  repository_dispatch:
-    types: [sync-docs] # 由 CTNH-Modules 的 notify_docs workflow 在主仓库有实质提交时触发
+  schedule:
+    # 轮询检测 CTNH-Modules 主仓库与子模块的新提交；无变化时秒退（见 check_pending 步骤）
+    - cron: '*/30 * * * *'
   workflow_dispatch: # 手动触发
     inputs:
       force_latest:
@@ -28,7 +29,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Check pending updates
+        id: pending
+        env:
+          # 读公开仓库 API 足够；GITHUB_TOKEN 提高限速（5000/h），无需任何 PAT
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_LATEST: ${{ inputs.force_latest }}
+        run: python scripts/check_pending.py
+
       - name: Checkout CTNH-Modules (with submodules)
+        if: steps.pending.outputs.has_updates == 'true'
         uses: actions/checkout@v4
         with:
           repository: CTNH-Team/CTNH-Modules
@@ -39,6 +58,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update submodules to latest dev
+        if: steps.pending.outputs.has_updates == 'true'
         run: |
           # actions/checkout 只会把子模块切到主仓库 master 记录的 gitlink 提交；
           # 而同步脚本轮询的是各子模块 dev 分支的最新提交。
@@ -55,16 +75,8 @@ jobs:
           git -C "modules/GregTech-Modern" fetch origin ctnh
           git -C "modules/GregTech-Modern" checkout -B ctnh origin/ctnh
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
       - name: Debug Environment Variables
+        if: steps.pending.outputs.has_updates == 'true'
         run: |
           echo "Checking environment variables (presence only):"
           [ -n "$GITHUB_TOKEN" ] && echo "GITHUB_TOKEN is set" || echo "GITHUB_TOKEN is NOT set"
@@ -73,6 +85,7 @@ jobs:
           [ -n "$MODEL_NAME" ] && echo "MODEL_NAME is set" || echo "MODEL_NAME is NOT set"
 
       - name: Run sync script
+        if: steps.pending.outputs.has_updates == 'true'
         id: sync_script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

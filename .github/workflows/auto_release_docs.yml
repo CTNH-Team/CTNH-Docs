@@ -1,8 +1,9 @@
 name: Auto Release Docs
 
 on:
-  repository_dispatch:
-    types: [sync-docs] # 由 CTNH-Modules 的 notify_docs workflow 在主仓库有实质提交时触发
+  schedule:
+    # 轮询检测：check_release.py 内部判断"同一天已发布则跳过"，无新发布时不创建 release
+    - cron: '*/30 * * * *'
   workflow_dispatch: # 手动构建
     inputs:
       force:
@@ -32,7 +33,18 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Check pending updates
+        id: pending
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/check_pending.py
+
       - name: Build skill package and check release status
+        if: steps.pending.outputs.has_updates == 'true'
         id: check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

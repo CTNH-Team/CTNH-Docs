@@ -30,7 +30,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 ## Skill Release（Auto Release Docs）
 
-`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 在 CTNH-Modules 主仓库有实质提交（repository_dispatch）或手动触发时构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。`prompts/` 仅供仓库内 CI 使用，不随 skill 包分发。
+`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 轮询检测到 CTNH-Modules 有新提交（或手动触发）时构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。`prompts/` 仅供仓库内 CI 使用，不随 skill 包分发。
 
 - 同一天已发布则跳过（手动触发可带 `force` 覆盖）
 - 下载：`https://github.com/CTNH-Team/CTNH-Docs/releases/latest`
@@ -44,10 +44,10 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 | 触发 | 说明 |
 |------|------|
-| `repository_dispatch` | 主模块 CTNH-Modules 有**非子模块指针**的提交 push 到 `master` 时，由 `notify_docs.yml` 触发（推荐） |
+| `schedule`（每 30 分钟） | 本仓库自行轮询 CTNH-Modules 主仓库与 8 个子模块的新提交（`check_pending.py` 先检测，无变化秒退，不消耗 LLM/checkout） |
 | `workflow_dispatch` | 手动触发；Sync 可带 `force_latest`，Release 可带 `force` |
 
-注意：主模块 push 若**仅包含子模块指针更新**（`modules/<Name>` 顶层路径），`notify_docs.yml` 会跳过，不触发同步/发布。
+采用**轮询而非上游 dispatch**：GitHub 的 `GITHUB_TOKEN` 无法跨仓库触发 `repository_dispatch`（需要额外 PAT），而读取公开仓库提交无需任何 token。`state.json` 记录各仓库 `last_sha` 增量对比，主仓库提交（不含子模块指针更新语义，指针更新不会产生文档差异）与子模块提交都会触发检查。
 
 ### 工作流
 
@@ -67,7 +67,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 | `MODEL_NAME` | 否 | 默认 `gemini-2.0-flash`；用 OpenAI 时设为你使用的模型名 |
 
 端点自动推断：显式 `BASE_URL`/`OPENAI_API_BASE` > 仅 `GEMINI_API_KEY` 时用 Gemini 官方 > 其余默认 OpenAI 兼容（`https://api.openai.com/v1`）。
-| `GITHUB_TOKEN` | 自动 | PR 创建与子模块 checkout（公开仓库够用） |
+| `GITHUB_TOKEN` | 自动 | 轮询公开仓库 API 限速（5000/h）与 PR 创建；公开仓库读取无需 PAT |
 
 ### 手动触发
 
