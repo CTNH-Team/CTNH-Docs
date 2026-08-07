@@ -25,8 +25,16 @@ scripts/                      # 自动同步脚本
 
 ## 获取方式
 
-CTNH-Modules 的代理（agent）不直接读取本仓库文件，通过 webfetch 获取：
+CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓库 latest release 下载），skill 不可用时 webfetch 兜底：
 `https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/<branch>/docs/<Module>/AGENTS.md`
+
+## Skill Release（Auto Release Docs）
+
+`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 每 6 小时（及手动触发）构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/` + `prompts/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。
+
+- 同一天已发布则跳过（手动触发可带 `force` 覆盖）
+- 下载：`https://github.com/CTNH-Team/CTNH-Docs/releases/latest`
+- zip 解压后得到 `ctnh-docs/` 目录（SKILL.md 入口），放入 skills 目录即作为 `ctnh-docs` skill 使用
 
 ## 自动同步（Auto Sync Docs）
 
