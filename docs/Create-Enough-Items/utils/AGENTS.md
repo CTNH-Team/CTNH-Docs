@@ -26,7 +26,8 @@ utils/emi/
 | Voltage filtering | `utils/emi/voltage/CEIVoltageRecipeFilter.java` |
 
 ## CONVENTIONS
-- `CEICollapsibleGroups` reads sidebar grouping rules and persists local expanded/collapsed state under `config/cei/collapsible_emi_groups.json`.
+- `CEICollapsibleGroups.loadRules()` is `public static` and idempotent (`rulesLoaded` guard); it is called eagerly from the `ClientProxy` constructor so grouping rules compile before any sidebar rebuild. `rebuild()` no longer triggers rule loading.
+- `CEICollapsibleGroups` reads sidebar grouping rules from `src/main/resources/assets/cei/emi/emi_collapsible_groups.json` and persists local expanded/collapsed state under `config/cei/collapsible_emi_groups.json`.
 - `CEIFeaturedRecipes`, `CEIDuplicateRecipes`, `CEIAssociatedSearch`, and `CEIVoltageRecipeFilter` back the recipe-page buttons described in the README.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 - `ForgeRegistries` usage here is for EMI rule JSON string-ID matching (reading rule files), not recipe item resolution.
@@ -34,6 +35,7 @@ utils/emi/
 ## ANTI-PATTERNS
 - Do not edit runtime `config/cei/*.json` to change defaults; edit the static rule files in `src/main/resources/assets/cei/emi/`.
 - Do not treat voltage filtering as generic EMI filtering; it only handles GTCEu `GTEmiRecipe` paths.
+- Do not re-add `loadRules()` to `rebuild()`; rule bootstrap is owned by the `ClientProxy` constructor.
 
 ## SCOPE
 Applies to `src/main/java/com/ctnh/cei/utils` and its child packages.
@@ -46,5 +48,6 @@ Applies to `src/main/java/com/ctnh/cei/utils` and its child packages.
 
 ## WORKFLOW
 1. Check the matching feature class before editing behavior.
-2. Validate rule JSON against the accepted selector syntax.
-3. Run `:modules:Create-Enough-Items:build`; validate the EMI surface at runtime.
+2. For collapsible-group rule timing, verify both `CEICollapsibleGroups.loadRules()` and the `ClientProxy` constructor call site.
+3. Validate rule JSON against the accepted selector syntax.
+4. Run `:modules:Create-Enough-Items:build`; validate the EMI surface at runtime.

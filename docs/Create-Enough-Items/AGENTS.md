@@ -21,6 +21,7 @@ src/main/java/com/ctnh/cei/
 |---------|----------|
 | Mod entry | `CreateEnoughItems.java` |
 | Proxies | `client/ClientProxy.java`, `common/CommonProxy.java` |
+| Collapsible rule bootstrap | `client/ClientProxy.java` (constructor -> `utils/emi/collapsible/CEICollapsibleGroups.loadRules()`) |
 | Registrate | `registry/CEIRegistrate.java` |
 | Datagen hook | `data/CEIDatagen.java` |
 | EMI mixins | `mixin/emi/` (8), `mixin/emi/accessor/GTEmiRecipeAccessor.java` |
@@ -48,6 +49,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Namespace is `com.ctnh.cei`; class prefixes use `CEI`.
 - This module depends on `:modules:CTNH-Lib` via `dependencies.gradle`; it does not depend on CTNH-Core.
 - User toggle state is runtime config under `config/cei/`; built-in defaults are static JSON under `src/main/resources/assets/cei/emi/`.
+- Collapsible group rules are loaded eagerly at client bootstrap: the `ClientProxy` constructor calls `CEICollapsibleGroups.loadRules()`; `rebuild()` does not lazy-load them.
 - Mixin targets include EMI, Create JEI, TMRV, and GTCEu EMI classes; inspect target method/field names before changing injection points.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 

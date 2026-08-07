@@ -34,22 +34,27 @@ registry/
 | Recipe types/modifiers/conditions | `registry/CTNHRecipeTypes.java`, `registry/CTNHRecipeModifiers.java`, `registry/CTNHRecipeConditions.java`, `registry/CTNHRecipeCategories.java` |
 | Enchantments | `registry/adventure/CTNHEnchantments.java` |
 | Jade | `registry/jade/CTNHJadePlugin.java` |
+| Block names/lang | `registry/CTNHBlocks.java` (cnlang for block display names) |
 
 ## CONVENTIONS
 - Registry classes use the `CTNH` prefix.
 - Large multiblock registry files use `spotless:off/on`; preserve the local formatting boundary.
 - `CTNHCoreGTAddon.initializeAddon()` initializes items, blocks, block entities, and block maps; later hooks register tag prefixes, elements, ore/fluid veins, worldgen layers, recipes, and recipe removals.
 - `CTNHRegistrate` and `CTNHRegistration` coexist; treat `CTNHRegistration` as the entry that wires the registrate, not a duplicate.
+- Block display names are registered through `createCasingBlock(..., cnlang)` in `CTNHBlocks`; keep block registration and lang in the same file rather than scattering raw lang JSON.
+- When referencing items/blocks/fluids, MUST use direct registration objects (static field references like `GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`); never `ResourceLocation` string parsing + `ForgeRegistries` lookups except where no registration object exists. See root AGENTS.md CONVENTIONS.
 
 ## ANTI-PATTERNS
 - Do not manually reformat huge multiblock registry sections protected by Spotless toggles.
 - Do not register the same entry from both registry and CommonProxy paths.
+- Do not hand-edit generated lang JSON for block names when the registrate `cnlang` is the source of truth.
 
 ## SCOPE
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/registry` and its child packages.
 
 ## READ WHEN
 - Adding or changing items, blocks, machines, recipe types, materials, or worldgen registrations in Core.
+- Changing block display names/language entries.
 
 ## SOURCE OF TRUTH
 - `registry/CTNHRegistrate.java`, `registry/CTNHRegistration.java`, and `CTNHCoreGTAddon.java` hook order.
