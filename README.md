@@ -30,7 +30,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 ## Skill Release（Auto Release Docs）
 
-`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 在 CTNH-Modules 主仓库有实质提交（repository_dispatch）或手动触发时构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/` + `prompts/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。
+`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 在 CTNH-Modules 主仓库有实质提交（repository_dispatch）或手动触发时构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。`prompts/` 仅供仓库内 CI 使用，不随 skill 包分发。
 
 - 同一天已发布则跳过（手动触发可带 `force` 覆盖）
 - 下载：`https://github.com/CTNH-Team/CTNH-Docs/releases/latest`

@@ -56,9 +56,9 @@ def _latest_release_tag(repo: str, token: str) -> Optional[str]:
     return max(tags) if tags else None
 
 
-def _build_skill_package(docs_root: str = "docs", prompts_root: str = "prompts",
+def _build_skill_package(docs_root: str = "docs",
                          staging: str = "skill/ctnh-docs") -> None:
-    """构建 skill 包目录：SKILL.md + docs/ + prompts/。"""
+    """构建 skill 包目录：SKILL.md + docs/（prompts/ 不打包，仅供仓库内 CI 使用）。"""
     today = _today_utc()
     if os.path.exists(staging):
         shutil.rmtree(staging)
@@ -67,17 +67,13 @@ def _build_skill_package(docs_root: str = "docs", prompts_root: str = "prompts",
     # 复制 docs/ -> skill/ctnh-docs/docs/
     if os.path.isdir(docs_root):
         shutil.copytree(docs_root, os.path.join(staging, "docs"))
-    # 复制 prompts/ -> skill/ctnh-docs/prompts/
-    if os.path.isdir(prompts_root):
-        shutil.copytree(prompts_root, os.path.join(staging, "prompts"))
 
     # 生成 SKILL.md
     skill_md = f"""---
 name: ctnh-docs
 description: |
   CTNH-Modules 层级知识库（AGENTS.md 指南）的权威参考。包含各模块（CTNH-Core、CTNH-Lib、
-  CTNH-Bio、CTNH-Energy、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items）的主文档与域文档，
-  以及 init-deep 更新模式提示词。
+  CTNH-Bio、CTNH-Energy、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items）的主文档与域文档。
 
   在以下场景使用本 skill：
   - 修改 CTNH 模块代码前，需要读取对应模块的 AGENTS.md 指南
@@ -100,7 +96,6 @@ CTNH-Modules 的层级知识库。每个模块是独立 git submodule；本 skil
 
 - 读取 `docs/<Module>/AGENTS.md` 了解模块入口、注册、约定与反模式。
 - 读取 `docs/<Module>/<domain>/AGENTS.md` 了解具体域（api/client/common/data/event/integration/mixin/registry/utils 等）。
-- 按 `prompts/init_deep_update.md` 的更新模式维护文档。
 - 变更代码前先读对应模块指南，遵守其中的 CONVENTIONS 与 ANTI-PATTERNS。
 
 ## Module routing
@@ -170,8 +165,7 @@ def main() -> int:
         f"附件为 skill 包（`ctnh-docs/` 目录），解压到 skills 目录后即可作为 "
         f"`ctnh-docs` skill 使用，包含：\n"
         f"- `SKILL.md`：skill 入口与路由表\n"
-        f"- `docs/`：8 个模块的层级 AGENTS.md（模块主文档 + 域文档）\n"
-        f"- `prompts/`：init-deep 更新模式提示词\n\n"
+        f"- `docs/`：8 个模块的层级 AGENTS.md（模块主文档 + 域文档）\n\n"
         f"下载地址（latest）：https://github.com/{repo}/releases/latest"
     )
 
