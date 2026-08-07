@@ -1,10 +1,9 @@
 name: Auto Release Docs
 
 on:
-  schedule:
-    # GitHub Actions cron 使用 UTC。每 6 小时检查一次
-    - cron: "0 */6 * * *"
-  workflow_dispatch:
+  repository_dispatch:
+    types: [sync-docs] # 由 CTNH-Modules 的 notify_docs workflow 在主仓库有实质提交时触发
+  workflow_dispatch: # 手动构建
     inputs:
       force:
         description: 'Force release even if today is already released'

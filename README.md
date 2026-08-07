@@ -30,7 +30,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 ## Skill Release（Auto Release Docs）
 
-`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 每 6 小时（及手动触发）构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/` + `prompts/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。
+`docs/` 指南按 **skill 格式**打包发布：`auto_release_docs.yml` 在 CTNH-Modules 主仓库有实质提交（repository_dispatch）或手动触发时构建 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `docs/` + `prompts/`），以**日期**为版本号发布到 GitHub Release（tag 形如 `2026-08-07`）。
 
 - 同一天已发布则跳过（手动触发可带 `force` 覆盖）
 - 下载：`https://github.com/CTNH-Team/CTNH-Docs/releases/latest`
@@ -44,9 +44,10 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 | 触发 | 说明 |
 |------|------|
-| `repository_dispatch` | 主模块 CTNH-Modules push 到 `master` 时由 `notify_docs.yml` 触发（推荐） |
-| `schedule` | 每 6 小时兜底轮询（cron `0 */6 * * *` UTC） |
-| `workflow_dispatch` | 手动触发，可带 `force_latest` |
+| `repository_dispatch` | 主模块 CTNH-Modules 有**非子模块指针**的提交 push 到 `master` 时，由 `notify_docs.yml` 触发（推荐） |
+| `workflow_dispatch` | 手动触发；Sync 可带 `force_latest`，Release 可带 `force` |
+
+注意：主模块 push 若**仅包含子模块指针更新**（`modules/<Name>` 顶层路径），`notify_docs.yml` 会跳过，不触发同步/发布。
 
 ### 工作流
 
