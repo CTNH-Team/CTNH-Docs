@@ -27,6 +27,7 @@ utils/emi/
 
 ## CONVENTIONS
 - `CEICollapsibleGroups` reads sidebar grouping rules and persists local expanded/collapsed state under `config/cei/collapsible_emi_groups.json`.
+- `CEICollapsibleGroups.loadRules()` is now invoked from `ClientProxy` constructor (early) rather than lazily in `rebuild()`, ensuring grouping rules are available before the first EMI UI interaction.
 - `CEIFeaturedRecipes`, `CEIDuplicateRecipes`, `CEIAssociatedSearch`, and `CEIVoltageRecipeFilter` back the recipe-page buttons described in the README.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 - `ForgeRegistries` usage here is for EMI rule JSON string-ID matching (reading rule files), not recipe item resolution.
