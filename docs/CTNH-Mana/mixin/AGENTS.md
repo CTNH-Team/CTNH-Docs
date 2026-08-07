@@ -1,23 +1,25 @@
 # CTNH-MANA MIXIN DOMAIN
 
 ## OVERVIEW
-Ars Nouveau, Blood Magic, Botania, and EMI compatibility mixins (10 Java files).
+Ars Nouveau, Blood Magic, Botania, AE2, and EMI compatibility mixins (15 Java files).
 
 ## STRUCTURE
 ```text
 mixin/
-|-- ars/                       # MixinEmiLecternRecipeHandler, StoredItemStackMixin
+|-- ae2/                       # WirelessTerminalItemMixin, WirelessTerminalMenuHostMixin
+|-- ars/                       # MixinEmiLecternRecipeHandler, PotionJarMixin, PotionTankMixin, StoredItemStackMixin
 |-- bloodmagic/                # BloodAltarMixin, TileAltarAccessor
-|-- botania/                   # BotaniaEntitiesMixin, FunctionalFlowerBaseAccessor, ManaPoolBlockEntityMixin, MixinForgePacketHandler, PetruniaMixin
+|-- botania/                   # BotaniaEntitiesMixin, FunctionalFlowerBaseAccessor, ManaPoolBlockEntityMixin, MixinForgePacketHandler, PetruniaMixin, WitherAconiteMixin
 `-- emi/                       # TagEmiIngredientMixin
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
+| AE2 patches | `mixin/ae2/` |
 | Ars Nouveau patches | `mixin/ars/` |
 | Blood Magic patches | `mixin/bloodmagic/` (incl. TileAltarAccessor) |
-| Botania patches | `mixin/botania/` (5) |
+| Botania patches | `mixin/botania/` (6) |
 | EMI patches | `mixin/emi/TagEmiIngredientMixin.java` |
 | Mixin config | `src/main/resources/ctnhmana.mixins.json` |
 
@@ -32,7 +34,7 @@ mixin/
 Applies to `src/main/java/com/moguang/ctnhmana/mixin` and `src/main/resources/ctnhmana.mixins.json`.
 
 ## READ WHEN
-- Patching Ars Nouveau, Blood Magic, Botania, or EMI behavior.
+- Patching Ars Nouveau, Blood Magic, Botania, AE2, or EMI behavior.
 
 ## SOURCE OF TRUTH
 - `src/main/resources/ctnhmana.mixins.json` and the mixin classes in `mixin/`.

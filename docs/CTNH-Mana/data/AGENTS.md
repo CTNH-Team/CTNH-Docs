@@ -1,7 +1,7 @@
 # CTNH-MANA DATA DOMAIN
 
 ## OVERVIEW
-Datagen source for `src/generated/resources` (47 Java files): recipe generators (30), lang, materials, and tags.
+Datagen source for `src/generated/resources` (50 Java files): recipe generators (31), lang, materials, tags, and builders.
 
 ## STRUCTURE
 ```text
@@ -10,8 +10,9 @@ data/
 |-- lang/                      # AHCCRuneLang, ChineseLangHandler, EnglishLangHandler
 |-- materials/                 # BotaniaMaterials
 |-- recipe/
-|   |-- 30 top-level classes: ManaReactorRecipes, HellForgeRecipes, WishingWillRecipes, BloodAltarRecipes, BotaniaRecipes, ElvenTradeRecipes, ManaCondenserRecipes, MeteorCapturerRecipes, DemonWillGeneratorRecipes, GaiaReactorRecipes, RuneAltarRecipes, TerraPlateRecipes, ZenithRecipes, TwistCollapseRecipes, ManaHatchRecipes, ManaMachineUpgradeRecipes, BeamsRecipes, RitualMechanicalRecipes, RecipeRemoval, ...
+|   |-- 31 top-level classes: ManaReactorRecipes, HellForgeRecipes, WishingWillRecipes, BloodAltarRecipes, BotaniaRecipes, ElvenTradeRecipes, ManaCondenserRecipes, MeteorCapturerRecipes, DemonWillGeneratorRecipes, GaiaReactorRecipes, RuneAltarRecipes, TerraPlateRecipes, ZenithRecipes, TwistCollapseRecipes, ManaHatchRecipes, ManaMachineUpgradeRecipes, BeamsRecipes, RitualMechanicalRecipes, RecipeRemoval, SalvagingRecipes, ...
 |   |-- builder/
+|   |   |-- apotheosis/        # SalvagingRecipeBuilder
 |   |   |-- bloodmagic/        # BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder
 |   |   `-- botania/           # ElfPlateRecipeBuilder, ElvenTradeRecipeBuilder, ManaInfusionRecipeBuilder, PetalRecipeBuilder, RuneAltarRecipeBuilder, RuneRitualRecipeBuilder, TerraPlateRecipeBuilder
 |   `-- utils/                 # BotaniaIngredients
@@ -22,9 +23,10 @@ data/
 | Concern | Location |
 |---------|----------|
 | Datagen entry | `data/CMDatagen.java` |
-| Recipe generation | `data/recipe/` (30 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
+| Recipe generation | `data/recipe/` (31 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
 | Blood Magic builders | `data/recipe/builder/bloodmagic/` (BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder) |
 | Botania builders | `data/recipe/builder/botania/` (7 builders) |
+| Apotheosis builders | `data/recipe/builder/apotheosis/SalvagingRecipeBuilder.java` |
 | Botania ingredients | `data/recipe/utils/BotaniaIngredients.java` |
 | Lang | `data/lang/` (incl. AHCCRuneLang) |
 | Materials | `data/materials/BotaniaMaterials.java` |

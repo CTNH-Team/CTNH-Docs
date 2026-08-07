@@ -1,24 +1,26 @@
 # CTNH-MANA API DOMAIN
 
 ## OVERVIEW
-Public API surfaces for Mana (16 Java files): magic multiblock predicates/maps, effects, recipe conditions, and network contracts.
+Public API surfaces for Mana (18 Java files): magic multiblock predicates/maps, effects, recipe conditions, network contracts, and custom logic.
 
 ## STRUCTURE
 ```text
 api/
-|-- effect/                    # 7: BladeUnleashedEffect, IndexTargetEffect, KarmaEffect, KarmaFortunaEffect, ShroudGazeEffect, SoulLeechEffect, WishingFlyEffect
+|-- effect/                    # 8: BladeUnleashedEffect, IndexTargetEffect, KarmaEffect, KarmaFortunaEffect, ShroudGazeEffect, SoulLeechEffect, TaintedBloodEffect, WishingFlyEffect
 |-- mixin/                     # IBloodAltarLogic
 |-- networks/                  # BotaniaEffectPacketExtend, BotaniaExtendEffectType
 |-- pattern/                   # CMBlockMaps, CMPredicates
-`-- recipe/condition/          # BloodAltarCondition, HellForgeCondition, InfusionCellCastingCondition, ZenithCondition
+|-- recipe/condition/          # BloodAltarCondition, HellForgeCondition, InfusionCellCastingCondition, ZenithCondition
+`-- recipe/customlogic/        # IndustrialSalvagingLogic
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
-| Effects | `api/effect/` (7) |
+| Effects | `api/effect/` (8) |
 | Recipe conditions | `api/recipe/condition/` (4) |
+| Custom logic | `api/recipe/customlogic/IndustrialSalvagingLogic.java` |
 | Network APIs | `api/networks/` (Botania packet extensions) |
 | Mixin APIs | `api/mixin/IBloodAltarLogic.java` |
 
