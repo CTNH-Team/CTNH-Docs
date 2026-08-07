@@ -1,0 +1,98 @@
+name: Auto Sync Docs
+
+on:
+  schedule:
+    # GitHub Actions cron 使用 UTC。每 6 小时：00:00, 06:00, 12:00, 18:00
+    - cron: "0 */6 * * *"
+  repository_dispatch:
+    types: [sync-docs] # 由 CTNH-Modules 的 notify workflow 触发
+  workflow_dispatch: # 支持手动触发
+    inputs:
+      force_latest:
+        description: 'Force sync with the latest commit'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-sync-docs
+  cancel-in-progress: false
+
+jobs:
+  auto-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CTNH-Docs
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout CTNH-Modules (with submodules)
+        uses: actions/checkout@v4
+        with:
+          repository: CTNH-Team/CTNH-Modules
+          ref: master
+          path: workspace/modules-src
+          fetch-depth: 50
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking environment variables (presence only):"
+          [ -n "$GITHUB_TOKEN" ] && echo "GITHUB_TOKEN is set" || echo "GITHUB_TOKEN is NOT set"
+          [ -n "$LLM_API_KEY" ] && echo "LLM_API_KEY is set" || echo "LLM_API_KEY is NOT set"
+          [ -n "$BASE_URL" ] && echo "BASE_URL is set" || echo "BASE_URL is NOT set"
+          [ -n "$MODEL_NAME" ] && echo "MODEL_NAME is set" || echo "MODEL_NAME is NOT set"
+
+      - name: Run sync script
+        id: sync_script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # LLM 凭据：任选一种风格。OpenAI 兼容: LLM_API_KEY + BASE_URL + MODEL_NAME;
+          # Gemini 原生: LLM_API_KEY + (可选 BASE_URL=https://generativelanguage.googleapis.com)
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          MODEL_NAME: ${{ secrets.MODEL_NAME }}
+          GEMINI_API_VERSION: ${{ vars.GEMINI_API_VERSION || 'v1beta' }}
+          LLM_API_STYLE: ${{ vars.LLM_API_STYLE || 'auto' }}
+          SYNC_LOOKBACK_HOURS: ${{ vars.SYNC_LOOKBACK_HOURS || '24' }}
+          MODULES_ROOT: workspace/modules-src/modules
+        run: |
+          if [ "${{ inputs.force_latest }}" = "true" ]; then
+            python scripts/main.py --force-latest
+          else
+            python scripts/main.py
+          fi
+
+      - name: Set branch name
+        if: steps.sync_script.outputs.has_updates == 'true'
+        id: vars
+        run: echo "branch=auto-doc-update-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.sync_script.outputs.has_updates == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.vars.outputs.branch }}
+          title: ${{ steps.sync_script.outputs.pr_title }}
+          body: ${{ steps.sync_script.outputs.pr_body }}
+          labels: auto-generated
+          commit-message: "docs: automated sync from CTNH-Modules"
+          base: ${{ github.ref_name }} # 确保指向当前运行的分支
