@@ -19,7 +19,7 @@ data/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Core data | `data/CAElements.java`, `CAMaterials.java`, `CATagPrefixes.java`, `CARecipes.java` |
+| Core data | `data/CAElements.java`, `CAMaterials.java` (incl. Seawater), `CATagPrefixes.java`, `CARecipes.java` |
 | Worldgen root | `data/worldgen/` (CABiomes, CADimensions, CADimensionTypes, CANoiseSetting, CASurfaceRuleData, CAOverworldRegion, CANetherRegion, CADensityFunctions) |
 | Biomes | `data/worldgen/biome/` (AstralBiomes, MoonBiomes, NetherBiomes, BiomeParameters) |
 | Features | `data/worldgen/feature/` (5) |
@@ -30,7 +30,8 @@ data/
 ## CONVENTIONS
 - Worldgen classes are concentrated under `data/worldgen`; dimension classes live directly in the `worldgen` root (no `dimension/` subpackage).
 - Datagen output is mostly dynamic registry/sound provider driven; don't infer missing JSON means missing worldgen.
-- This module currently has no `src/generated/resources`; many material model JSON files are static resources under `src/main/resources`.
+- This module has `src/generated/resources` (lang, blockstates, noise settings); many material model JSON files are static resources under `src/main/resources`.
+- `CAMaterials.Seawater` is the Astral seawater fluid (replaces `GTMaterials.SaltWater`); `GTMateralAdjust` no longer adjusts SaltWater block/textures. Moon dimension default fluid uses `CAMaterials.Seawater` (see `CANoiseSetting`).
 
 ## ANTI-PATTERNS
 - Do not edit one worldgen registry without checking related biome/source/dimension/noise classes.
@@ -39,7 +40,7 @@ data/
 Applies to `src/main/java/com/ctnh/ctnhastral/data` and its child packages.
 
 ## READ WHEN
-- Adding astral materials, worldgen, dimensions, or lang.
+- Adding astral materials, fluids, worldgen, dimensions, or lang.
 
 ## SOURCE OF TRUTH
 - `data/` classes and `CommonProxy.gatherData()` bootstraps.

@@ -42,7 +42,7 @@ src/main/java/com/mo_guang/ctpp/
 | Registrate | `CTPPRegistrate.java`, `CTPPRegistration.java` |
 | API | `api/` (13) |
 | Dynamic contraptions | `dynamicPart/` (10) |
-| KubeJS integration | `integration/kjs/` |
+| KubeJS recipe keys | `CTPPGTAddon.registerRecipeKeys()` (SU_IN/SU_OUT) |
 | Recipes/datagen | `data/recipe/` (top-level, NOT under common/) |
 | Fan processing | `data/recipe/fanprocessing/` (no underscore) |
 | Toolbox system | `common/toolbox/` (13 classes), `network/` (6 packets), `client/` toolbox UI |
@@ -87,7 +87,7 @@ CTPP wraps Create and addon recipe types with datagen-friendly builders. These a
 | `CompactingRecipeBuilder` | `create:compacting` | item/fluid I/O, heated/superheated |
 | `CrushingRecipeBuilder` | `create:crushing` | item I/O with chanced outputs per entry |
 | `CuttingRecipeBuilder` | `create:cutting` | item I/O |
-| `FillingRecipeBuilder` | `create:filling` | item/fluid I/O |
+| `FillingRecipeBuilder` | `create:filling` | item/fluid I/O, supports string fluid IDs |
 | `ItemApplicationRecipeBuilder` | `create:item_application` | item I/O (deployer-style) |
 | `MechanicalCraftingRecipeBuilder` | `create:mechanical_crafting` | shaped pattern with key |
 | `MillingRecipeBuilder` | `create:milling` | item I/O with chanced outputs per entry |
@@ -143,7 +143,7 @@ Read the matching domain guide before editing the corresponding source area.
 | `data` | `docs/CTPP/data/AGENTS.md` | Recipe providers, tags, models |
 | `dynamicPart` | `docs/CTPP/dynamicPart/AGENTS.md` | Moving/rotating contraptions |
 | `event` | `docs/CTPP/event/AGENTS.md` | Forge event handlers |
-| `integration` | `docs/CTPP/integration/AGENTS.md` | KubeJS and JEI integration |
+| `integration` | `docs/CTPP/integration/AGENTS.md` | JEI integration |
 | `mixin` | `docs/CTPP/mixin/AGENTS.md` | Create/GT patches |
 | `network` | `docs/CTPP/network/AGENTS.md` | Toolbox packets |
 | `registry` | `docs/CTPP/registry/AGENTS.md` | Items, blocks, machines, recipe types |

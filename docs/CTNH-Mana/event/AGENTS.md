@@ -1,7 +1,7 @@
 # CTNH-MANA EVENT DOMAIN
 
 ## OVERVIEW
-EventHandler for Mana (7 Java files): machines, multiblocks, recipe types, conditions, materials, tag-prefix ignores, networking, client item properties, datagen, and Mana Ponder lang.
+EventHandler for Mana (8 Java files): machines, multiblocks, recipe types, conditions, materials, tag-prefix ignores, networking, client item properties, datagen, and Mana Ponder lang.
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -11,6 +11,7 @@ EventHandler for Mana (7 Java files): machines, multiblocks, recipe types, condi
 | Key bindings | `event/CMKeyBindings.java` |
 | Index events | `event/IndexEventHandler.java` |
 | Soul leech events | `event/SoulLeechEventHandler.java` |
+| Tainted Blood events | `event/TaintedBloodWeepingEyeEventHandler.java` |
 | Third eye events | `event/ThirdEyeEventHandler.java` |
 | Ring events | `event/YurikoRingEventHandler.java` |
 

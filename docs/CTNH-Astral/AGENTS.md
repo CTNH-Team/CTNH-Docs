@@ -32,11 +32,11 @@ src/main/java/com/ctnh/ctnhastral/
 | Proxies | `client/`, `common/CommonProxy.java` |
 | Oxygen/atmosphere | `common/oxygen/` (OxygenEnvironmentService, OxygenEnvironment, OxygenMachineRules, ...) |
 | Rocket content | `common/entity/RocketContraptionEntity.java`, `common/event/RocketDimensionTravelHandler.java`, `client/RocketLaunchHud.java`, `registry/CARocketBlocks.java`, `registry/CARocketEntityTypes.java`, `common/machine/multiblock/RocketAssemblyPlatformMachine.java` |
-| Core data | `data/CAElements.java`, `CAMaterials.java`, `CATagPrefixes.java`, `CARecipes.java` |
+| Core data | `data/CAElements.java`, `CAMaterials.java` (incl. Seawater), `CATagPrefixes.java`, `CARecipes.java` |
 | Worldgen | `data/worldgen/` (root dimension classes + biome/ feature/ structure/) |
 | Structures/features | `data/worldgen/structure/` (12 classes), `data/worldgen/feature/` (5) |
 | Mixins | `mixin/`, `src/main/resources/ctnhastral.mixins.json` |
-| Resources | `src/main/resources/assets/gtceu/`, `assets/ctnhastral/` |
+| Resources | `src/main/resources/assets/ctnhastral/`, `assets/gtceu/` (legacy), `src/generated/resources/` (lang, blockstates, noise settings) |
 
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
@@ -55,12 +55,13 @@ Read the matching domain guide before editing the corresponding source area.
 - Namespace is `com.ctnh.ctnhastral`; class prefixes generally use `CA`.
 - GT/GMT recipes are runtime dynamic-pack data (`CTNHAstralGTAddon.addRecipes()`); `runData` produces no JSON for them. See root AGENTS.md CONVENTIONS.
 - Item/block/fluid references MUST use direct registration objects (`CABlocks.X`, `CAMaterials.X`, `GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
-- This module currently has no `src/generated/resources`; many material model JSON files are static resources.
+- This module has `src/generated/resources` (lang, blockstates, noise settings, e.g. `seawater.json`, `moon.json`); many material model JSON files are static resources under `src/main/resources`.
 - Worldgen classes are concentrated under `data/worldgen`; dimension classes live directly in the `worldgen` root (no `dimension/` subpackage).
 - Datagen output is mostly dynamic registry/sound provider driven; don't infer missing JSON means missing worldgen.
+- Moon dimension default fluid is `CAMaterials.Seawater` (replacing `GTMaterials.SaltWater`); seawater textures live under `assets/ctnhastral/textures/block/fluids/fluid.seawater*.png`.
 
 ## ANTI-PATTERNS
-- Do not assume assets under `assets/gtceu` were generated; in this module they are under `src/main/resources`.
+- Do not assume assets under `assets/gtceu` are Astral-owned; fluid textures for Astral materials (e.g. seawater) are under `assets/ctnhastral/textures/block/fluids/` in `src/main/resources`.
 - Do not edit one worldgen registry without checking related biome/source/dimension/noise classes.
 - Do not change Ad Astra oxygen/temperature behavior without checking both mixin JSON entries and the upstream API targets.
 
