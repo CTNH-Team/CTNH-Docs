@@ -44,6 +44,8 @@ jobs:
           # 读公开仓库 API 足够；GITHUB_TOKEN 提高限速（5000/h），无需任何 PAT
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FORCE_LATEST: ${{ inputs.force_latest }}
+          # 已有未合并的同步 PR 时跳过本轮，避免同一批提交重复生成/重复开 PR
+          SKIP_IF_OPEN_PR: 'true'
         run: python scripts/check_pending.py
 
       - name: Checkout CTNH-Modules (with submodules)
@@ -111,7 +113,9 @@ jobs:
       - name: Set branch name
         if: steps.sync_script.outputs.has_updates == 'true'
         id: vars
-        run: echo "branch=auto-doc-update-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+        # 固定分支名：peter-evans/create-pull-request 会更新已有同名 PR，
+        # 配合 SKIP_IF_OPEN_PR 保证同一批提交只产生一个 PR，不堆积重复 PR。
+        run: echo "branch=auto-doc-update" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         if: steps.sync_script.outputs.has_updates == 'true'

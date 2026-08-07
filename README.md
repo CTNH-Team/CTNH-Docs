@@ -55,7 +55,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 2. `scripts/monitor.py` 轮询主仓库与 8 个子模块（CTNH-Core/Lib/Bio/Energy/Mana/Astral/CTPP/CEI）分支最新提交，与 `scripts/state.json` 中记录的 `last_sha` 对比
 3. 对每个有新提交的模块，`scripts/doc_gen.py` 将 init-deep 更新模式提示词 + 现有文档 + 源码结构 + 提交 diff 发给 LLM
 4. LLM 返回 `{path, action, content}` 更新清单，脚本写入 `docs/<Module>/`
-5. 有新改动时自动创建 PR（`peter-evans/create-pull-request`）
+5. 有新改动时自动创建 PR（`peter-evans/create-pull-request`，固定分支 `auto-doc-update`）；存在**未合并的同步 PR** 时跳过本轮（`state.json` 的推进依赖 PR 合并，跳过可避免同一批提交重复生成/重复开 PR），手动 `force_latest` 不受此限制
 
 ### 所需 Secrets
 
