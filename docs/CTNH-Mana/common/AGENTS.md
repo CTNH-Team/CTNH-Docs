@@ -1,7 +1,7 @@
 # CTNH-MANA COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Mana (104 Java files, the largest Mana domain): CommonProxy, rituals, items, machines, multiblocks, block entities, events, and recipe builders for Blood Magic/Botania.
+Shared implementation for Mana (105 Java files, the largest Mana domain): CommonProxy, rituals, items, machines, multiblocks, block entities, events, and recipe builders for Blood Magic/Botania.
 
 ## STRUCTURE
 ```text
@@ -24,7 +24,7 @@ common/
 |   |-- manamachineupgrade/    # 8 upgrade items
 |   `-- rune/                  # IRuneItem, RuneElementType, SpireUpgradeRuneItem
 |-- machine/                   # FlowerCakeBlock, FlowerCakeMachine
-|-- multiblock/                # 29 machines: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, ZenithMatrixMachine, EternalGarden, EternalWosMachine, WishingWill, ManaCondenserMachine, ManaFuelInfuserMachine, TwistedFusionMachine, IndustrialAltarMachine, MeteorCaptureMachine, DemonWillMachine, QuasarEye, NicollDysonBeams, ArcaneHighEnergyCompressionReactorCore, IndustrialSalvagingMachine, ...
+|-- multiblock/                # 30 classes: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, ZenithMatrixMachine, EternalGarden, EternalWosMachine, WishingWill, ManaCondenserMachine, ManaFuelInfuserMachine, TwistedFusionMachine, IndustrialAltarMachine, MeteorCaptureMachine, DemonWillMachine, QuasarEye, NicollDysonBeams, ArcaneHighEnergyCompressionReactorCore, IndustrialSalvagingMachine, IndustrialGemInlayMachine, ...
 |-- parts/                     # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch
 |   `-- ManaHatches/           # BloodManaHatch, CreativeManaHatch, SparkManaHatch
 |-- ritual/                    # MachineRitualSoulNetwork, MachineRitualStoneHost
@@ -37,7 +37,8 @@ common/
 | Common proxy | `common/CommonProxy.java` |
 | Rituals | `common/ritualtypes/` (5), `common/ritual/` (2) |
 | Items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, bosssummoner/, ...) |
-| Multiblocks | `common/multiblock/` (29) |
+| Multiblocks | `common/multiblock/` (30) |
+| Industrial gem inlay machine | `common/multiblock/IndustrialGemInlayMachine.java` |
 | Parts | `common/parts/`, `common/parts/ManaHatches/` |
 | Machines | `common/machine/` (FlowerCake) |
 | Block entities | `common/blockentity/flower/` (7), `common/blockentity/machine/` (5) |

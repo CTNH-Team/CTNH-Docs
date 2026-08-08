@@ -1,7 +1,7 @@
 # CTNH-MANA API DOMAIN
 
 ## OVERVIEW
-Public API surfaces for Mana (18 Java files): magic multiblock predicates/maps, effects, recipe conditions, network contracts, and custom logic.
+Public API surfaces for Mana (21 Java files): magic multiblock predicates/maps, effects, recipe conditions, network contracts, and custom logic.
 
 ## STRUCTURE
 ```text
@@ -11,7 +11,7 @@ api/
 |-- networks/                  # BotaniaEffectPacketExtend, BotaniaExtendEffectType
 |-- pattern/                   # CMBlockMaps, CMPredicates
 |-- recipe/condition/          # BloodAltarCondition, HellForgeCondition, InfusionCellCastingCondition, ZenithCondition
-`-- recipe/customlogic/        # IndustrialSalvagingLogic
+`-- recipe/customlogic/        # DigitalWellOfSufferLogic, EternalGardenLogic, IndustrialGemCuttingLogic, IndustrialSalvagingLogic
 ```
 
 ## WHERE TO LOOK
@@ -20,7 +20,7 @@ api/
 | Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
 | Effects | `api/effect/` (8) |
 | Recipe conditions | `api/recipe/condition/` (4) |
-| Custom logic | `api/recipe/customlogic/IndustrialSalvagingLogic.java` |
+| Custom logic | `api/recipe/customlogic/` (4) |
 | Network APIs | `api/networks/` (Botania packet extensions) |
 | Mixin APIs | `api/mixin/IBloodAltarLogic.java` |
 

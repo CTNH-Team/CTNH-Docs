@@ -1,20 +1,20 @@
 # CTNH-MANA INTEGRATION DOMAIN
 
 ## OVERVIEW
-EMI and Jade integration for Mana magic content (6 Java files).
+EMI and Jade integration for Mana magic content (7 Java files).
 
 ## STRUCTURE
 ```text
 integration/
 |-- emi/                       # CTNHManaEmiPlugin
-`-- jade/                      # BaseManaMachineStatusProvider, BloodAltarStatusProvider, ManaHatchStatusProvider, ManaMachineManaStatusProvider, ThirdEyeStatusProvider
+`-- jade/                      # BaseManaMachineStatusProvider, BloodAltarStatusProvider, EternalWosStatusProvider, ManaHatchStatusProvider, ManaMachineManaStatusProvider, ThirdEyeStatusProvider
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | EMI plugin | `integration/emi/CTNHManaEmiPlugin.java` |
-| Jade providers | `integration/jade/` (5 providers) |
+| Jade providers | `integration/jade/` (6 providers) |
 
 ## CONVENTIONS
 - Keep integrations isolated and optional.

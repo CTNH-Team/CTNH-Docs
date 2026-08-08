@@ -1,24 +1,24 @@
 # CTNH-MANA MODULE
 
 ## OVERVIEW
-CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (271 Java files, the second-largest module).
+CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (284 Java files, the second-largest module).
 
 ## STRUCTURE
 ```text
 src/main/java/com/moguang/ctnhmana/
 |-- CTNHMana.java / CTNHManaGTAddon.java / CMConfig.java   # mod entry, GT addon, config
-|-- api/                      # 18: effect/ (8), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (1)
+|-- api/                      # 21: effect/ (8), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (4)
 |-- client/                   # 33: ZenithInvadeClient, radial menu, Ponder, models, renderers (11), particles
-|-- common/                   # 104: CommonProxy, DigitalWosMachine, blocks, blockentities, entities, events, items, machines, multiblocks (29), parts, rituals
+|-- common/                   # 105: CommonProxy, DigitalWosMachine, blocks, blockentities, entities, events, items, machines, multiblocks (30), parts, rituals
 |   |-- item/                 # bloodmagicjade/ bosssummoner/ caduceus/ equipment/ manafuelstick/ manamachineupgrade/ (8) rune/ (3) + ZenithDebugToolItem
-|   |-- multiblock/           # 29: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, IndustrialSalvagingMachine, ...
+|   |-- multiblock/           # 30: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, IndustrialSalvagingMachine, IndustrialGemInlayMachine, ...
 |   |-- parts/                # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch + ManaHatches/ (3)
 |   |-- ritualtypes/          # 5: RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
 |   `-- ritual/               # MachineRitualSoulNetwork, MachineRitualStoneHost
-|-- data/                     # 50: CMDatagen, ManaData, recipes (31 + builders), lang (3), materials, tags
+|-- data/                     # 54: CMDatagen, ManaData, recipes (34 + builders), lang (3), materials, tags
 |-- event/                    # 8: EventHandler, ForgeEventHandler, CMKeyBindings, IndexEventHandler, SoulLeechEventHandler, TaintedBloodWeepingEyeEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
-|-- integration/              # 6: emi/ (1), jade/ (5)
-|-- mixin/                    # 15: ae2/ (2), ars/ (4), bloodmagic/ (2), botania/ (6), emi/ (1)
+|-- integration/              # 7: emi/ (1), jade/ (6)
+|-- mixin/                    # 17: ae2/ (2), apotheosis/ (2), ars/ (4), bloodmagic/ (2), botania/ (6), emi/ (1)
 |-- networking/               # 6: CMNetworking, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket, ZenithInvadePacket
 |-- registry/                 # 27: CMRegistrate + items/ (1) + multiblock/ (5) + sounds/ (2)
 `-- utils/                    # 3: CTNHManaUtils, EnvUtils, ModUtils
@@ -31,7 +31,7 @@ src/main/java/com/moguang/ctnhmana/
 | GT addon | `CTNHManaGTAddon.java` |
 | Config | `CMConfig.java` |
 | Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
-| Multiblocks | `common/multiblock/` (29 machines) |
+| Multiblocks | `common/multiblock/` (30 machines) |
 | Rituals | `common/ritualtypes/` (5), `common/ritual/` (2) |
 | Magic items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, ...) |
 | Registries | `registry/` (27) |
@@ -52,7 +52,7 @@ Read the matching domain guide before editing the corresponding source area.
 | `data` | `docs/CTNH-Mana/data/AGENTS.md` | Recipe generators, lang, materials, tags |
 | `event` | `docs/CTNH-Mana/event/AGENTS.md` | EventHandler wiring |
 | `integration` | `docs/CTNH-Mana/integration/AGENTS.md` | EMI, Jade integration |
-| `mixin` | `docs/CTNH-Mana/mixin/AGENTS.md` | Ars/Blood Magic/Botania/EMI patches |
+| `mixin` | `docs/CTNH-Mana/mixin/AGENTS.md` | Ars/Blood Magic/Botania/Apotheosis/EMI patches |
 | `networking` | `docs/CTNH-Mana/networking/AGENTS.md` | Packets |
 | `registry` | `docs/CTNH-Mana/registry/AGENTS.md` | Items, machines, multiblocks, recipe types |
 | `utils` | `docs/CTNH-Mana/utils/AGENTS.md` | Shared helpers |
@@ -63,7 +63,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Item/block/fluid references MUST use direct registration objects (`CMItems.X`, `CMBlocks.X`, `CMMaterials.X`, `GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
 - Generated resources are large; use `:modules:CTNH-Mana:runData` after datagen or Ponder text changes.
 - Ponder `CTNHManaPonderSceneBuilder` is a thin adapter around CTNH-Lib's shared builder; keep Mana-specific scenes/tags/plugins in CTNH-Mana, not Core or Lib.
-- Blood Magic/Botania/Ars/EMI compatibility is spread across recipe builders, mixins, integrations, and client packets; check all four before changing a magic integration surface.
+- Blood Magic/Botania/Ars/Apotheosis/EMI compatibility is spread across recipe builders, mixins, integrations, and client packets; check all four before changing a magic integration surface.
 
 ## ANTI-PATTERNS
 - Do not assume magic integrations are isolated from GTCEu; machine/recipe registration still flows through GT addon patterns.

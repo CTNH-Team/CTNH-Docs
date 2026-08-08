@@ -1,7 +1,7 @@
 # CTNH-MANA DATA DOMAIN
 
 ## OVERVIEW
-Datagen source for `src/generated/resources` (50 Java files): recipe generators (31), lang, materials, tags, and builders.
+Datagen source for `src/generated/resources` (54 Java files): recipe generators (34), lang, materials, tags, and builders.
 
 ## STRUCTURE
 ```text
@@ -10,9 +10,9 @@ data/
 |-- lang/                      # AHCCRuneLang, ChineseLangHandler, EnglishLangHandler
 |-- materials/                 # BotaniaMaterials
 |-- recipe/
-|   |-- 31 top-level classes: ManaReactorRecipes, HellForgeRecipes, WishingWillRecipes, BloodAltarRecipes, BotaniaRecipes, ElvenTradeRecipes, ManaCondenserRecipes, MeteorCapturerRecipes, DemonWillGeneratorRecipes, GaiaReactorRecipes, RuneAltarRecipes, TerraPlateRecipes, ZenithRecipes, TwistCollapseRecipes, ManaHatchRecipes, ManaMachineUpgradeRecipes, BeamsRecipes, RitualMechanicalRecipes, RecipeRemoval, SalvagingRecipes, ...
+|   |-- 34 top-level classes: BeamsRecipes, BloodAltarRecipes, BotaniaRecipes, DemonWillGeneratorRecipes, ElvenTradeRecipes, EternalGardenRecipes, EternalGardenSpecialRecipes, EternalWosRecipes, GaiaReactorRecipes, GemCuttingRecipes, HellForgeRecipes, MachineRecipes, ManaCircuitRecipes, ManaCondenserRecipes, ManaHatchRecipes, ManaMachineBlockRecipes, ManaMachineRecipes, ManaMachineUpgradeRecipes, ManaPoolRecipes, ManaReactorRecipes, ManaRecipes, ManaTransformerRecipes, MeteorCapturerRecipes, MeteorRitualGuideRecipes, RecipeRemoval, RitualMechanicalRecipes, RuneAltarRecipes, RuneSalvagingRecipes, SalvagingRecipes, TerraPlateRecipes, TwistCollapseRecipes, WishingWillRecipes, ZenithRecipes, runeRitualRecipes
 |   |-- builder/
-|   |   |-- apotheosis/        # SalvagingRecipeBuilder
+|   |   |-- apotheosis/        # GemCuttingRecipeBuilder, SalvagingRecipeBuilder
 |   |   |-- bloodmagic/        # BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder
 |   |   `-- botania/           # ElfPlateRecipeBuilder, ElvenTradeRecipeBuilder, ManaInfusionRecipeBuilder, PetalRecipeBuilder, RuneAltarRecipeBuilder, RuneRitualRecipeBuilder, TerraPlateRecipeBuilder
 |   `-- utils/                 # BotaniaIngredients
@@ -23,10 +23,12 @@ data/
 | Concern | Location |
 |---------|----------|
 | Datagen entry | `data/CMDatagen.java` |
-| Recipe generation | `data/recipe/` (31 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
+| Recipe generation | `data/recipe/` (34 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
+| Gem cutting recipes | `data/recipe/GemCuttingRecipes.java` |
+| Mana transformer recipe | `data/recipe/ManaTransformerRecipes.java` |
 | Blood Magic builders | `data/recipe/builder/bloodmagic/` (BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder) |
 | Botania builders | `data/recipe/builder/botania/` (7 builders) |
-| Apotheosis builders | `data/recipe/builder/apotheosis/SalvagingRecipeBuilder.java` |
+| Apotheosis builders | `data/recipe/builder/apotheosis/` (GemCuttingRecipeBuilder, SalvagingRecipeBuilder) |
 | Botania ingredients | `data/recipe/utils/BotaniaIngredients.java` |
 | Lang | `data/lang/` (incl. AHCCRuneLang) |
 | Materials | `data/materials/BotaniaMaterials.java` |

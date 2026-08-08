@@ -1,12 +1,13 @@
 # CTNH-MANA MIXIN DOMAIN
 
 ## OVERVIEW
-Ars Nouveau, Blood Magic, Botania, AE2, and EMI compatibility mixins (15 Java files).
+Ars Nouveau, Blood Magic, Botania, AE2, Apotheosis, and EMI compatibility mixins (17 Java files).
 
 ## STRUCTURE
 ```text
 mixin/
 |-- ae2/                       # WirelessTerminalItemMixin, WirelessTerminalMenuHostMixin
+|-- apotheosis/                # AdventureJeiPluginMixin, GemCuttingMenuMixin
 |-- ars/                       # MixinEmiLecternRecipeHandler, PotionJarMixin, PotionTankMixin, StoredItemStackMixin
 |-- bloodmagic/                # BloodAltarMixin, TileAltarAccessor
 |-- botania/                   # BotaniaEntitiesMixin, FunctionalFlowerBaseAccessor, ManaPoolBlockEntityMixin, MixinForgePacketHandler, PetruniaMixin, WitherAconiteMixin
@@ -17,6 +18,7 @@ mixin/
 | Concern | Location |
 |---------|----------|
 | AE2 patches | `mixin/ae2/` |
+| Apotheosis patches | `mixin/apotheosis/` (2) |
 | Ars Nouveau patches | `mixin/ars/` |
 | Blood Magic patches | `mixin/bloodmagic/` (incl. TileAltarAccessor) |
 | Botania patches | `mixin/botania/` (6) |
@@ -34,7 +36,7 @@ mixin/
 Applies to `src/main/java/com/moguang/ctnhmana/mixin` and `src/main/resources/ctnhmana.mixins.json`.
 
 ## READ WHEN
-- Patching Ars Nouveau, Blood Magic, Botania, AE2, or EMI behavior.
+- Patching Ars Nouveau, Blood Magic, Botania, AE2, Apotheosis, or EMI behavior.
 
 ## SOURCE OF TRUTH
 - `src/main/resources/ctnhmana.mixins.json` and the mixin classes in `mixin/`.

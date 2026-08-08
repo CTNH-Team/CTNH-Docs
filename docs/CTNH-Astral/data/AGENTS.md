@@ -13,7 +13,7 @@ data/
     |-- CANetherRegion.java, CANoiseSetting.java, CAOverworldRegion.java, CASurfaceRuleData.java
     |-- biome/                 # AstralBiomes, BiomeParameters, MoonBiomes, NetherBiomes
     |-- feature/               # AcidPoolFeature, CAConfiguredFeatures, CAFeatures, CAPlacements, MarsDeadVolcanoFeature
-    `-- structure/             # 12: AstralMeteorStructure(+Piece/Placer), CAStructureSets, CAStructures, MarsResearchGraveyardStructure(+Piece), MarsStargateRuinsStructure(+Piece), MoonAbandonedOutpostStructure, MoonCraterStructure(+Piece/Placer)
+    `-- structure/             # 13: AstralMeteorStructure, AstralMeteorStructurePiece, AstralMeteorPlacer, CAStructureSets, CAStructures, MarsResearchGraveyardStructure, MarsResearchGraveyardStructurePiece, MarsStargateRuinsStructure, MarsStargateRuinsStructurePiece, MoonAbandonedOutpostStructure, MoonCraterStructure, MoonCraterStructurePiece, MoonCraterPlacer
 ```
 
 ## WHERE TO LOOK
@@ -23,7 +23,7 @@ data/
 | Worldgen root | `data/worldgen/` (CABiomes, CADimensions, CADimensionTypes, CANoiseSetting, CASurfaceRuleData, CAOverworldRegion, CANetherRegion, CADensityFunctions) |
 | Biomes | `data/worldgen/biome/` (AstralBiomes, MoonBiomes, NetherBiomes, BiomeParameters) |
 | Features | `data/worldgen/feature/` (5) |
-| Structures | `data/worldgen/structure/` (12) |
+| Structures | `data/worldgen/structure/` (13) |
 | Lang | `data/lang/` |
 | Enchantments | `data/CAEnchantments.java`, `common/enchantment/VacuumSealEnchantment.java` |
 
