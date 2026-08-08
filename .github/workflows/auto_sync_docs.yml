@@ -48,7 +48,7 @@ jobs:
           SKIP_IF_OPEN_PR: 'true'
         run: python scripts/check_pending.py
 
-      - name: Checkout CTNH-Modules (with submodules)
+      - name: Checkout CTNH-Modules
         if: steps.pending.outputs.has_updates == 'true'
         uses: actions/checkout@v4
         with:
@@ -56,26 +56,26 @@ jobs:
           ref: master
           path: workspace/modules-src
           fetch-depth: 50
-          submodules: recursive
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update submodules to latest dev
+      - name: Checkout submodules from their branches
         if: steps.pending.outputs.has_updates == 'true'
         run: |
-          # actions/checkout 只会把子模块切到主仓库 master 记录的 gitlink 提交；
-          # 而同步脚本轮询的是各子模块 dev 分支的最新提交。
-          # 这里把每个子模块强制切到其分支最新，保证 LLM 扫描的源码与检测到的提交一致。
+          # 主仓库 master 记录的 modules/CTPP 与 modules/GregTech-Modern 指针指向
+          # 子模块仓库中已不存在（force-push 后被 GC）的提交，actions/checkout 递归
+          # 拉取子模块会直接失败。因此不依赖主仓库的 gitlink 指针，改为从各子模块
+          # 仓库的分支最新直接克隆源码，与 monitor.py 轮询的分支保持一致。
           cd workspace/modules-src
+          mkdir -p modules
           for m in CTNH-Core CTNH-Lib CTNH-Bio CTNH-Energy CTNH-Mana CTNH-Astral CTPP Create-Enough-Items; do
-            echo "== updating $m =="
-            git -C "modules/$m" fetch origin dev
-            git -C "modules/$m" checkout -B dev origin/dev
+            echo "== cloning $m (dev) =="
+            rm -rf "modules/$m"  # 清掉 checkout 留下的空 gitlink 目录
+            git clone --depth=50 --branch dev "https://github.com/CTNH-Team/$m.git" "modules/$m"
           done
           # GregTech-Modern 是 vendored 依赖，不参与 LLM 扫描，但保持源码树完整。
           # 注意：其远程默认分支是 ctnh（.gitmodules 中声明的 dev 已过时）。
-          echo "== updating GregTech-Modern =="
-          git -C "modules/GregTech-Modern" fetch origin ctnh
-          git -C "modules/GregTech-Modern" checkout -B ctnh origin/ctnh
+          echo "== cloning GregTech-Modern (ctnh) =="
+          rm -rf modules/GregTech-Modern
+          git clone --depth=50 --branch ctnh "https://github.com/CTNH-Team/GregTech-Modern.git" modules/GregTech-Modern
 
       - name: Debug Environment Variables
         if: steps.pending.outputs.has_updates == 'true'

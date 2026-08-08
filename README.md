@@ -51,7 +51,7 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 
 ### 工作流
 
-1. checkout 本仓库 + `CTNH-Team/CTNH-Modules`（含全部子模块，供 LLM 扫描源码结构）
+1. checkout 本仓库 + `CTNH-Team/CTNH-Modules`；子模块源码按各自分支（CTNH 模块 `dev`、GregTech-Modern `ctnh`）直接克隆，不依赖主仓库的 gitlink 指针（主仓库指针可能指向已 GC 的提交），供 LLM 扫描源码结构
 2. `scripts/monitor.py` 轮询主仓库与 8 个子模块（CTNH-Core/Lib/Bio/Energy/Mana/Astral/CTPP/CEI）分支最新提交，与 `scripts/state.json` 中记录的 `last_sha` 对比
 3. 对每个有新提交的模块，`scripts/doc_gen.py` 将 init-deep 更新模式提示词 + 现有文档 + 源码结构 + 提交 diff 发给 LLM
 4. LLM 返回 `{path, action, content}` 更新清单，脚本写入 `docs/<Module>/`
