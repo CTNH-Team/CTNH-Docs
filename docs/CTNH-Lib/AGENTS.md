@@ -1,14 +1,14 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH-Lib is the shared support module for CTNH code (57 Java files). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, language annotations, shared Ponder support, right-side configurator UI, Jade priority infrastructure, and client highlight networking.
+CTNH-Lib is the shared support module for CTNH code (57 Java files). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, language annotations, shared Ponder support, Jade priority infrastructure, and client highlight networking.
 
 ## STRUCTURE
 ```text
 src/main/java/tech/vixhentx/mcmod/ctnhlib/
 |-- CTNHLib.java             # library mod initialization
 |-- api/                     # CTNHValues, CrossParallelRecipeLogic, ICrossParallelRecipeLogicMachine
-|-- client/                  # ClientProxy, right configurator UI, highlight render, Ponder framework
+|-- client/                  # ClientProxy, highlight render, Ponder framework
 |   |-- ponder/              # CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper
 |   |-- render/              # ColorData
 |   `-- render/highlight/    # HighlightHandler, HighlightRender
@@ -35,7 +35,7 @@ src/main/java/tech/vixhentx/mcmod/ctnhlib/
 | Registrate helpers | `registrate/` |
 | Builder APIs | `registrate/builders/` (10 builders) |
 | Dynamic data | `data/` (`CTNHDynamicDataPack`, `DataFilterPack`) |
-| Shared GUI | `client/` (RightConfiguratorPanel, RCUIWidget) |
+| Client bootstrap | `client/ClientProxy.java` |
 | Highlight rendering | `client/render/highlight/` (`HighlightHandler`, `HighlightRender`), `network/packets/BlockHighlightPacket.java` |
 | Jade priority | `jade/` |
 | Ponder framework | `client/ponder/` (`CTNHPonderLang`, `CTNHPonderSceneBuilder`, `CTNHPonderTagHelper`) |
@@ -48,7 +48,7 @@ Read the matching domain guide before editing the corresponding source area.
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
 | `api` | `docs/CTNH-Lib/api/AGENTS.md` | Shared values, cross-parallel recipe logic |
-| `client` | `docs/CTNH-Lib/client/AGENTS.md` | Right configurator UI, highlight render, Ponder framework |
+| `client` | `docs/CTNH-Lib/client/AGENTS.md` | Highlight render, Ponder framework |
 | `command` | `docs/CTNH-Lib/command/AGENTS.md` | Chat helper, inspector commands |
 | `common` | `docs/CTNH-Lib/common/AGENTS.md` | CommonProxy, MultiblockHelper |
 | `data` | `docs/CTNH-Lib/data/AGENTS.md` | Dynamic datapack and filter packs |
@@ -64,7 +64,7 @@ Read the matching domain guide before editing the corresponding source area.
 - `CTNHDynamicDataPack` is the runtime pack that carries GT/GMT recipes (via `GTDynamicPackContents`) into the recipe manager; that is why `runData` never emits JSON for GT/GMT recipes. See root AGENTS.md CONVENTIONS.
 - Item/block/fluid references MUST use direct registration objects (`GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. In Lib, `ResourceLocation` appears only for recipe/tag/advancement ID path generation, not item resolution. See root AGENTS.md CONVENTIONS.
 - Resource count is intentionally tiny compared with gameplay modules.
-- Changes here can affect all CTNH modules through shared builders, annotations, Jade provider ordering, right configurator UI, highlight packets, and shared Ponder support.
+- Changes here can affect all CTNH modules through shared builders, annotations, Jade provider ordering, highlight packets, and shared Ponder support.
 
 ## ANTI-PATTERNS
 - Do not add gameplay-specific logic to CTNH-Lib unless it is genuinely shared.
@@ -84,7 +84,7 @@ Applies to `modules/CTNH-Lib` and every CTNH module that consumes its shared API
 
 ## READ WHEN
 - Adding a shared registration helper, builder, or annotation consumed by multiple modules.
-- Changing Jade provider ordering, the right configurator UI, highlight packets, or the shared Ponder builder.
+- Changing Jade provider ordering, highlight packets, or the shared Ponder builder.
 - Any change that could ripple into other CTNH modules through shared infrastructure.
 
 ## SOURCE OF TRUTH
