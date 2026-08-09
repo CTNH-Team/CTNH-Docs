@@ -1,7 +1,7 @@
 # CTNH-BIO API DOMAIN
 
 ## OVERVIEW
-Public API surfaces for Bio (61 Java files, the largest Bio domain): living-machine block/entity hierarchy, recipe capabilities, entity/model ingredients, property operators, and nutrient serialization.
+Public API surfaces for Bio (61 Java files, the largest Bio domain): living-machine block/entity hierarchy, recipe capabilities, entity/model ingredients, property operators, nutrient serialization, and float multiplier handling.
 
 ## STRUCTURE
 ```text
@@ -9,8 +9,8 @@ api/
 |-- CBValues.java, IHostAwareEntity.java, ILivingEntityHostBlock.java, ILivingMachine.java
 |-- block/                       # LivingMetaMachineBlock, LivingMultiMetaMachineBlock
 |-- blockentity/                 # LivingMetaMachineBlockEntity
-|-- capability/                  # IEntityContainer
-|   `-- forge/                   # CBCapabilities
+|-- capability/                  # IEntityContainer.java
+|   |-- forge/                   # CBCapabilities
 |   `-- recipe/                  # CogniItemRecipeCapability, EntityRecipeCapability, ModelRecipeCapability, NutrientRecipeCapability
 |-- entity/                      # LivingMetaMachineEntity
 |-- gui/                         # CBGuiTextures, CBRecipeTypeUI, LivingMachineUIWidget
@@ -26,8 +26,8 @@ api/
     |-- CBRecipeModifiers.java, CBRecipeType.java
     |-- customlogic/             # BasicLivingLogic, DigestRecipeLogic
     |-- ingredient/
-    |   |-- entity/              # ChancedEntityIngredient, EntityIngredient
-    |   |   `-- property/        # IAutoGetValueEntityProperty, I*EntityProperty interfaces
+    |   |-- entity/              # ChancedEntityIngredient, EntityIngredient (copyWithMultiplier(float))
+    |   |   `-- property/        # IBaseEntityProperty, I*EntityProperty interfaces, SimpleEntityPropertyFactory
     |   |       |-- data/        # EntityProperties, EntityPropertyDetector, EntityPropertyValue
     |   |       `-- utils/       # EntityPropertyBuilder
     |   `-- model/               # ModelIngredient
@@ -51,6 +51,7 @@ api/
 - `PropertyOperators` and `EntityProperties` are initialized explicitly in `CommonProxy.init()`; do not call them before that.
 - Nutrient KubeJS keys `NU_IN` / `NU_OUT` are exposed by `CTNHBioGTAddon.registerRecipeKeys()`.
 - Entity property interfaces follow `I<Type>EntityProperty` naming (IBooleanEntityProperty, IIntEntityProperty, IStringEntityProperty, ...).
+- Recipe capability multiplier methods are `copyWithMultiplier(content, float multiplier)` in `EntityRecipeCapability`, `ModelRecipeCapability`, and `NutrientRecipeCapability`; `EntityIngredient` / `ChancedEntityIngredient` also accept `float` and truncate multiplied integral fields back to `int`.
 - NOTE: there is no `api/recipe/content/` subpackage; nutrient serialization lives under `api/capability/recipe/`.
 
 ## ANTI-PATTERNS
