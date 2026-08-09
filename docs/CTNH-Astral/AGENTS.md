@@ -34,7 +34,7 @@ src/main/java/com/ctnh/ctnhastral/
 | Rocket content | `common/entity/RocketContraptionEntity.java`, `common/event/RocketDimensionTravelHandler.java`, `client/RocketLaunchHud.java`, `registry/CARocketBlocks.java`, `registry/CARocketEntityTypes.java`, `common/machine/multiblock/RocketAssemblyPlatformMachine.java` |
 | Core data | `data/CAElements.java`, `CAMaterials.java` (incl. Seawater), `CATagPrefixes.java`, `CARecipes.java` |
 | Worldgen | `data/worldgen/` (root dimension classes + biome/ feature/ structure/) |
-| Structures/features | `data/worldgen/structure/` (12 classes), `data/worldgen/feature/` (5) |
+| Structures/features | `data/worldgen/structure/` (13 classes), `data/worldgen/feature/` (5) |
 | Mixins | `mixin/`, `src/main/resources/ctnhastral.mixins.json` |
 | Resources | `src/main/resources/assets/ctnhastral/`, `assets/gtceu/` (legacy), `src/generated/resources/` (lang, blockstates, noise settings) |
 
