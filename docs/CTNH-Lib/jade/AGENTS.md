@@ -7,15 +7,18 @@ Jade provider ordering infrastructure: ordered GT provider registration shared b
 | Concern | Location |
 |---------|----------|
 | Provider registrar | `jade/GTProvidersRegistrar.java` |
+| RecipeLogic provider registration | `jade/GTProvidersRegistrar.java` (block data + block component) |
 | Priority manager | `jade/JadePriorityManager.java` |
 
 ## CONVENTIONS
-- `GTProvidersRegistrar` loads ordered GT providers; `JadePriorityManager` lets feature modules register/unregister block data and component providers with explicit priority.
+- `GTProvidersRegistrar` loads ordered GT providers through `JadePriorityManager`; `JadePriorityManager` lets feature modules register/unregister block data and component providers with explicit priority.
+- `RecipeLogicProvider` is registered for block data (`recipe_logic_data`, 1400) and block component (`recipe_logic_component`, 1400); keep both registrations enabled so block data and block component GT tooltips stay consistent.
 - Feature modules register Jade providers through this shared surface, not directly.
 - Core's `registry/jade/CTNHJadePlugin` and Energy's `integration/jade/` providers all go through this manager.
 
 ## ANTI-PATTERNS
 - Do not bypass `JadePriorityManager` for GT provider ordering; CTNH modules rely on predictable Jade block data/component priority.
+- Do not comment out either the `RecipeLogicProvider` block data or block component registration; they must stay in sync.
 
 ## SCOPE
 Applies to `src/main/java/tech/vixhentx/mcmod/ctnhlib/jade`.
