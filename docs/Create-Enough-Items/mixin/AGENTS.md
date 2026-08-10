@@ -1,7 +1,7 @@
 # CREATE-ENOUGH-ITEMS MIXIN DOMAIN
 
 ## OVERVIEW
-EMI mixins (recipe screen buttons, sidebar behavior, search refresh hooks, tag expansion, recipe manager replacement), Create JEI mixin, TMRV mixin, and accessors (12 Java files).
+EMI mixins (recipe screen buttons, sidebar behavior, search refresh hooks, tag expansion, recipe manager replacement, fluid-stack give handling, cursor-container filling, center-search-bar disable), Create JEI mixin, TMRV mixin, and accessors (12 Java files).
 
 ## STRUCTURE
 ```text
@@ -16,7 +16,7 @@ mixin/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| EMI mixins | `mixin/emi/` (8) |
+| EMI mixins | `mixin/emi/` (8) — `EmiScreenManagerMixin` handles fluid-stack give → GT `FLUID_CELL`, cursor-container fill, and `centerSearchBar` forced off |
 | GTEmiRecipe accessor | `mixin/emi/accessor/GTEmiRecipeAccessor.java` |
 | Create JEI mixin | `mixin/create/CreateJEIMixin.java` |
 | TMRV mixin | `mixin/tmrv/RecipeManagerMixin.java` |
@@ -25,20 +25,25 @@ mixin/
 
 ## CONVENTIONS
 - Mixin targets include EMI, Create JEI, TMRV, and GTCEu EMI classes; inspect target method/field names before changing injection points.
+- `EmiScreenManagerMixin` is `remap = false` and targets `EmiScreenManager`; it uses `Redirect` for fluid-stack give, `Inject` at `deleteCursor` inside `mouseReleased` to fill the held container, and `ModifyExpressionValue` on `EmiConfig.centerSearchBar` to disable the centered search box.
+- `EmiScreenManagerMixin` syncs filled containers with `CreateItemC2SPacket`, except in creative instabuild.
+- `EmiScreenManagerMixin` resolves the handled screen through `EmiApi.getHandledScreen()`; it no longer `@Shadow`s `Minecraft client`.
 - Keep accessor names aligned with mixin targets.
 - Keep mixin JSON and package entries synchronized.
 
 ## ANTI-PATTERNS
 - Do not change mixin accessor signatures without checking `cei.mixins.json` and the upstream EMI/GTCEu target members.
+- Do not bypass the creative-instabuild skip before sending `CreateItemC2SPacket` in the `mouseReleased` fill path.
+- Do not reintroduce a `@Shadow Minecraft client` in `EmiScreenManagerMixin`; use `EmiApi.getHandledScreen()`.
 
 ## SCOPE
 Applies to `src/main/java/com/ctnh/cei/mixin` and `src/main/resources/cei.mixins.json`.
 
 ## READ WHEN
-- Patching EMI recipe screen, sidebar, search, tag expansion, recipe manager, Create JEI, or TMRV behavior.
+- Patching EMI recipe screen, sidebar, search, tag expansion, recipe manager, screen-manager give/fill, Create JEI, or TMRV behavior.
 
 ## SOURCE OF TRUTH
-- `src/main/resources/cei.mixins.json` and the mixin/accessor classes in `mixin/`.
+- `src/main/resources/cei.mixins.json` and the mixin/accessor classes in `mixin/`, especially `mixin/emi/EmiScreenManagerMixin.java`.
 
 ## WORKFLOW
 1. Locate the mixin package and JSON entry.

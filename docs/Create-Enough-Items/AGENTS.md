@@ -1,7 +1,7 @@
 # CREATE-ENOUGH-ITEMS MODULE
 
 ## OVERVIEW
-Create-Enough-Items (`cei`) is the CTNH EMI experience module (31 Java files): sidebar collapsible groups, recipe-page filters, associated search, drag-to-search, GTCEu voltage filtering, and static EMI rule resources. Namespace is `com.ctnh.cei` (not `com.moguang.cei`).
+Create-Enough-Items (`cei`) is the CTNH EMI experience module (31 Java files): sidebar collapsible groups, recipe-page filters, associated search, drag-to-search, GTCEu voltage filtering, cheat-mode fluid-container filling, disabled center search bar, and static EMI rule resources. Namespace is `com.ctnh.cei` (not `com.moguang.cei`).
 
 ## STRUCTURE
 ```text
@@ -24,6 +24,7 @@ src/main/java/com/ctnh/cei/
 | Registrate | `registry/CEIRegistrate.java` |
 | Datagen hook | `data/CEIDatagen.java` |
 | EMI mixins | `mixin/emi/` (8), `mixin/emi/accessor/GTEmiRecipeAccessor.java` |
+| EMI screen-manager behavior | `mixin/emi/EmiScreenManagerMixin.java` (fluid-stack give → GT `FLUID_CELL`, cursor-container fill, `centerSearchBar` forced off) |
 | Create JEI mixin | `mixin/create/CreateJEIMixin.java` (incl. CategoryBuilderMixin inner class) |
 | TMRV mixin | `mixin/tmrv/RecipeManagerMixin.java` |
 | EditBox accessor | `mixin/accessor/EditBoxAccessor.java` |
@@ -48,11 +49,13 @@ Read the matching domain guide before editing the corresponding source area.
 - Namespace is `com.ctnh.cei`; class prefixes use `CEI`.
 - This module depends on `:modules:CTNH-Lib` via `dependencies.gradle`; it does not depend on CTNH-Core.
 - User toggle state is runtime config under `config/cei/`; built-in defaults are static JSON under `src/main/resources/assets/cei/emi/`.
+- `EmiScreenManagerMixin` converts EMI fluid-stack give into a GT `FLUID_CELL`, fills the held container on `mouseReleased`, and forces `EmiConfig.centerSearchBar` off; these are code-intrinsic EMI patches, not config options.
 - Mixin targets include EMI, Create JEI, TMRV, and GTCEu EMI classes; inspect target method/field names before changing injection points.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 
 ## ANTI-PATTERNS
 - Do not move EMI UI behavior into CTNH-Core; CEI owns EMI sidebar/search/recipe-page customization.
+- Do not handle EMI cheat-mode container filling outside `mixin/emi/EmiScreenManagerMixin.java`; it is screen-manager behavior owned by CEI.
 - Do not edit runtime `config/cei/*.json` to change defaults; edit the static rule files in `src/main/resources/assets/cei/emi/`.
 - Do not treat voltage filtering as generic EMI filtering; it only handles GTCEu `GTEmiRecipe` paths.
 - Do not change mixin accessor signatures without checking `cei.mixins.json` and the upstream EMI/GTCEu target members.
@@ -68,12 +71,13 @@ Read the matching domain guide before editing the corresponding source area.
 Applies to `modules/Create-Enough-Items` and its submodule repository. It is a reference guide loaded through the root routing table, not an additional source-tree instruction file.
 
 ## READ WHEN
-- Changing EMI sidebar, search, or recipe-page behavior.
+- Changing EMI sidebar, search, recipe-page, or screen-manager give/fill behavior.
 - Changing EMI/Create/TMRV mixin targets or static rule JSON.
 
 ## SOURCE OF TRUTH
 - Registration/lifecycle: `CreateEnoughItems.java`, `common/CommonProxy.java`.
 - EMI features: `utils/emi/` classes.
+- EMI screen-manager behavior: `mixin/emi/EmiScreenManagerMixin.java`.
 - Static rules: `src/main/resources/assets/cei/emi/` JSON files.
 
 ## WORKFLOW
