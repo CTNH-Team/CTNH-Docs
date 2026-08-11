@@ -1,7 +1,7 @@
 # CTNH-ENERGY COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Energy (52 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
+Shared implementation for Energy (55 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
 
 ## STRUCTURE
 ```text
@@ -16,7 +16,7 @@ common/
 |   `-- strategy/              # EUContainerItemStrategy
 |       `-- context/           # CarriedContextEU, PlayerInvContextEU
 |-- machine/
-|   |-- ITagFilter.java, MEPartMachine.java
+|   |-- ITagFilter.java, MEPartMachine.java   # circuitInventory is @DescSynced
 |   |-- energyhatch/           # MEEnergyInputConfigurator, MEEnergyPartMachine, MESubstationHatch
 |   |-- gui/                   # AEConfigSlotWidget, AmountSetWidget, AutoPullAmountConfigurator, ConfigWidget, MEDualOutputConfigurator, TagFilterConfigurator
 |   |-- handler/               # MEStorageEUHandler, MEStorageFluidHandler, MEStorageItemHandler
@@ -44,6 +44,7 @@ common/
 | Container strategy | `common/me/strategy/` (+ `context/`) |
 | Machine EU handler | `common/me/MEMachineEUHandler.java` |
 | Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
+| Circuit inventory sync | `common/machine/MEPartMachine.java` (`@DescSynced` on `circuitInventory`) |
 | Energy hatches | `common/machine/energyhatch/` (MEEnergyPartMachine, MESubstationHatch) |
 | I/O hatches | `common/machine/iohatch/` (MEInputMachine, MEOutputMachine, MEStokingInputMachine) |
 | Storage handlers | `common/machine/handler/` (EU/fluid/item) |
@@ -55,6 +56,7 @@ common/
 - `CommonProxy.init()` initializes config, registrate, AE menus, networking, datagen, gatherData listener, creative tabs, and AE key type registration.
 - Common setup registers `EnergyDistributeService`, EU container strategy, EU cell handler/upgrades, pattern-provider upgrade cards, and EU P2P attunement.
 - `CommonProxy.attachCapabilities()` adds `generic_eu_wrapper` through `common/me/MEMachineEUHandler.java`.
+- `MEPartMachine.circuitInventory` is `@DescSynced`; circuit slot contents are pushed from the server part to the client so GUI slots stay synchronized.
 - Do not register EU key/cell behavior only in item code; AE2 key types, storage cell handler, container strategy, upgrades, and P2P attunement are separate CommonProxy hooks.
 
 ## ANTI-PATTERNS
@@ -64,7 +66,7 @@ common/
 Applies to `src/main/java/tech/luckyblock/mcmod/ctnhenergy/common` and its child packages.
 
 ## READ WHEN
-- Implementing AE2/EU behavior, pattern buffer, or quantum computer logic.
+- Implementing AE2/EU behavior, pattern buffer, quantum computer logic, or machine circuit-slot sync.
 
 ## SOURCE OF TRUTH
 - `common/CommonProxy.java` and `common/me/` contracts.
