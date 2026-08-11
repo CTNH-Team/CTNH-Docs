@@ -4,7 +4,7 @@
             "last_sha": "7faf05fc45d15622c80c8d6ce1bff0f54877a455"
         },
         "CTNH-Core": {
-            "last_sha": "1054a98346faf93293745e5f4d1b9c446840b21b"
+            "last_sha": "6b0823b7e67975072181a375764f9081b41dd560"
         },
         "CTNH-Lib": {
             "last_sha": "465359bcabae00202c4cb17c0ee0fa3e09814d89"
@@ -16,7 +16,7 @@
             "last_sha": "ed93463e7a198cd05c431286014e460c890f59c4"
         },
         "CTNH-Mana": {
-            "last_sha": "b9cec6b843c06c8f3ae0879d9dffc5b494a6e0cd"
+            "last_sha": "538bb5aa19252a812e6aaf7ac797d0d16bb8fa38"
         },
         "CTNH-Astral": {
             "last_sha": "1da0c7ac81425e8c2cc33519023ec7734071c51f"
@@ -25,7 +25,7 @@
             "last_sha": "3d32baf706b932d3dac2eff725665b2538dc4faa"
         },
         "Create-Enough-Items": {
-            "last_sha": "acd1c63151da245dea530457bdffafd0b9b89e9c"
+            "last_sha": "e536d3c43a4c3d76373ad9677b15ed9bbfd84af3"
         }
     }
 }
