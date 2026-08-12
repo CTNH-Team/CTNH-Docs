@@ -1,7 +1,7 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH-Lib is the shared support module for CTNH code (57 Java files). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, language annotations, shared Ponder support, Jade priority infrastructure, and client highlight networking.
+CTNH-Lib is the shared support module for CTNH code (60 Java files). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, language annotations, shared Ponder support, Jade priority infrastructure, and client highlight networking.
 
 ## STRUCTURE
 ```text
@@ -16,16 +16,18 @@ src/main/java/tech/vixhentx/mcmod/ctnhlib/
 |-- common/                  # CommonProxy, MultiblockHelper
 |-- data/                    # CTNHDynamicDataPack, DataFilterPack
 |-- jade/                    # GTProvidersRegistrar, JadePriorityManager
-|-- langprovider/            # Lang, LangProcessor (annotations processor; see com.ctnhlang)
+|-- langprovider/            # Lang, LangProcessor (annotation processor; see com.ctnhlang)
 |-- mixin/                   # GTJadePluginMixin, GTRecipesMixin, MachineBuilderMixin, TMRVMixin
 |-- network/packets/         # BlockHighlightPacket
 |-- registrate/              # CNRegistrate, CTNHLibNetworking
 |   |-- builders/            # 10 builders (CTNHItemBuilder, CTNHMachineBuilder, CTNHRecipeType, ...)
 |   |-- data/                # ProviderTypes
 |   `-- lang/                # RegistrateCNLangProvider
-|-- utils/                   # ChunkList, EnvUtils, ExtendNbtUtils, LockIdentityHashMap, MachineUtils
-`-- src/main/java/com/ctnhlang/  # separate annotation namespace
-    `-- langprovider/        # LangKeyBuilder
+`-- utils/                   # AllBuilder2, ChunkList, CodecBuilder, EnvUtils, ExtendNbtUtils, InfiniteMeteorTerrain, LockIdentityHashMap, MachineUtils
+
+src/main/java/com/ctnhlang/   # separate annotation namespace
+|-- CN.java, EN.java, Category.java, Domain.java, IgnoreLang.java, Key.java, Lang.java, LangFactory.java, Prefix.java, Suffix.java
+`-- langprovider/            # LangKeyBuilder
 ```
 
 ## WHERE TO LOOK
@@ -39,8 +41,9 @@ src/main/java/tech/vixhentx/mcmod/ctnhlib/
 | Highlight rendering | `client/render/highlight/` (`HighlightHandler`, `HighlightRender`), `network/packets/BlockHighlightPacket.java` |
 | Jade priority | `jade/` |
 | Ponder framework | `client/ponder/` (`CTNHPonderLang`, `CTNHPonderSceneBuilder`, `CTNHPonderTagHelper`) |
-| Lang annotations | `com/ctnhlang/` (separate namespace, `LangKeyBuilder`) |
+| Lang annotations | `com/ctnhlang/` (separate namespace: `CN`, `EN`, `Category`, `Domain`, `IgnoreLang`, `Key`, `Lang`, `LangFactory`, `Prefix`, `Suffix`; `langprovider/LangKeyBuilder.java`) |
 | Mixins | `mixin/`, `src/main/resources/ctnhlib.mixins.json` |
+| Shared helpers | `utils/` (AllBuilder2, ChunkList, CodecBuilder, EnvUtils, ExtendNbtUtils, InfiniteMeteorTerrain, LockIdentityHashMap, MachineUtils) |
 
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
