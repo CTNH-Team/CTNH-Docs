@@ -1,20 +1,37 @@
 # CTNH-LIB LANGPROVIDER DOMAIN
 
 ## OVERVIEW
-The `com.ctnhlang` annotation namespace (`@CN`, `@EN`, category/domain annotations) and the annotation processor consumed by the custom `com.ctnhlang.langprovider` Gradle plugin.
+The `com.ctnhlang` annotation namespace and the annotation processor consumed by the custom `com.ctnhlang.langprovider` Gradle plugin (13 Java files across both namespaces).
 
 ## STRUCTURE
 ```text
-src/main/java/tech/vixhentx/mcmod/ctnhlib/langprovider/   # Lang, LangProcessor
-src/main/java/com/ctnhlang/langprovider/                  # LangKeyBuilder (separate namespace)
+src/main/java/com/ctnhlang/
+|-- CN.java
+|-- Category.java
+|-- Domain.java
+|-- EN.java
+|-- IgnoreLang.java
+|-- Key.java
+|-- Lang.java
+|-- LangFactory.java
+|-- Prefix.java
+|-- Suffix.java
+`-- langprovider/
+    `-- LangKeyBuilder.java
+
+src/main/java/tech/vixhentx/mcmod/ctnhlib/langprovider/
+|-- Lang.java
+`-- LangProcessor.java
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Annotations | `src/main/java/com/ctnhlang/` (`@CN`, `@EN`, category/domain annotations) |
-| Key builder | `src/main/java/com/ctnhlang/langprovider/LangKeyBuilder.java` |
-| Processor | `langprovider/Lang.java`, `langprovider/LangProcessor.java` |
+| Bilingual annotations | `com/ctnhlang/CN.java`, `com/ctnhlang/EN.java` |
+| Category/domain annotations | `com/ctnhlang/Category.java`, `com/ctnhlang/Domain.java` |
+| Other annotation/helper types | `com/ctnhlang/IgnoreLang.java`, `com/ctnhlang/Key.java`, `com/ctnhlang/Lang.java`, `com/ctnhlang/LangFactory.java`, `com/ctnhlang/Prefix.java`, `com/ctnhlang/Suffix.java` |
+| Key builder | `com/ctnhlang/langprovider/LangKeyBuilder.java` |
+| Processor | `tech/vixhentx/mcmod/ctnhlib/langprovider/Lang.java`, `tech/vixhentx/mcmod/ctnhlib/langprovider/LangProcessor.java` |
 
 ## CONVENTIONS
 - The main library namespace is `tech.vixhentx.mcmod.ctnhlib`; lang annotations live in the separate `com.ctnhlang` namespace.
@@ -31,7 +48,7 @@ Applies to `src/main/java/com/ctnhlang` and `src/main/java/tech/vixhentx/mcmod/c
 - Changing lang annotation semantics or the annotation processor.
 
 ## SOURCE OF TRUTH
-- `com/ctnhlang/` annotations, `langprovider/LangProcessor.java`, and the `com.ctnhlang.langprovider` Gradle plugin.
+- `com/ctnhlang/` annotations, `tech/vixhentx/mcmod/ctnhlib/langprovider/LangProcessor.java`, and the `com.ctnhlang.langprovider` Gradle plugin.
 
 ## WORKFLOW
 1. Check all modules using `@CN`/`@EN` before changing annotation contracts.
