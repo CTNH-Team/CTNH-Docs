@@ -17,7 +17,7 @@ utils/emi/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Collapsible groups | `utils/emi/collapsible/CEICollapsibleGroups.java` |
+| Collapsible groups (rules, state, group lookup for tooltip) | `utils/emi/collapsible/CEICollapsibleGroups.java` |
 | Featured/duplicate filtering | `utils/emi/featured/`, `utils/emi/duplicate/` |
 | Associated search | `utils/emi/search/CEIAssociatedSearch.java` |
 | Fast recipe indexing | `utils/emi/search/FastRecipeManager.java` |
@@ -28,6 +28,7 @@ utils/emi/
 ## CONVENTIONS
 - `CEICollapsibleGroups` reads sidebar grouping rules and persists local expanded/collapsed state under `config/cei/collapsible_emi_groups.json`.
 - `CEICollapsibleGroups.loadRules()` is now invoked from `ClientProxy` constructor (early) rather than lazily in `rebuild()`, ensuring grouping rules are available before the first EMI UI interaction.
+- `EmiScreenManagerInputMixin` calls `CEICollapsibleGroups.getGroup(ingredient)` to append `cei.emi.collapsible.group.count` and `cei.emi.collapsible.group.toggle` lines to the hovered ingredient tooltip.
 - `CEIFeaturedRecipes`, `CEIDuplicateRecipes`, `CEIAssociatedSearch`, and `CEIVoltageRecipeFilter` back the recipe-page buttons described in the README.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 - `ForgeRegistries` usage here is for EMI rule JSON string-ID matching (reading rule files), not recipe item resolution.
@@ -41,6 +42,7 @@ Applies to `src/main/java/com/ctnh/cei/utils` and its child packages.
 
 ## READ WHEN
 - Changing EMI sidebar/search/recipe-page feature behavior.
+- Changing collapsible-group tooltip content or grouping rule lookup.
 
 ## SOURCE OF TRUTH
 - `utils/emi/` classes and the static rule JSON in `src/main/resources/assets/cei/emi/`.
