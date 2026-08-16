@@ -1,7 +1,7 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-Client-side bootstrap, models, renderers, and Core-owned Create Ponder scenes, tags, and plugin (22 Java files).
+Client-side bootstrap, models, renderers, and Core-owned Create Ponder scenes, tags, and plugin (23 Java files).
 
 ## STRUCTURE
 ```text
@@ -13,7 +13,8 @@ client/
 |   |-- Electric/              # GregTechMultiblocks, NeutronActivator
 |   `-- Kinetic/               # Meadow, MechanicalExporter
 |-- renderer/                  # ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender, LargeBottleRender, MartialMoralityEyeRender, TurbineRotorRender
-`-- renderer/utils/            # RenderUtils
+|-- renderer/utils/            # RenderUtils
+`-- util/                      # SnowOverlayQuadOffset
 ```
 
 ## WHERE TO LOOK
@@ -23,8 +24,9 @@ client/
 | Ponder plugin/scenes/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
 | Core Ponder scenes | `client/ponder/Kinetic/` (Meadow, MechanicalExporter), `client/ponder/Electric/` (GregTechMultiblocks, NeutronActivator) |
 | Ponder adapter builder | `client/ponder/CTNHCorePonderSceneBuilder.java` |
-| Models | `client/model/` (ModelBase, TemplateModel, TurbineRotorModel) |
+| Models | `client/model/` (ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel) |
 | Renderers | `client/renderer/` (ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, ...) |
+| Client utility | `client/util/SnowOverlayQuadOffset.java` |
 
 ## CONVENTIONS
 - Ponder scenes use `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` with text embedded directly in scene files.

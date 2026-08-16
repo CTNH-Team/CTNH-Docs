@@ -1,7 +1,7 @@
 # CTNH-CORE MIXIN DOMAIN
 
 ## OVERVIEW
-Broad cross-mod mixins (35 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
+Broad cross-mod mixins (38 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
 
 ## STRUCTURE
 ```text
@@ -12,11 +12,13 @@ mixin/
 |-- apotheosis/                # EarthsBoonEnchantMixin, SocketHelperMixin
 |-- ars_nouveau/               # GlyphRecipeCategoryMixin
 |-- avaritia/                  # AvaritiaSculkCategoryMixin
-|-- create/                    # ChainConveyorRidingHandlerMixin, MechanicalCraftingCategoryMixin, SpoutCategoryMixin, StockKeeperRequestScreenMixin
+|-- create/                    # ChainConveyorRidingHandlerMixin, MechanicalCraftingCategoryMixin, RuntimeDataGeneratorMixin, SpoutCategoryMixin, StockKeeperRequestScreenMixin
+|-- creatediesel/              # DistillationCategoryMixin, OilChunksSavedDataMixin, OilScannerItemMixin, PumpjackHoleBlockEntityMixin
 |-- dategen/                   # NOTE: spelled dategen, not datagen — AECSDatagenMixin, CreateOreExcavationDategenMixin, DataGeneratorBanMixin, FTBUltimineDatagenMixin, ImmersiveAircraftDatagenMixin
 |-- eio/                       # MachinesJEIMixin
-|-- emi/                       # EmiReloadManagerMixin, GTRecipeEMICategoryMixin
+|-- emi/                       # EmiReloadManagerMixin, GTRecipeEMICategoryMixin, JemiRecipeMixin, JemiStackSerializerMixin
 |-- ftbchunks/                 # HeightUtilsMixin
+|-- ftbessentials/             # TeleportCommandsMixin
 |-- gtceu/                     # GTBlocksMixin, ItemMaterialDataMixin
 |   `-- orevein/               # ClientProxyAccessor (only non-Mixin-named accessor)
 |-- javd/                      # PortalBlockMixin
@@ -32,9 +34,10 @@ mixin/
 | Minecraft core mixins | `mixin/mc/` (incl. `RecipeManagerApplyMixin.java` at `RecipeManager.apply()` HEAD) |
 | GTCEu mixins | `mixin/gtceu/`, `mixin/gtceu/orevein/` |
 | Create mixins | `mixin/create/` |
-| AECs / EIO / EMI | `mixin/aecs/`, `mixin/eio/`, `mixin/emi/` |
+| Create Diesel mixins | `mixin/creatediesel/` (DistillationCategoryMixin, OilChunksSavedDataMixin, OilScannerItemMixin, PumpjackHoleBlockEntityMixin) |
+| AECs / EIO / EMI | `mixin/aecs/`, `mixin/eio/`, `mixin/emi/` (incl. JemiRecipeMixin, JemiStackSerializerMixin) |
 | Apotheosis / Ars / Avaritia | `mixin/apotheosis/`, `mixin/ars_nouveau/`, `mixin/avaritia/` |
-| FTB Chunks / JAVD / TMRV | `mixin/ftbchunks/`, `mixin/javd/`, `mixin/tmrv/` |
+| FTB Chunks / JAVD / TMRV | `mixin/ftbchunks/`, `mixin/ftbessentials/`, `mixin/javd/`, `mixin/tmrv/` |
 | Datagen mixins | `mixin/dategen/` (spelling preserved) |
 | Chunk reload | `mixin/ChunkMixin.java`, `mixin/ChunkSerializerMixin.java`, `mixin/TagLoaderMixin.java` |
 | FTB Essentials accessor | `mixin/mc/ServerChunkCacheAccessor.java` (used by `integration/ftbessentials/AsyncRtpManager`) |
@@ -45,6 +48,7 @@ mixin/
 - Inspect target mod versions before changing injection signatures.
 - The datagen mixin package is spelled `dategen`; do not "fix" it to `datagen` without updating the mixin JSON refmap.
 - `ServerChunkCacheAccessor` exposes the private main-thread chunk future method for the async RTP manager.
+- `creatediesel.DistillationCategoryMixin` and `emi.JemiRecipeMixin`/`JemiStackSerializerMixin` are client mixins; they center variable-height distillation recipes and fix JEI custom-renderer stack round-trips in EMI favorites.
 
 ## ANTI-PATTERNS
 - Do not change injection points without checking the upstream target members.
