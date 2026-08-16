@@ -1,26 +1,26 @@
 # CTNH-ENERGY MIXIN DOMAIN
 
 ## OVERVIEW
-AE2, AE2CS/AECS, Better P2P, GTM, Omni Cells, PCC, and ME Requester integration mixins (49 Java files, the largest Energy domain). These are central to Energy behavior.
+AE2, AE2CS/AECS, Better P2P, GTM, Omni Cells, and ME Requester integration mixins (49 Java files, the largest Energy domain). These are central to Energy behavior.
 
 ## STRUCTURE
 ```text
 mixin/
 |-- ae2/                       # CableBusContainerMixin, SettingsMixin
-|   |-- cpu/                   # CraftingCPUMenuMixin, CraftingCpuLogicMixin, CraftingServiceMixin
-|   |-- emi/                   # 8 mixins: AbstractRecipeHandlerMixin, EmiAeBaseScreenStackProviderMixin, EmiEncodePatternHandlerMixin, FillCraftingGridFromRecipePacketMixin, ...
+|   |-- cpu/                   # CraftingCPUMenuMixin, CraftingCpuLogicMixin, CraftingServiceMixin, ExecutingCraftingJobCircuitMixin
+|   |-- emi/                   # 9 mixins: AbstractRecipeHandlerMixin, CraftingHelperMixin, EmiAeBaseScreenStackProviderMixin, EmiEncodePatternHandlerMixin, EmiItemStackConverterMixin, EmiScreenBaseMixin, EmiStackHelperCircuitMixin, EmiUseCraftingRecipeHandlerMixin, FillCraftingGridFromRecipePacketMixin
 |   |-- energy/                # 7: ChestBlockEntityMixin, DriveBlockEntityMixin, EnergyOverlayGridMixin, InterfaceEnergyDistributorLogic, MEInventoryHandlerMixin, PatternProviderEnergyDistributorLogic, StorageBusPartMixin
 |   |-- menu/                  # AEBaseMenuMixin
 |   |-- misc/                  # 7: BodyProviderAdapterMixin, ColorApplicatorItemMixin, IOBusPartMixin, PartPlacementMixin, PowerUnitsMixin, UpgradeInventoriesMixin, WirelessAccessPointBlockEntityMixin
 |   |-- patternencodingpanel/  # ProcessingEncodingPanelMixin, StyleManagerMixin
-|   `-- patternprovider/       # 6: PatternContainerGroupMixin, PatternProviderLogicMixin, PatternProviderMenuMixin, PatternProviderScreenMixin, PatternProviderTargetCacheMixin, SettingToggleButtonMixin
+|   `-- patternprovider/       # 7: PatternContainerGroupMixin, PatternProviderLogicHostMixin, PatternProviderLogicMixin, PatternProviderMenuMixin, PatternProviderScreenMixin, PatternProviderTargetCacheMixin, SettingToggleButtonMixin
 |-- ae2ct/                     # CraftingTreeScreenMixin, CraftingTreeWidgetAccessor
 |-- aecs/                      # CrystalSeedItemMixin, ResonatingPatternProviderLogicMixin
 |-- betterP2P/                 # CommonProxyMixin
 |-- datagen/                   # AECSDatagenMixin
-|-- gtm/                       # BlockPatternMixin, MultiblockStateMixin
+|-- gtm/                       # BlockPatternMixin
 |-- omni/                      # AEUniversalCellInventoryMixin, OCItemsMixin, OmniCraftingBlockEntityMixin
-`-- pcc/                       # ConfigClientAccessor, PatternProviderLogicImplMixin
+`-- pcc/                       # (removed in current source)
 ```
 
 ## WHERE TO LOOK
@@ -30,7 +30,7 @@ mixin/
 | AE2CS/AECS patches | `mixin/aecs/` |
 | Better P2P | `mixin/betterP2P/` |
 | GTM patches | `mixin/gtm/` |
-| Omni Cells / PCC | `mixin/omni/`, `mixin/pcc/` |
+| Omni Cells | `mixin/omni/` |
 | Datagen mixins | `mixin/datagen/` |
 | Mixin config | `src/main/resources/ctnhenergy.mixins.json` |
 
@@ -45,7 +45,7 @@ mixin/
 Applies to `src/main/java/tech/luckyblock/mcmod/ctnhenergy/mixin` and `src/main/resources/ctnhenergy.mixins.json`.
 
 ## READ WHEN
-- Patching AE2, AECS, Better P2P, GTM, Omni Cells, PCC, or ME Requester behavior.
+- Patching AE2, AECS, Better P2P, GTM, Omni Cells, or ME Requester behavior.
 
 ## SOURCE OF TRUTH
 - `src/main/resources/ctnhenergy.mixins.json` and the mixin classes in `mixin/`.

@@ -13,6 +13,7 @@ Datagen source for `src/generated/resources` (3 Java files): CEDatagen and lang 
 - `src/generated/resources` is produced by `:modules:CTNH-Energy:runData`; do not hand-edit generated JSON.
 - GT/GMT recipes via `CTNHEnergyGTAddon.addRecipes()` are runtime dynamic-pack data: `runData` produces NO JSON for them. See root AGENTS.md CONVENTIONS.
 - Ponder language entries are extracted during client datagen via `common/CommonProxy.gatherData()` and CTNH-Lib's `CTNHPonderLang`.
+- Lang keys for the maintaining card are under `ctnhenergy.maintainingcarditem.*` (e.g. `configuretooltip`, `currentamounttooltip`, `settingstitle`, `stockingamount`).
 
 ## ANTI-PATTERNS
 - Do not hand-edit `src/generated/resources`.

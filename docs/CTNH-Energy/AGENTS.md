@@ -1,29 +1,29 @@
 # CTNH-ENERGY MODULE
 
 ## OVERVIEW
-CTNH-Energy adds AE2/energy integration, pattern buffer machinery, quantum computer systems, AE2 mixins, EMI/Jade integration, and generated resources under mod id `ctnhenergy` (171 Java files).
+CTNH-Energy adds AE2/energy integration, pattern buffer machinery, quantum computer systems, AE2 mixins, EMI/Jade integration, and generated resources under mod id `ctnhenergy` (172 Java files).
 
 ## STRUCTURE
 ```text
 src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 |-- CTNHEnergy.java / CTNHEnergyGTAddon.java / CEConfig.java   # mod entry, GT addon, config
-|-- api/                      # 6: CEPredicates, EUItemContext, IAutoMultiplyCPU, IBlockStateChangeIgnored, IGhostKeyTarget, IPatternProviderLogic
+|-- api/                      # 8: CEPredicates, EUItemContext, IAutoMultiplyCPU, IGhostKeyTarget, IMaintainingContext, IPatternProviderLogic, IUpgradeableMenu
 |-- client/                   # ClientProxy, EUKeyRenderHandler, Ponder (plugin/scenes/tags + 15 ae2 scenes)
 |-- common/                   # CommonProxy, CESettings, AE2/EU logic (me/), machines, quantum computer
 |   |-- me/                   # key/ (EUKey, EUKeyType, VoltageKey, VoltageKeyType), cell/ (EUCellInventory, EuCellHandler), parts/p2p/ (EUP2PTunnelPart), service/ (EnergyDistributeService, IEnergyDistributor), strategy/ (EUContainerItemStrategy + context/ CarriedContextEU, PlayerInvContextEU)
 |   |-- machine/              # ITagFilter, MEPartMachine, energyhatch/ (3), gui/ (6 widgets), handler/ (3), iohatch/ (3), patternbuffer/ (MEPatternBuffer), utils/ (2)
 |   |-- quantumcomputer/      # cpu/ (5), gui/ (4), machine/ (QuantumComputerMultiblockMachine), port/ (2)
 |   |-- block/                # QuantumComputerCasingBlock
-|   |-- item/                 # EUCellItem, EUCellStats, DynamoCardItem, IEUCell
+|   |-- item/                 # DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
 |   |-- multi/                # PowerSubstationMachine
 |   `-- pattern/              # DynamicProcessingPattern
 |-- data/                     # CEDatagen, lang/ (ChineseLangHandler, EnglishLangHandler)
 |-- event/                    # ForgeEventHandler, ForgeClientEventHandler
 |-- integration/              # emi/ (CEEMIPlugin, EUEmiStack, EUEmiStackSerializer, EUStackConverter), jade/ (AEDeviceEUProvider, AdMEPatternBufferProvider, AdMEPatternBufferProxyProvider, CTNHEnergyJadePlugin), ldlib/ (CELDLibPlugin)
-|-- mixin/                    # 49 files: ae2/ (8 subpackages), aecs/, betterP2P/, gtm/, omni/, pcc/, datagen/
+|-- mixin/                    # 49 files: ae2/ (8 subpackages), aecs/, betterP2P/, gtm/, omni/, datagen/
 |-- network/                  # packets/QCOpenCPUMenuPacket, syncdata/AEKeyPayLoad
 |-- registry/                 # 9: CERegistrate, CEItems, CEBlocks, CEMachines, CEMultiblock, CERecipeTypes, AEMenus, CENetWorking, CECreativeModeTabs
-`-- utils/                    # 12: CEDrawHelper, CEUtil, MEConfigUtil, CEPatternProviderTarget, ProviderRecord, FakePccCard, FakeSizedIntList, TempColorSprayBehaviour, button/ (BlitterButton, Blitters, CETextures, ToggleBlitterButton)
+`-- utils/                    # 12: CEDrawHelper, CEUtil, MEConfigUtil, CEPatternProviderTarget, ProviderRecord, FakeSizedIntList, TempColorSprayBehaviour, button/ (BlitterButton, Blitters, CETextures, ToggleBlitterButton)
 ```
 
 ## WHERE TO LOOK
@@ -36,6 +36,7 @@ src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 | Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
 | AE2 machines/hatches | `common/machine/energyhatch/`, `common/machine/iohatch/`, `common/machine/handler/` |
 | Quantum computer | `common/quantumcomputer/` (cpu/, gui/, machine/, port/) |
+| Maintaining card | `common/item/MaintainingCardItem.java`, `api/IMaintainingContext.java` |
 | Registries | `registry/` |
 | EMI/Jade | `integration/` |
 | Ponder/client | `client/ponder/` |
@@ -52,7 +53,7 @@ Read the matching domain guide before editing the corresponding source area.
 | `data` | `docs/CTNH-Energy/data/AGENTS.md` | CEDatagen, lang |
 | `event` | `docs/CTNH-Energy/event/AGENTS.md` | Forge event handlers |
 | `integration` | `docs/CTNH-Energy/integration/AGENTS.md` | EMI, Jade, LDLib integration |
-| `mixin` | `docs/CTNH-Energy/mixin/AGENTS.md` | AE2/AECS/Better P2P/GTM/Omni/PCC patches |
+| `mixin` | `docs/CTNH-Energy/mixin/AGENTS.md` | AE2/AECS/Better P2P/GTM/Omni patches |
 | `network` | `docs/CTNH-Energy/network/AGENTS.md` | Packets and sync data |
 | `registry` | `docs/CTNH-Energy/registry/AGENTS.md` | Items, blocks, machines, recipe types |
 | `utils` | `docs/CTNH-Energy/utils/AGENTS.md` | Shared helpers |
@@ -64,6 +65,7 @@ Read the matching domain guide before editing the corresponding source area.
 - AE2 mixins are central to behavior; inspect target class assumptions before changing signatures.
 - `src/generated/resources` is produced by `:modules:CTNH-Energy:runData`.
 - Ponder `CTNHEnergyPonderSceneBuilder` is a thin adapter around CTNH-Lib's shared builder; `AE2CablePonderHelper` stays in Energy because it depends on AE2 cable bus internals.
+- `MaintainingCardItem` implements `IMaintainingContext` to track a stocking amount; lang keys are under `ctnhenergy.maintainingcarditem.*`.
 
 ## ANTI-PATTERNS
 - Do not change AE2 mixins without checking both mixin JSON and the target AE2 behavior.

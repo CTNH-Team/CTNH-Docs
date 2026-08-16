@@ -47,9 +47,9 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- tags/                 # biome/entity/block/fluid/item tag providers, TagClearHelper
 |   `-- worldgen/             # CTNHBiomeModifiers
 |-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
-|-- integration/              # EMI (2 plugins) + Legendary Survival (2 modifiers)
+|-- integration/              # EMI (2 plugins) + Legendary Survival (2 modifiers) + FTB Essentials (AsyncRtpManager)
 |-- mixin/                    # 34 mixins across 17 target mods; mc/ RecipeManagerApplyMixin
-|-- registry/                 # 30 root classes + adventure/ jade/ machines/ material/
+|-- registry/                 # 30 root classes + adventure/ jade/ machines/ material/ sound/
 `-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
 ```
 
@@ -68,6 +68,8 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Materials | `data/materials/` (23 sets), `registry/material/` |
 | Ponder/client | `client/ponder/`, `client/renderer/` |
 | Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
+| Sound events | `registry/sound/CTNHSoundEvents.java` |
+| FTB Essentials integration | `integration/ftbessentials/AsyncRtpManager.java` |
 
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
@@ -79,9 +81,9 @@ Read the matching domain guide before editing the corresponding source area.
 | `common` | `docs/CTNH-Core/common/AGENTS.md` | Blocks, machines, capabilities, items, entities |
 | `data` | `docs/CTNH-Core/data/AGENTS.md` | Recipe generators, tags, worldgen, materials datagen |
 | `event` | `docs/CTNH-Core/event/AGENTS.md` | Forge event handlers, task managers |
-| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI and Legendary Survival integration |
+| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI, Legendary Survival, and FTB Essentials integration |
 | `mixin` | `docs/CTNH-Core/mixin/AGENTS.md` | Cross-mod mixins, recipe removal at `RecipeManager.apply()` |
-| `registry` | `docs/CTNH-Core/registry/AGENTS.md` | Items, blocks, machines, recipe types, materials |
+| `registry` | `docs/CTNH-Core/registry/AGENTS.md` | Items, blocks, machines, recipe types, materials, sound events |
 | `utils` | `docs/CTNH-Core/utils/AGENTS.md` | Shared helpers and recipe utilities |
 
 ## CONVENTIONS
@@ -93,6 +95,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Ponder `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
 - `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
 - Spelling quirk: mixin package is `dategen` (not `datagen`); `data/recipe/tconstruct/` is an empty leftover directory.
+- Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
 
 ## ANTI-PATTERNS
 - Do not manually reformat huge multiblock registry sections protected by Spotless toggles.
@@ -123,6 +126,7 @@ Applies to `modules/CTNH-Core` and the CI release artifacts it aggregates. It is
 - Recipe root: `data/recipe/CTNHCoreRecipeAddition.java` and `data/CTNHCoreDatagen.java`.
 - Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctnhcore.mixins.json`.
 - Static generated data: providers plus `src/generated/resources`, never the generated files alone.
+- Sound events: `registry/sound/CTNHSoundEvents.java` and `src/main/resources/assets/ctnhcore/sounds.json`.
 
 ## WORKFLOW
 1. Map the changed symbol to its domain and read that domain guide.
