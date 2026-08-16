@@ -57,6 +57,7 @@ data/
 - Recipe removal/filtering: `data/recipe/RecipeRemoval.java` registers ID-only filters; `mixin/mc/RecipeManagerApplyMixin.java` removes matching datapack entries at `RecipeManager.apply()` HEAD. Dynamic recipes are intentionally not filtered.
 - When referencing items/blocks/fluids, MUST use direct registration objects (static field references like `GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`); never `ResourceLocation` string parsing + `ForgeRegistries` lookups except where no registration object exists. See root AGENTS.md CONVENTIONS.
 - `data/recipe/tconstruct/` is an empty leftover directory; do not add files there without first checking where TConstruct recipes actually live.
+- Recent recipe changes: PrimitiveKineticAgeRecipes now includes cinnabar/realgar/pyrite/chalcopyrite centrifugation; CreateRecipes now crushes GT ingots to dust (not vanilla ingots) and removes Create silver/brass recipes; OreProcessingRecipes melts PreciousAlloy to liquid gold; GoldChain now uses fluid copper chloride and adds sodium cyanide production.
 
 ## ANTI-PATTERNS
 - Do not hand-edit `src/generated/resources`; change datagen Java then run `runData`.

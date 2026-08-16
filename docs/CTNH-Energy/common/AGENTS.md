@@ -1,7 +1,7 @@
 # CTNH-ENERGY COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Energy (55 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
+Shared implementation for Energy (56 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
 
 ## STRUCTURE
 ```text
@@ -29,7 +29,7 @@ common/
 |   |-- machine/               # QuantumComputerMultiblockMachine
 |   `-- port/                  # QuantumComputerMENetworkPortBlock, QuantumComputerMENetworkPortBlockEntity
 |-- block/                     # QuantumComputerCasingBlock
-|-- item/                      # DynamoCardItem, EUCellItem, EUCellStats, IEUCell
+|-- item/                      # DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
 |-- multi/                     # PowerSubstationMachine
 `-- pattern/                   # DynamicProcessingPattern
 ```
@@ -50,7 +50,7 @@ common/
 | Storage handlers | `common/machine/handler/` (EU/fluid/item) |
 | Machine GUI widgets | `common/machine/gui/` (6 widgets) |
 | Quantum computer | `common/quantumcomputer/` (cpu/, gui/, machine/, port/) |
-| Items | `common/item/` (EUCellItem, EUCellStats, DynamoCardItem) |
+| Items | `common/item/` (EUCellItem, EUCellStats, DynamoCardItem, MaintainingCardItem) |
 
 ## CONVENTIONS
 - `CommonProxy.init()` initializes config, registrate, AE menus, networking, datagen, gatherData listener, creative tabs, and AE key type registration.
@@ -58,6 +58,7 @@ common/
 - `CommonProxy.attachCapabilities()` adds `generic_eu_wrapper` through `common/me/MEMachineEUHandler.java`.
 - `MEPartMachine.circuitInventory` is `@DescSynced`; circuit slot contents are pushed from the server part to the client so GUI slots stay synchronized.
 - Do not register EU key/cell behavior only in item code; AE2 key types, storage cell handler, container strategy, upgrades, and P2P attunement are separate CommonProxy hooks.
+- `MaintainingCardItem` implements `api/IMaintainingContext` and provides right-click configuration for stocking amount.
 
 ## ANTI-PATTERNS
 - Do not treat quantum computer/menu updates as server-only; UI progress sync is part of the module.

@@ -1,13 +1,13 @@
 # CTNH-CORE MIXIN DOMAIN
 
 ## OVERVIEW
-Broad cross-mod mixins (34 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
+Broad cross-mod mixins (35 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
 
 ## STRUCTURE
 ```text
 mixin/
 |-- ChunkMixin / ChunkSerializerMixin / TagLoaderMixin     # Minecraft core
-|-- mc/                        # MinecraftServerMixin, MobMixin, MonsterMixin, NaturalSpawnerMixin, RecipeManagerApplyMixin, ServerChunkCacheMixin
+|-- mc/                        # MinecraftServerMixin, MobMixin, MonsterMixin, NaturalSpawnerMixin, RecipeManagerApplyMixin, ServerChunkCacheMixin, ServerChunkCacheAccessor
 |-- aecs/                      # EmiPluginMixin
 |-- apotheosis/                # EarthsBoonEnchantMixin, SocketHelperMixin
 |-- ars_nouveau/               # GlyphRecipeCategoryMixin
@@ -37,12 +37,14 @@ mixin/
 | FTB Chunks / JAVD / TMRV | `mixin/ftbchunks/`, `mixin/javd/`, `mixin/tmrv/` |
 | Datagen mixins | `mixin/dategen/` (spelling preserved) |
 | Chunk reload | `mixin/ChunkMixin.java`, `mixin/ChunkSerializerMixin.java`, `mixin/TagLoaderMixin.java` |
+| FTB Essentials accessor | `mixin/mc/ServerChunkCacheAccessor.java` (used by `integration/ftbessentials/AsyncRtpManager`) |
 
 ## CONVENTIONS
 - Keep mixin JSON and package entries synchronized; both are required for a mixin to load.
 - `RecipeManagerApplyMixin.java` removes matching incoming datapack entries at `RecipeManager.apply()` HEAD; dynamic recipes are intentionally not filtered.
 - Inspect target mod versions before changing injection signatures.
 - The datagen mixin package is spelled `dategen`; do not "fix" it to `datagen` without updating the mixin JSON refmap.
+- `ServerChunkCacheAccessor` exposes the private main-thread chunk future method for the async RTP manager.
 
 ## ANTI-PATTERNS
 - Do not change injection points without checking the upstream target members.

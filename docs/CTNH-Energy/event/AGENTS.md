@@ -11,6 +11,7 @@ Forge event handlers for Energy (2 Java files).
 
 ## CONVENTIONS
 - Event subscribers are lifecycle entry points; trace them through annotations and registration sites.
+- Tooltip lang keys for auto-multiply and omni thread number moved from `forgeclienteventhandler.*` to `tooltip.*` (see generated lang).
 
 ## ANTI-PATTERNS
 - Do not move event wiring into registry classes.

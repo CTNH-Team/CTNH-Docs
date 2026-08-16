@@ -16,6 +16,7 @@ Forge event handlers and background task managers for Core runtime behavior (5 J
 - Event subscribers and registry callbacks are lifecycle entry points; trace them through annotations, not ordinary Java callers.
 - Capability attach hooks (EIO capacitor capabilities, namespace/remap helpers) are wired through `common/capability/` from here.
 - `ProvidableNetEventHandler` works with `common/machine/trait/providable_net/` machines.
+- `ForgeEventHandler` also hosts the soul torch easter egg (`onSoulTorchEasterEgg`), which spawns a firework and plays the `easter_egg_clown` sound event.
 
 ## ANTI-PATTERNS
 - Do not move event logic into registry classes; keep lifecycle wiring in `event/`.
