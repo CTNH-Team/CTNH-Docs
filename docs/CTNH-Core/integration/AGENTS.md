@@ -1,12 +1,13 @@
 # CTNH-CORE INTEGRATION DOMAIN
 
 ## OVERVIEW
-Optional third-party integrations owned by Core (5 Java files): EMI, Legendary Survival, and FTB Essentials.
+Optional third-party integrations owned by Core (7 Java files): EMI, Create Diesel, Legendary Survival, and FTB Essentials.
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | EMI plugins | `integration/emi/CTNHCoreEmiPlugin.java`, `integration/emi/CTNHExtraEmiPlugin.java` |
+| Create Diesel | `integration/creatediesel/DistillationCategoryLayout.java`, `integration/creatediesel/GTBedrockOilBridge.java` |
 | Legendary Survival | `integration/legendary/ArmorModifier.java`, `integration/legendary/UnderfloorHeatingSystemTempModifier.java` |
 | FTB Essentials | `integration/ftbessentials/AsyncRtpManager.java` |
 
@@ -15,6 +16,7 @@ Optional third-party integrations owned by Core (5 Java files): EMI, Legendary S
 - Broad cross-mod recipe compatibility generally belongs in Core (aggregator), while feature modules keep their own mechanic integrations.
 - Legendary Survival modifiers integrate with the Underfloor Heating System machine.
 - FTB Essentials integration is compile-only (`modCompileOnly`); the `AsyncRtpManager` replaces the synchronous `/rtp` with an async chunk-loading search, using the `ServerChunkCacheAccessor` mixin.
+- Create Diesel integration centers on `DistillationCategoryLayout`, which dynamically centers variable-height distillation recipes; its client mixins live under `mixin/creatediesel/` and `mixin/emi/`.
 
 ## ANTI-PATTERNS
 - Do not move optional integrations into base modules.
@@ -24,10 +26,10 @@ Optional third-party integrations owned by Core (5 Java files): EMI, Legendary S
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/integration`.
 
 ## READ WHEN
-- Changing EMI, Legendary Survival, or FTB Essentials compatibility in Core.
+- Changing EMI, Create Diesel, Legendary Survival, or FTB Essentials compatibility in Core.
 
 ## SOURCE OF TRUTH
-- `integration/emi/`, `integration/legendary/`, and `integration/ftbessentials/` classes; wiring in `common/CommonProxy.java`.
+- `integration/emi/`, `integration/creatediesel/`, `integration/legendary/`, and `integration/ftbessentials/` classes; wiring in `common/CommonProxy.java`.
 
 ## WORKFLOW
 1. Confirm the integration target mod version before changing hooks.

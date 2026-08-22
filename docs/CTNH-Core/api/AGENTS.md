@@ -1,12 +1,11 @@
 # CTNH-CORE API DOMAIN
 
 ## OVERVIEW
-Public API surfaces for Core (19 Java files): the multiblock builder, machine feature hooks, GUI/Jade/recipe integration points, and material data helpers. Code outside Core uses these surfaces to build machines and recipes without reaching into implementation classes.
+Public API surfaces for Core (18 Java files): the multiblock builder, machine feature hooks, GUI/Jade/recipe integration points, and material data helpers. Code outside Core uses these surfaces to build machines and recipes without reaching into implementation classes.
 
 ## STRUCTURE
 ```text
 api/
-|-- CTNHAPI.java               # module API entry
 |-- CTNHMultiblockBuilder.java
 |-- Pattern/                   # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates
 |-- data/material/             # CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty
@@ -24,9 +23,9 @@ api/
 | Machine features | `api/machine/feature/` (`ICoilMachine`, `IDigitalMiner`, `IDynamicCasing`) |
 | Pattern helpers | `api/Pattern/` (`AsynBlockPattern`, `CTNHBlockMaps`, `CTNHPredicates`) |
 | Material data | `api/data/material/` (icon sets/types, property keys, catalyst property) |
+| GUI textures | `api/gui/CTNHGuiTextures.java` |
 | Jade providers | `api/jade/` (multithread recipe/output/thread status) |
 | Recipe APIs | `api/recipe/` (`DigitalMinerLogic`) |
-| Module entry | `api/CTNHAPI.java` |
 
 ## CONVENTIONS
 - API classes must not leak client-only classes into common construction paths.

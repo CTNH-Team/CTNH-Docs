@@ -1,7 +1,7 @@
 # CTNH-CORE MODULE
 
 ## OVERVIEW
-CTNH-Core is the aggregate/core mod and CI release target (394 Java files, the largest module). It hosts shared CTNH gameplay systems, GTCEu integration, large machine registries, generated data, Core-owned Ponder scenes, and cross-mod content.
+CTNH-Core is the aggregate/core mod and CI release target (Java files, the largest module). It hosts shared CTNH gameplay systems, GTCEu integration, large machine registries, generated data, Core-owned Ponder scenes, and cross-mod content.
 
 ## STRUCTURE
 ```text
@@ -10,25 +10,31 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |-- CTNHCoreGTAddon.java      # GTCEu addon hooks; addRecipes() dispatches data/recipe/**
 |-- CTNHConfig.java           # module config
 |-- api/                      # public APIs: multiblock builder, patterns, machine features
+|   |-- CTNHMultiblockBuilder.java
 |   |-- Pattern/              # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates
 |   |-- data/material/        # icon sets/types, property keys, catalyst property
+|   |-- gui/                  # CTNHGuiTextures
+|   |-- jade/                 # multithread recipe/output/thread providers
 |   |-- machine/feature/      # ICoilMachine, IDigitalMiner, IDynamicCasing
 |   |-- machine/multiblock/   # UnlimitedItemStackTransfer
-|   |-- jade/                 # multithread recipe/output/thread providers
 |   `-- recipe/               # DigitalMinerLogic
 |-- client/                   # ClientProxy, models, renderers, Core Ponder
-|   |-- model/                # ModelBase, TemplateModel, TurbineRotorModel
+|   |-- ClientProxy.java / ClientUtil.java
+|   |-- model/                # ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel
 |   |-- ponder/               # plugin/scenes/tags + Electric/ and Kinetic/ scene groups
-|   `-- renderer/             # ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, ...
-|-- common/                   # CommonProxy, blocks, machines, capabilities, items, worlds
+|   |-- renderer/             # ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, ...
+|   `-- util/                 # SnowOverlayQuadOffset
+|-- common/                   # CommonProxy, blocks, machines, capabilities, items, entities
 |   |-- block/                # CoilType, PhotovoltaicBlock, TurbineRotorBlock, blockdata/
 |   |-- capability/           # EIOCapacitorProvider
 |   |-- entity/monster/       # AstralSlime, SightSeerSpitter
 |   |-- gui/                  # WPAAcceleratorGui, terminal/widget widgets
 |   |-- item/                 # ArkOfHomoItem, AstronomyCircuitItem, MEAdvancedTerminalItem, ...
 |   |-- machine/cover/        # CreativeEnergyCover
-|   |-- machine/multiblock/   # 5 top-level + electric/ (33) + generator/ (12) + kinetic/ + part/ (12) + quantum/
+|   |-- machine/multiblock/   # 5 top-level + electric/ + generator/ + kinetic/ + part/ + quantum/
 |   |   |-- electric/         # WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, ...
+|   |   |   |-- multithread/  # CNCAlloySmelter
+|   |   |   `-- rareearth/    # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
 |   |   |-- generator/        # Arc_Reactor, HyperPlasmaTurbineMachine, MegaTurbineMachine, ...
 |   |   |-- kinetic/          # IndustrialPrimitiveBlastFurnaceMachine, MeadowMachine, NoEnergyMachine
 |   |   |-- part/             # CTNHPartAbility, CatalystHatchPartMachine, Creative*PartMachine, ...
@@ -42,14 +48,14 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- CreateRecipeTypes.java
 |   |-- item/                 # CrystalItems
 |   |-- machines/             # GTNNMachines
-|   |-- materials/            # 23 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
-|   |-- recipe/               # 31 top-level + age/ chain/ create/ migrated/ modmodify/ multiblock/ ...
+|   |-- materials/            # 25 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
+|   |-- recipe/               # 32 top-level + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
 |   |-- tags/                 # biome/entity/block/fluid/item tag providers, TagClearHelper
 |   `-- worldgen/             # CTNHBiomeModifiers
 |-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
-|-- integration/              # EMI (2 plugins) + Legendary Survival (2 modifiers) + FTB Essentials (AsyncRtpManager)
-|-- mixin/                    # 34 mixins across 17 target mods; mc/ RecipeManagerApplyMixin
-|-- registry/                 # 30 root classes + adventure/ jade/ machines/ material/ sound/
+|-- integration/              # EMI, Create Diesel, Legendary Survival, FTB Essentials
+|-- mixin/                    # cross-mod mixins across many target mods; mc/ RecipeManagerApplyMixin
+|-- registry/                 # 43 root+child classes; adventure/ jade/ machines/ material/ sound/
 `-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
 ```
 
@@ -59,16 +65,17 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Mod entry | `CTNHCore.java` |
 | GT addon | `CTNHCoreGTAddon.java` |
 | Config | `CTNHConfig.java` |
-| Registries | `registry/` (30 root classes) |
+| Registries | `registry/` (43 root+child classes) |
 | Recipe generation root | `data/recipe/CTNHCoreRecipeAddition.java` (dispatched from `addRecipes()`) |
-| Multiblocks (electric) | `common/machine/multiblock/electric/` (33 machines) |
+| Multiblocks (electric) | `common/machine/multiblock/electric/` (including `multithread/` and `rareearth/`) |
 | Multiblocks (generator) | `common/machine/multiblock/generator/` (12 machines) |
 | Multiblocks (parts) | `common/machine/multiblock/part/` (12 machines) |
 | Machine traits/net | `common/machine/trait/providable_net/` |
-| Materials | `data/materials/` (23 sets), `registry/material/` |
+| Materials | `data/materials/` (25 sets), `registry/material/` |
 | Ponder/client | `client/ponder/`, `client/renderer/` |
 | Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
 | Sound events | `registry/sound/CTNHSoundEvents.java` |
+| Create Diesel integration | `integration/creatediesel/DistillationCategoryLayout.java`, `mixin/creatediesel/DistillationCategoryMixin.java`, `mixin/emi/JemiRecipeMixin.java` |
 | FTB Essentials integration | `integration/ftbessentials/AsyncRtpManager.java` |
 
 ## DOMAIN GUIDE ROUTING
@@ -81,7 +88,7 @@ Read the matching domain guide before editing the corresponding source area.
 | `common` | `docs/CTNH-Core/common/AGENTS.md` | Blocks, machines, capabilities, items, entities |
 | `data` | `docs/CTNH-Core/data/AGENTS.md` | Recipe generators, tags, worldgen, materials datagen |
 | `event` | `docs/CTNH-Core/event/AGENTS.md` | Forge event handlers, task managers |
-| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI, Legendary Survival, and FTB Essentials integration |
+| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI, Create Diesel, Legendary Survival, and FTB Essentials integration |
 | `mixin` | `docs/CTNH-Core/mixin/AGENTS.md` | Cross-mod mixins, recipe removal at `RecipeManager.apply()` |
 | `registry` | `docs/CTNH-Core/registry/AGENTS.md` | Items, blocks, machines, recipe types, materials, sound events |
 | `utils` | `docs/CTNH-Core/utils/AGENTS.md` | Shared helpers and recipe utilities |
@@ -93,7 +100,7 @@ Read the matching domain guide before editing the corresponding source area.
 - CI builds this module only; changes in other modules should still be validated through `:modules:CTNH-Core:build` when they affect aggregation.
 - Some generated recipe Java lives under `data/recipe/generated`; distinguish Java recipe generators from JSON generated resources.
 - Ponder `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
-- `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, EIO/JEI, EMI, FTB Chunks, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
+- `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
 - Spelling quirk: mixin package is `dategen` (not `datagen`); `data/recipe/tconstruct/` is an empty leftover directory.
 - Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
 
