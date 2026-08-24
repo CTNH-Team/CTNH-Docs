@@ -1,13 +1,13 @@
 # CTNH-BIO MIXIN DOMAIN
 
 ## OVERVIEW
-Compatibility mixins (20 Java files) for Biomancy, Hostile Neural Networks, EMI/ALI, Create, and GTCEu recipe/machine internals.
+Compatibility mixins (19 Java files) for Biomancy, Hostile Neural Networks, EMI/ALI, Create, and GTCEu recipe/machine internals.
 
 ## STRUCTURE
 ```text
 mixin/
 |-- GTMixin.java               # root
-|-- ali/                       # EmiCompatibilityMixin, EmiGamePlayLootMixin, EmiScrollWidgetMixin
+|-- ali/                       # EmiGamePlayLootMixin, EmiScrollWidgetMixin
 |-- biomancy/                  # BiomancyJeiPluginMixin, InjectorItemMixin, InjectorScreenMixin, VialHolderBlockEntityMixin
 |-- create/                    # CrushingWheelControllerBlockEntityMixin
 |-- emi/                       # EmiApiMixin, RecipeScreenMixin
@@ -28,9 +28,11 @@ mixin/
 ## CONVENTIONS
 - Keep mixin JSON and package entries synchronized.
 - Treat these as compatibility patches, not generic helpers.
+- Despoil-loot catalyst display (EMI workstation) moved to Core; `mixin/ali/EmiCompatibilityMixin` was removed from both source and `ctnhbio.mixins.json`.
 
 ## ANTI-PATTERNS
 - Do not change injection points without checking upstream target members.
+- Do not re-add `mixin/ali/EmiCompatibilityMixin`; despoil-loot catalyst display is owned by Core.
 
 ## SCOPE
 Applies to `src/main/java/com/moguang/ctnhbio/mixin` and `src/main/resources/ctnhbio.mixins.json`.
