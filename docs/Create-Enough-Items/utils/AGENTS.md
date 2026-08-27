@@ -1,7 +1,7 @@
 # CREATE-ENOUGH-ITEMS UTILS DOMAIN
 
 ## OVERVIEW
-EMI feature implementations (13 Java files): collapsible sidebar groups, duplicate/featured recipe filtering, associated search, fast recipe indexing, drag search fill, and GTCEu voltage filtering for the recipe page.
+EMI feature implementations (13 Java files): collapsible sidebar groups, duplicate/featured recipe filtering, associated search, fast recipe indexing, drag search fill, and GTCEu voltage filtering (with one-click reset) for the recipe page.
 
 ## STRUCTURE
 ```text
@@ -24,7 +24,7 @@ utils/emi/
 | Fast recipe indexing | `utils/emi/search/FastRecipeManager.java` |
 | Tag relation graph | `utils/emi/search/TagRelationGraph.java` |
 | Drag search fill | `utils/emi/search/CEIEmiDragSearchFill.java` |
-| Voltage filtering | `utils/emi/voltage/CEIVoltageRecipeFilter.java` |
+| Voltage filtering (incl. reset) | `utils/emi/voltage/CEIVoltageRecipeFilter.java`, `utils/emi/voltage/CEIVoltageRecipeScreen.java` |
 
 ## CONVENTIONS
 - `CEICollapsibleGroups` reads sidebar grouping rules and persists local expanded/collapsed state under `config/cei/collapsible_emi_groups.json`.
@@ -32,6 +32,8 @@ utils/emi/
 - `EmiScreenManagerInputMixin` calls `CEICollapsibleGroups.getGroup(ingredient)` to append `cei.emi.collapsible.group.count` and `cei.emi.collapsible.group.toggle` lines to the hovered ingredient tooltip.
 - `CEIFeaturedRecipes`, `CEIDuplicateRecipes`, `CEIAssociatedSearch`, and `CEIVoltageRecipeFilter` back the recipe-page filters described in the README.
 - `CEIDuplicateRecipes` filters via a hardcoded blocklist: `create:automatic_packing`, `create:block_cutting`, `create:fan_smoking`, `create:fan_blasting`, and `vintageimprovements:unpacking` (the Vintage Improvements vibrating-table auto-generated `unpacking` recipe that duplicates a Create compacting recipe). The Vintage entry is built by a `vintageImprovementsId()` helper; IDs are built with `ResourceLocation.tryBuild`, not `ForgeRegistries`.
+- `CEIVoltageRecipeFilter.reset()` reloads state, sets `minTier = GTValues.ULV` and `maxTier = GTValues.MAX`, then saves state; the reset button in `EmiScreenManagerInputMixin` calls it through `CEIVoltageRecipeScreen.cei$resetVoltageFilter()`.
+- `CEIVoltageRecipeScreen` declares `cei$getVoltageResetButtonX()`, `cei$getVoltageResetButtonY()`, and `cei$resetVoltageFilter()`; `RecipeScreenMixin` implements them.
 - Rule JSON accepts item IDs, tags, regex forms, negation, grouped OR/AND syntax, and recipe/category/input/output/catalyst selectors for featured filters.
 - `ForgeRegistries` usage here is for EMI rule JSON string-ID matching (reading rule files), not recipe item resolution.
 
@@ -39,6 +41,7 @@ utils/emi/
 - Do not edit runtime `config/cei/*.json` to change defaults; edit the static rule files in `src/main/resources/assets/cei/emi/`.
 - Do not treat voltage filtering as generic EMI filtering; it only handles GTCEu `GTEmiRecipe` paths.
 - Do not resolve the `CEIDuplicateRecipes` ID blocklist through `ForgeRegistries`; keep the hardcoded `ResourceLocation` list.
+- Do not implement voltage reset by mutating `minTier`/`maxTier` directly without `loadState()`/`saveState()`; use `CEIVoltageRecipeFilter.reset()`.
 
 ## SCOPE
 Applies to `src/main/java/com/ctnh/cei/utils` and its child packages.
@@ -47,13 +50,16 @@ Applies to `src/main/java/com/ctnh/cei/utils` and its child packages.
 - Changing EMI sidebar/search/recipe-page feature behavior.
 - Changing collapsible-group tooltip content or grouping rule lookup.
 - Changing the duplicate-recipe ID blocklist (Create/Vintage Improvements or other upstream recipe IDs).
+- Changing voltage-filter reset behavior or the `CEIVoltageRecipeScreen` interface.
 
 ## SOURCE OF TRUTH
 - `utils/emi/` classes and the static rule JSON in `src/main/resources/assets/cei/emi/`.
 - For duplicate filtering, `utils/emi/duplicate/CEIDuplicateRecipes.java` is the source of the recipe-ID blocklist.
+- For voltage filtering/reset, `utils/emi/voltage/CEIVoltageRecipeFilter.java` and `utils/emi/voltage/CEIVoltageRecipeScreen.java`.
 
 ## WORKFLOW
 1. Check the matching feature class before editing behavior.
 2. For duplicate filtering, verify new upstream recipe IDs against the actual generated recipe IDs before adding to the `CEIDuplicateRecipes` blocklist.
 3. Validate rule JSON against the accepted selector syntax.
-4. Run `:modules:Create-Enough-Items:build`; validate the EMI surface at runtime.
+4. For voltage reset, keep `CEIVoltageRecipeScreen` interface and `RecipeScreenMixin` implementation in sync.
+5. Run `:modules:Create-Enough-Items:build`; validate the EMI surface at runtime.

@@ -1,7 +1,7 @@
 # CTNH-BIO MODULE
 
 ## OVERVIEW
-CTNH-Bio adds Biomancy/living-machine systems, entity/recipe capabilities, biological machines, and generated recipes/resources under mod id `ctnhbio` (175 Java files).
+CTNH-Bio adds Biomancy/living-machine systems, entity/recipe capabilities, biological machines, and generated recipes/resources under mod id `ctnhbio` (174 Java files).
 
 ## STRUCTURE
 ```text
@@ -20,7 +20,7 @@ src/main/java/com/moguang/ctnhbio/
 |-- event/                    # EventHandler, ForgeEventHandler, TransformManager
 |-- integration/              # EMI, Jade (LivingMachineStatusProvider), JEI (3), XEI (entity entries/handlers)
 |-- machine/                  # living-machine implementations: braininavat/ bioobservation/ greatflesh/ multiblock/
-|-- mixin/                    # 20 files: Biomancy, HNN, EMI/ALI, Create, GTCEu patches
+|-- mixin/                    # 19 files: Biomancy, HNN, EMI/ALI, Create, GTCEu patches
 |-- registry/                 # 17 files: CBBlocks, CBItems, CBMachines, CBMultiblocks, CBRecipeTypes, ...
 `-- utils/                    # CBMachineNames, DecomposingRecipeHandler, DespoilLootHelper, ...
 ```
@@ -62,11 +62,13 @@ Read the matching domain guide before editing the corresponding source area.
 - `src/main/resources/data/ctnhbio/recipes/decomposing` has many hand-authored/static recipe JSON files.
 - `src/generated/resources` is produced by `:modules:CTNH-Bio:runData`.
 - Mixins span Biomancy, Hostile Neural Networks, EMI/ALI, Create, and GTCEu recipe/machine internals; treat them as compatibility patches, not generic helpers.
+- Despoil-loot catalyst display (EMI workstation) moved to Core; Bio's `mixin/ali/` no longer contains `EmiCompatibilityMixin`.
 
 ## ANTI-PATTERNS
 - Do not collapse biological recipe capabilities into Core; this module owns its living-machine abstractions.
 - Do not assume all recipe JSON is generated; check whether it is under `src/main/resources` or `src/generated/resources`.
 - Do not bypass `PropertyOperators` / `EntityProperties` when adding entity-model recipe matching; those registries are initialized explicitly in `CommonProxy.init()`.
+- Do not re-add `mixin/ali/EmiCompatibilityMixin`; despoil-loot catalyst display is owned by Core.
 
 ## COMMANDS
 ```text
