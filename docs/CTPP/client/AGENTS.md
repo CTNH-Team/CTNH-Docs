@@ -12,7 +12,8 @@ client/
 |-- ponder/                    # CTPPPonderPlugin, CTPPPonderSceneBuilder, CTPPPonderScenes, CTPPPonderTags
 |   |-- electric/              # CarbonBrushes
 |   `-- kinetic/               # BigDam, KineticHatch, SmashingFactory, WindmillControlCenter
-|-- renderer/                  # CTPPToolboxCurioRenderer, CTPPToolboxRenderer, GTWireCutterRenderer
+|-- renderer/                  # CTPPToolboxCurioRenderer, CTPPToolboxRenderer, CTPPWireRenderTypes, GTWireCutterRenderer, VoltageTerminalRenderer
+|-- terminal/                  # TerminalClientSelection, TerminalClientSelectionEvents
 `-- toolbox/                   # CTPPToolboxClientState, CTPPToolboxKeyHandler, CTPPToolboxOverlay, CTPPToolboxRadialScreen, CTPPToolboxScreen
 ```
 
@@ -21,8 +22,9 @@ client/
 |---------|----------|
 | Client proxy | `client/ClientProxy.java` |
 | Ponder plugin/scenes/tags | `client/ponder/` (incl. Carbon Brushes electric scene) |
-| Renderers | `client/renderer/` (toolbox, wire cutter), top-level visuals (CarbonBrushes, GeneratorCoil, KineticMachine) |
+| Renderers | `client/renderer/` (toolbox, wire cutter, voltage terminal), top-level visuals (CarbonBrushes, GeneratorCoil, KineticMachine) |
 | Toolbox UI | `client/toolbox/` (5 classes) |
+| Terminal client | `client/terminal/` (TerminalClientSelection, TerminalClientSelectionEvents) |
 | Partial models | `client/CTPPPartialModels.java` |
 
 ## CONVENTIONS

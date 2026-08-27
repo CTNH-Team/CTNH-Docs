@@ -7,7 +7,9 @@ JEI integration for CTPP (3 Java files).
 ```text
 integration/
 |-- jei/                       # CTPPJeiPlugin
-`-- jei/category/              # FanAcidWashingCategory, FanBreathingCategory
+|-- jei/category/              # FanAcidWashingCategory, FanBreathingCategory
+|-- jade/                      # KineticOutputMachineProvider
+`-- ldlib/                     # CTPPLDLibPlugin
 ```
 
 ## WHERE TO LOOK
@@ -15,6 +17,8 @@ integration/
 |---------|----------|
 | JEI plugin | `integration/jei/CTPPJeiPlugin.java` |
 | Fan categories | `integration/jei/category/` (FanAcidWashingCategory, FanBreathingCategory) |
+| Jade provider | `integration/jade/KineticOutputMachineProvider.java` |
+| LDLib plugin | `integration/ldlib/CTPPLDLibPlugin.java` |
 
 ## CONVENTIONS
 - KubeJS recipe keys `SU_IN` / `SU_OUT` are registered from `CTPPGTAddon.registerRecipeKeys()` (not in this domain).
