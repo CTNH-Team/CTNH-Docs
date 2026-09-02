@@ -22,6 +22,7 @@ dynamicPart/
 
 ## CONVENTIONS
 - Create kinetic behavior is patched through mixins and dynamic contraption classes; inspect both when changing rotation or moving-block behavior.
+- `SimpleRotatingContraptionEntity.tick()` sets running state before attempting reattach to controller.
 
 ## ANTI-PATTERNS
 - Do not change rotation behavior without checking the matching Create mixins.

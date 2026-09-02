@@ -1,10 +1,10 @@
 {
     "repos": {
         "__main__": {
-            "last_sha": "ba2c79412a7cb114aaf1662fc4cf4391e2e14140"
+            "last_sha": "6e5b73f1a3425adcd46f6cddf1dfbaed6a92a3cd"
         },
         "CTNH-Core": {
-            "last_sha": "e2709bd91c2338e10d130162723d8b0fcdf1db39"
+            "last_sha": "10dc4745ced627ce10bec81ee666915a5a832c04"
         },
         "CTNH-Lib": {
             "last_sha": "85811cb54312de6e08ff0de359b05916a6fc5d16"
@@ -13,16 +13,16 @@
             "last_sha": "d6ef064bc0be895fba54a9594c9e4461ade0953b"
         },
         "CTNH-Energy": {
-            "last_sha": "6589bbe9a38cfd62fdf0adba4bb634ac952b76dc"
+            "last_sha": "d244f291bbf9adf0247fc1dd9bf65cd4154c4c68"
         },
         "CTNH-Mana": {
-            "last_sha": "5a00e5c69c3eca4fb056e4f9a7485df7aca31d5a"
+            "last_sha": "23785c7fcd7b9b8a291c325f2a7cb48b9f932c0d"
         },
         "CTNH-Astral": {
-            "last_sha": "53420f828dc108c838184f228060ca5decbc79c8"
+            "last_sha": "162c2a58d818965f255b34cceb2f87895ac48650"
         },
         "CTPP": {
-            "last_sha": "dc5083d94e422c9c4dcd9bcb5240084d4c4d95dc"
+            "last_sha": "c46e186daaffe8218e3a1c93a2f6b90829f2ddae"
         },
         "Create-Enough-Items": {
             "last_sha": "de5bc0e18d9a02637f2cf2429c67ac12fb6b09c5"
