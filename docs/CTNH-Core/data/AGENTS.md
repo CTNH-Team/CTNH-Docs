@@ -1,7 +1,7 @@
 # CTNH-CORE DATA DOMAIN
 
 ## OVERVIEW
-Datagen source for `src/generated/resources` (141 Java files, the second-largest Core domain): recipe generators split by age/chain/domain, tags, materials (25 sets), and worldgen providers.
+Datagen source for `src/generated/resources` (149 Java files, the second-largest Core domain): recipe generators split by age/chain/domain, tags, materials (26 sets), and worldgen providers.
 
 ## STRUCTURE
 ```text
@@ -11,15 +11,15 @@ data/
 |-- CreateRecipeTypes.java
 |-- item/                         # CrystalItems
 |-- machines/                     # GTNNMachines
-|-- materials/                    # 25 material sets: NaquadahMaterials, PlatinumLineMaterials, RareEarthMaterials, AdastraMaterials, AeCrystalScienceMaterials, AeOmniMaterials, EnderIOMaterials, WetWareLineMaterials, ZrHfSeparationMaterials, ...
+|-- materials/                    # 26 material sets: NaquadahMaterials, PlatinumLineMaterials, RareEarthMaterials, AdastraMaterials, AeCrystalScienceMaterials, AeOmniMaterials, EnderIOMaterials, WetWareLineMaterials, ZrHfSeparationMaterials, ...
 |-- tags/                         # CTNHBiomeTagsProvider, CTNHEntityTypeTagsProvider, CTNHExtraBlockTagsProvider, CTNHExtraFluidTagsProvider, CTNHExtraItemTagsProvider, ItemTags, StoneTags, TagClearHelper
 |-- worldgen/                     # CTNHBiomeModifiers
 `-- recipe/
     |-- CTNHCoreRecipeAddition.java  # addRecipes() dispatch root
     |-- RecipeRemoval.java           # ID-only removal filters
-    |-- (32 top-level classes: AdAstraRecipes, CTNHCraftingComponents, ScalableReservoirComputingRecipes, UHVPartsRecipe, EUCellRecipes, MachinesRecipes, ...)
+    |-- (34 top-level classes: AdAstraRecipes, CTNHCraftingComponents, ScalableReservoirComputingRecipes, UHVPartsRecipe, EUCellRecipes, MachinesRecipes, ...)
     |-- age/                      # 10: LVRecipes, EVRecipes, HVRecipes, IVRecipes, LuVRecipes, MVRecipes, UHVRecipes, UVRecipes, ZPMRecipes, PrimitiveKineticAgeRecipes
-    |-- chain/                    # 25: AlumiumChain, BrineChain, CementChain, ChromiteChain, CoalChain, FuelChain, FuelRefiningChain, GoldChain, GraphiteChain, IodineChain, NaquadahLine, PlatinumLine, RareearthChain, SiliconChain, SpaceFabric, StonedustChain, TiChain, WoodChain, ZirconChain, ...
+    |-- chain/                    # 30: AlumiumChain, BoronChain, BrineChain, CementChain, ChromiteChain, CoalChain, ColorfulsocChain, FuelChain, FuelRefiningChain, GeyanChain, GoldChain, GraphiteChain, IodineChain, NaquadahLine, PlatinumLine, RareearthBastnasiteChain, RareearthChain, RareearthMonaziteChain, RareearthPowderChain, RareearthRecoveryChain, SeleniumTelluriumChain, SiliconChain, SnowAdjust, SpaceFabric, StonedustChain, TantaliteChain, TiChain, WChain, WoodChain, ZirconChain
     |-- cogniassembly/            # WetwareCircuit
     |-- create/                   # CafeRecipes, CreateOreExcavationRecipes, CreateRecipeJsonHelper, CreateRecipes, CreateVintageRecipe, DieselGeneratorRecipes
     |-- generated/                # HyperRotorRecipes (generated recipe Java)
@@ -29,8 +29,7 @@ data/
     |-- modmodify/                # EIORecipes
     |   `-- omnicells/            # QuantumOmniRecipes
     |-- multiblock/               # 11: AcceleratorRecipes, AstronomicalObservatoryRecipes, NaquadahReactorRecipes, PhotovoltaicStationRecipes, SinteringRecipes, SlaughterHouseRecipes, UnderfloorHeatingSystemRecipes, WaterPowerStationRecipes, ...
-    |-- tconstruct/               # EMPTY leftover directory
-    |-- utils/                    # ComputationModifier, KeepIngredientRecipeHelper, NuclearComposition
+        |-- utils/                    # ComputationModifier, KeepIngredientRecipeHelper, NuclearComposition
     `-- wood/                     # WoodMachineRecipes, WoodTypeEntries, WoodTypeEntry
 ```
 
@@ -40,7 +39,7 @@ data/
 | Datagen entry | `data/CTNHCoreDatagen.java` |
 | Recipe dispatch root | `data/recipe/CTNHCoreRecipeAddition.java` |
 | Age-based recipes | `data/recipe/age/` (LV..ZPM, PrimitiveKinetic) |
-| Processing chains | `data/recipe/chain/` (25 chains) |
+| Processing chains | `data/recipe/chain/` (30 chains) |
 | Create/addon recipes | `data/recipe/create/`, `data/recipe/immersiveaircraft/`, `data/recipe/multiblock/` |
 | Wood machine recipes | `data/recipe/wood/` (WoodMachineRecipes, WoodTypeEntries, WoodTypeEntry) |
 | Migrated/script recipes | `data/recipe/migrated/` (KJS-migrated) |
@@ -48,7 +47,7 @@ data/
 | Mana bridge recipes | `data/recipe/mana/` |
 | Generated recipe Java | `data/recipe/generated/` |
 | Recipe helpers | `data/recipe/utils/` |
-| Materials | `data/materials/` (25 sets), `data/CTNHMaterialFlags.java` |
+| Materials | `data/materials/` (26 sets), `data/CTNHMaterialFlags.java` |
 | Tags/worldgen | `data/tags/`, `data/worldgen/` |
 | Create recipe types | `data/CreateRecipeTypes.java` |
 
@@ -58,7 +57,6 @@ data/
 - Recipe generators are split by age, chain, Create/addons, migrated scripts, mod modifies, mana bridge, multiblock, and wood domains.
 - Recipe removal/filtering: `data/recipe/RecipeRemoval.java` registers ID-only filters; `mixin/mc/RecipeManagerApplyMixin.java` removes matching datapack entries at `RecipeManager.apply()` HEAD. Dynamic recipes are intentionally not filtered.
 - When referencing items/blocks/fluids, MUST use direct registration objects (static field references like `GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`); never `ResourceLocation` string parsing + `ForgeRegistries` lookups except where no registration object exists. See root AGENTS.md CONVENTIONS.
-- `data/recipe/tconstruct/` is an empty leftover directory; do not add files there without first checking where TConstruct recipes actually live.
 - Recent recipe changes: PrimitiveKineticAgeRecipes now includes cinnabar/realgar/pyrite/chalcopyrite centrifugation; CreateRecipes now crushes GT ingots to dust (not vanilla ingots) and removes Create silver/brass recipes; OreProcessingRecipes melts PreciousAlloy to liquid gold; GoldChain now uses fluid copper chloride and adds sodium cyanide production; `MachinesRecipes` overrides `gtceu:shaped/ulv_machine_hull` to use `minecraft:planks` tag.
 
 ## ANTI-PATTERNS

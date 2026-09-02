@@ -1,7 +1,7 @@
 # CTPP INTEGRATION DOMAIN
 
 ## OVERVIEW
-JEI integration for CTPP (3 Java files).
+Jade, JEI, and LDLib integration for CTPP (6 Java files).
 
 ## STRUCTURE
 ```text

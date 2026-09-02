@@ -1,7 +1,7 @@
 # CTNH-ASTRAL DATA DOMAIN
 
 ## OVERVIEW
-Astral data registration (38 Java files): materials, elements, tag prefixes, recipes, lang, and worldgen (biomes, dimensions, density/noise/surface rules, structures, features).
+Astral data registration (43 Java files): materials, elements, tag prefixes, recipes, lang, and worldgen (biomes, dimensions, density/noise/surface rules, structures, features).
 
 ## STRUCTURE
 ```text
@@ -22,6 +22,7 @@ data/
 | Core data | `data/CAElements.java`, `CAMaterials.java` (incl. Seawater), `CATagPrefixes.java`, `CARecipes.java` |
 | Worldgen root | `data/worldgen/` (CABiomes, CADimensions, CADimensionTypes, CANoiseSetting, CASurfaceRuleData, CAOverworldRegion, CANetherRegion, CADensityFunctions) |
 | Biomes | `data/worldgen/biome/` (AstralBiomes, MoonBiomes, NetherBiomes, BiomeParameters) |
+| Carvers | `data/worldgen/carver/` (4: CAConfiguredCarvers, CAWorldCarvers, MoonCraterCarver, MoonCraterCarverConfig) |
 | Features | `data/worldgen/feature/` (5) |
 | Structures | `data/worldgen/structure/` (13) |
 | Lang | `data/lang/` |

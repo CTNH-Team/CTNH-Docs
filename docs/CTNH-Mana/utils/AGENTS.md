@@ -17,7 +17,7 @@ Shared helper utilities for Mana (3 Java files).
 - Do not duplicate helpers that exist in CTNH-Lib `utils/`.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/utils`.
+Applies to `src/main/java/com/magicbee/ctnhmana/utils`.
 
 ## READ WHEN
 - Reusing Mana-wide helper logic.

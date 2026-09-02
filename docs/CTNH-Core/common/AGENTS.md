@@ -1,7 +1,7 @@
 # CTNH-CORE COMMON DOMAIN
 
 ## OVERVIEW
-Shared (client+server) implementation for Core: CommonProxy, blocks, block entities, capabilities, enchantments, entities, GUIs, items, machines, recipes, and world handling. This is the largest domain (123 Java files), dominated by the multiblock machine hierarchy.
+Shared (client+server) implementation for Core: CommonProxy, blocks, block entities, capabilities, enchantments, entities, GUIs, items, machines, recipes, and world handling. This is the largest domain (125 Java files), dominated by the multiblock machine hierarchy.
 
 ## STRUCTURE
 ```text
@@ -21,11 +21,11 @@ common/
 |-- machine/
 |   |-- cover/                    # CreativeEnergyCover
 |   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine, MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine
-|   |   |-- electric/             # 29 top-level machines: WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, VoidMinerProcessingMachine (+VoidMinerRecipeLogic), INFFluidDrillMachine (+INFFluidDrillLogic), MegaLCRMachine, NeuroMatrixCompiler, ScalableReservoirComputingMachine, Superconducting_Penning_Trap, ...
+|   |   |-- electric/             # 29 top-level machines (34 incl. multithread/ and rareearth/): WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, VoidMinerProcessingMachine (+VoidMinerRecipeLogic), INFFluidDrillMachine (+INFFluidDrillLogic), MegaLCRMachine, NeuroMatrixCompiler, ScalableReservoirComputingMachine, Superconducting_Penning_Trap, ...
 |   |   |   |-- multithread/      # CNCAlloySmelter
 |   |   |   `-- rareearth/        # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
 |   |   |-- generator/            # 12 machines: Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine, LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator, NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine, WaterPowerStationMachine, WindPowerArrayMachine
-|   |   |-- kinetic/              # IndustrialPrimitiveBlastFurnaceMachine, MeadowMachine, NoEnergyMachine
+|   |   |-- kinetic/              # 5: IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine, MeadowMachine, NoEnergyMachine
 |   |   |-- part/                 # 12 parts: CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine, CreativeEnergyHatchPartMachine, CreativeInputBusPartMachine, CreativeInputHatchPartMachine, CreativeLaserHatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock, NeutronAcceleratorMachine, NeutronSensorMachine
 |   |   `-- quantum/              # quantum_core
 |   |-- simple/                   # DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine
@@ -49,7 +49,7 @@ common/
 | Items | `common/item/`, `common/item/debug/` |
 | Electric multiblocks | `common/machine/multiblock/electric/` (29 + multithread + rareearth) |
 | Generator multiblocks | `common/machine/multiblock/generator/` (12) |
-| Kinetic multiblocks | `common/machine/multiblock/kinetic/` (3) |
+| Kinetic multiblocks | `common/machine/multiblock/kinetic/` (5) |
 | Machine parts | `common/machine/multiblock/part/` (12) |
 | Simple machines | `common/machine/simple/` (4) |
 | Machine traits | `common/machine/trait/`, `common/machine/trait/providable_net/` |

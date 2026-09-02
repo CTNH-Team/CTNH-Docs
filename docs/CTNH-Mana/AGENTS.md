@@ -1,26 +1,26 @@
 # CTNH-MANA MODULE
 
 ## OVERVIEW
-CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (284 Java files, the second-largest module).
+CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (338 Java files, the second-largest module).
 
 ## STRUCTURE
 ```text
-src/main/java/com/moguang/ctnhmana/
+src/main/java/com/magicbee/ctnhmana/
 |-- CTNHMana.java / CTNHManaGTAddon.java / CMConfig.java   # mod entry, GT addon, config
-|-- api/                      # 21: effect/ (8), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (4)
-|-- client/                   # 33: ZenithInvadeClient, radial menu, Ponder, models, renderers (11), particles
-|-- common/                   # 105: CommonProxy, DigitalWosMachine, blocks, blockentities, entities, events, items, machines, multiblocks (30), parts, rituals
-|   |-- item/                 # bloodmagicjade/ bosssummoner/ caduceus/ equipment/ manafuelstick/ manamachineupgrade/ (8) rune/ (3) + ZenithDebugToolItem
+|-- api/                      # 32: effect/ (16), machine/gem/ (1), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (6)
+|-- client/                   # 41: ZenithInvadeClient, radial menu (4), Ponder (7), models (8), renderers (17), particles
+|-- common/                   # 128: CommonProxy, DigitalWosMachine, blocks (5), blockentities (13), capability, entities (5), events, items (28), machines (3), multiblocks (30), parts (8), rituals
+|   |-- item/                 # bloodmagicjade/ bosssummoner/ (4) caduceus/ dungeon/ equipment/ (4) manafuelstick/ manamachineupgrade/ (9) rune/ (3) + ZenithDebugToolItem
 |   |-- multiblock/           # 30: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, IndustrialSalvagingMachine, IndustrialGemInlayMachine, ...
 |   |-- parts/                # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch + ManaHatches/ (3)
-|   |-- ritualtypes/          # 5: RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
+|   |-- ritualtypes/          # 6: RitualBeeSummon, RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
 |   `-- ritual/               # MachineRitualSoulNetwork, MachineRitualStoneHost
-|-- data/                     # 54: CMDatagen, ManaData, recipes (34 + builders), lang (3), materials, tags
-|-- event/                    # 8: EventHandler, ForgeEventHandler, CMKeyBindings, IndexEventHandler, SoulLeechEventHandler, TaintedBloodWeepingEyeEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
-|-- integration/              # 7: emi/ (1), jade/ (6)
-|-- mixin/                    # 17: ae2/ (2), apotheosis/ (2), ars/ (4), bloodmagic/ (2), botania/ (6), emi/ (1)
-|-- networking/               # 6: CMNetworking, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket, ZenithInvadePacket
-|-- registry/                 # 27: CMRegistrate + items/ (1) + multiblock/ (5) + sounds/ (2)
+|-- data/                     # 55: CMDatagen, ManaData, recipes (35 + builders), lang (3), materials, tags
+|-- event/                    # 16: EventHandler, ForgeEventHandler, CMKeyBindings, ArmorBreakEventHandler, DamageClampHandler, IndexEventHandler, MagicalAntagonismEventHandler, MinerEliteHandler, MythicBossPool, PainShieldEventHandler, PhysicalAntagonismEventHandler, RealityDissociationEventHandler, SoulLeechEventHandler, TaintedBloodWeepingEyeEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
+|-- integration/              # 8: emi/ (1), jade/ (7)
+|-- mixin/                    # 18: ae2/ (2), ars/ (4), bloodmagic/ (4), botania/ (6), emi/ (1), minecraft/ (1)
+|-- networking/packets/       # 7: CMNetworking, AntagonismPacket, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket, ZenithInvadePacket
+|-- registry/                 # 27: 19 root classes (CMRegistrate, ...) + items/ (1) + multiblock/ (5) + sounds/ (2)
 `-- utils/                    # 3: CTNHManaUtils, EnvUtils, ModUtils
 ```
 
@@ -32,13 +32,13 @@ src/main/java/com/moguang/ctnhmana/
 | Config | `CMConfig.java` |
 | Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
 | Multiblocks | `common/multiblock/` (30 machines) |
-| Rituals | `common/ritualtypes/` (5), `common/ritual/` (2) |
+| Rituals | `common/ritualtypes/` (6), `common/ritual/` (2) |
 | Magic items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, ...) |
 | Registries | `registry/` (27) |
 | Recipe builders | `data/recipe/builder/bloodmagic/`, `data/recipe/builder/botania/`, `data/recipe/builder/apotheosis/` |
-| Networking | `networking/packets/` (6) |
+| Networking | `networking/packets/` (7) |
 | Client UI/Ponder | `client/` (radial menu, ponder/mana/ scenes) |
-| Mixins/integrations | `mixin/`, `integration/emi/`, `integration/jade/` |
+| Mixins/integrations | `mixin/` (18), `integration/emi/` (1), `integration/jade/` (7) |
 | Zenith invasion | `common/event/zenith/`, `client/ZenithInvadeClient.java` |
 
 ## DOMAIN GUIDE ROUTING
@@ -52,18 +52,18 @@ Read the matching domain guide before editing the corresponding source area.
 | `data` | `docs/CTNH-Mana/data/AGENTS.md` | Recipe generators, lang, materials, tags |
 | `event` | `docs/CTNH-Mana/event/AGENTS.md` | EventHandler wiring |
 | `integration` | `docs/CTNH-Mana/integration/AGENTS.md` | EMI, Jade integration |
-| `mixin` | `docs/CTNH-Mana/mixin/AGENTS.md` | Ars/Blood Magic/Botania/Apotheosis/EMI patches |
+| `mixin` | `docs/CTNH-Mana/mixin/AGENTS.md` | Ars/Blood Magic/Botania/AE2/EMI/Minecraft patches |
 | `networking` | `docs/CTNH-Mana/networking/AGENTS.md` | Packets |
 | `registry` | `docs/CTNH-Mana/registry/AGENTS.md` | Items, machines, multiblocks, recipe types |
 | `utils` | `docs/CTNH-Mana/utils/AGENTS.md` | Shared helpers |
 
 ## CONVENTIONS
-- Namespace is `com.moguang.ctnhmana`; registry prefixes generally use `CM`.
+- Namespace is `com.magicbee.ctnhmana`; registry prefixes generally use `CM`.
 - GT/GMT recipes are runtime dynamic-pack data (`CTNHManaGTAddon.addRecipes()`); `runData` produces no JSON for them. See root AGENTS.md CONVENTIONS.
 - Item/block/fluid references MUST use direct registration objects (`CMItems.X`, `CMBlocks.X`, `CMMaterials.X`, `GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
 - Generated resources are large; use `:modules:CTNH-Mana:runData` after datagen or Ponder text changes.
 - Ponder `CTNHManaPonderSceneBuilder` is a thin adapter around CTNH-Lib's shared builder; keep Mana-specific scenes/tags/plugins in CTNH-Mana, not Core or Lib.
-- Blood Magic/Botania/Ars/Apotheosis/EMI compatibility is spread across recipe builders, mixins, integrations, and client packets; check all four before changing a magic integration surface.
+- Blood Magic/Botania/Ars/Apotheosis/EMI compatibility is spread across recipe builders, mixins, integrations, and client packets; check all four before changing a magic integration surface. Apotheosis support lives in `data/recipe/builder/apotheosis/`, not in `mixin/`.
 
 ## ANTI-PATTERNS
 - Do not assume magic integrations are isolated from GTCEu; machine/recipe registration still flows through GT addon patterns.

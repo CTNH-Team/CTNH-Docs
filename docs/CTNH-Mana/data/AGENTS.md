@@ -1,7 +1,7 @@
 # CTNH-MANA DATA DOMAIN
 
 ## OVERVIEW
-Datagen source for `src/generated/resources` (54 Java files): recipe generators (34), lang, materials, tags, and builders.
+Datagen source for `src/generated/resources` (55 Java files): recipe generators (35), lang, materials, tags, and builders.
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,7 @@ data/
 |-- lang/                      # AHCCRuneLang, ChineseLangHandler, EnglishLangHandler
 |-- materials/                 # BotaniaMaterials
 |-- recipe/
-|   |-- 34 top-level classes: BeamsRecipes, BloodAltarRecipes, BotaniaRecipes, DemonWillGeneratorRecipes, ElvenTradeRecipes, EternalGardenRecipes, EternalGardenSpecialRecipes, EternalWosRecipes, GaiaReactorRecipes, GemCuttingRecipes, HellForgeRecipes, MachineRecipes, ManaCircuitRecipes, ManaCondenserRecipes, ManaHatchRecipes, ManaMachineBlockRecipes, ManaMachineRecipes, ManaMachineUpgradeRecipes, ManaPoolRecipes, ManaReactorRecipes, ManaRecipes, ManaTransformerRecipes, MeteorCapturerRecipes, MeteorRitualGuideRecipes, RecipeRemoval, RitualMechanicalRecipes, RuneAltarRecipes, RuneSalvagingRecipes, SalvagingRecipes, TerraPlateRecipes, TwistCollapseRecipes, WishingWillRecipes, ZenithRecipes, runeRitualRecipes
+|   |-- 35 top-level classes: BeamsRecipes, BloodAltarRecipes, BotaniaRecipes, DemonWillGeneratorRecipes, ElvenTradeRecipes, EternalGardenRecipes, EternalGardenSpecialRecipes, EternalWosRecipes, GaiaReactorRecipes, GemCuttingRecipes, HellForgeRecipes, MachineRecipes, ManaCircuitRecipes, ManaCondenserRecipes, ManaHatchRecipes, ManaMachineBlockRecipes, ManaMachineRecipes, ManaMachineUpgradeRecipes, ManaPoolRecipes, ManaReactorRecipes, ManaRecipes, ManaTransformerRecipes, MeteorCapturerRecipes, MeteorRitualGuideRecipes, RecipeRemoval, RitualMechanicalRecipes, RuneAltarRecipes, RuneSalvagingRecipes, SalvagingRecipes, TerraPlateRecipes, TwistCollapseRecipes, WishingWillRecipes, ZenithRecipes, runeRitualRecipes
 |   |-- builder/
 |   |   |-- apotheosis/        # GemCuttingRecipeBuilder, SalvagingRecipeBuilder
 |   |   |-- bloodmagic/        # BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder
@@ -23,7 +23,7 @@ data/
 | Concern | Location |
 |---------|----------|
 | Datagen entry | `data/CMDatagen.java` |
-| Recipe generation | `data/recipe/` (34 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
+| Recipe generation | `data/recipe/` (35 classes, dispatched from `CTNHManaGTAddon.addRecipes()`) |
 | Gem cutting recipes | `data/recipe/GemCuttingRecipes.java` |
 | Mana transformer recipe | `data/recipe/ManaTransformerRecipes.java` |
 | Blood Magic builders | `data/recipe/builder/bloodmagic/` (BloodAltarRecipeBuilder, TartaricForgeRecipeBuilder) |
@@ -44,7 +44,7 @@ data/
 - Do not hand-edit `src/generated/resources`.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/data` and its child packages.
+Applies to `src/main/java/com/magicbee/ctnhmana/data` and its child packages.
 
 ## READ WHEN
 - Adding Mana recipes, lang, materials, or tags.

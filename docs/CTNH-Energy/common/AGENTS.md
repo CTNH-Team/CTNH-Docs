@@ -1,7 +1,7 @@
 # CTNH-ENERGY COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Energy (56 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
+Shared implementation for Energy (60 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
 
 ## STRUCTURE
 ```text

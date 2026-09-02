@@ -1,7 +1,7 @@
 # CTPP COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for CTPP (58 Java files): CommonProxy, blocks, block entities, kinetic machine logic, fan processing, toolbox system, and recipe builders.
+Shared implementation for CTPP (73 Java files): CommonProxy, blocks, block entities, kinetic machine logic, fan processing, toolbox system, and recipe builders.
 
 ## STRUCTURE
 ```text

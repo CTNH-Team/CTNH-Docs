@@ -1,7 +1,7 @@
 # CTNH-ASTRAL MODULE
 
 ## OVERVIEW
-CTNH-Astral adds astral content, GTCEu materials, enchantments, proxies, custom worldgen/dimension code, and an oxygen/atmosphere environment system under mod id `ctnhastral` (86 Java files).
+CTNH-Astral adds astral content, GTCEu materials, enchantments, proxies, custom worldgen/dimension code, and an oxygen/atmosphere environment system under mod id `ctnhastral` (92 Java files).
 
 ## STRUCTURE
 ```text
@@ -18,7 +18,7 @@ src/main/java/com/ctnh/ctnhastral/
 |   |-- oxygen/               # AtmosphereType, OxygenAreaSource, OxygenEnvironment, OxygenEnvironmentService, OxygenMachineRules
 |   `-- recipe/               # OxygenCondition
 |-- data/                     # CAElements, CAEnchantments, CAMaterials, CARecipes, CATagPrefixes, GTMateralAdjust, lang/, worldgen/
-|   `-- worldgen/             # worldgen root: CABiomes, CADensityFunctions, CADimensionTypes, CADimensions, CANetherRegion, CANoiseSetting, CAOverworldRegion, CASurfaceRuleData + biome/ feature/ structure/
+|   `-- worldgen/             # 34: worldgen root: CABiomes, CADensityFunctions, CADimensionTypes, CADimensions, CANetherRegion, CANoiseSetting, CAOverworldRegion, CASurfaceRuleData + biome/ (4) carver/ (4) feature/ (5) structure/ (13)
 |-- mixin/                    # adastra/ (Oxygen/Temperature), minecraft/ (chunk generator, packet listener)
 |-- registry/                 # CABlocks, CAItems, CAMachines, CAMultiblocks, CARocketBlocks, CARocketEntityTypes, CTNHBlockInfo, CARegistrate, recipe types/conditions/modifiers, creative tabs + sound/ + worldgen/
 `-- utils/                    # ModUtils
@@ -33,7 +33,7 @@ src/main/java/com/ctnh/ctnhastral/
 | Oxygen/atmosphere | `common/oxygen/` (OxygenEnvironmentService, OxygenEnvironment, OxygenMachineRules, ...) |
 | Rocket content | `common/entity/RocketContraptionEntity.java`, `common/event/RocketDimensionTravelHandler.java`, `client/RocketLaunchHud.java`, `registry/CARocketBlocks.java`, `registry/CARocketEntityTypes.java`, `common/machine/multiblock/RocketAssemblyPlatformMachine.java` |
 | Core data | `data/CAElements.java`, `CAMaterials.java` (incl. Seawater), `CATagPrefixes.java`, `CARecipes.java` |
-| Worldgen | `data/worldgen/` (root dimension classes + biome/ feature/ structure/) |
+| Worldgen | `data/worldgen/` (root dimension classes + biome/ carver/ feature/ structure/) |
 | Structures/features | `data/worldgen/structure/` (13 classes), `data/worldgen/feature/` (5) |
 | Mixins | `mixin/`, `src/main/resources/ctnhastral.mixins.json` |
 | Resources | `src/main/resources/assets/ctnhastral/`, `assets/gtceu/` (legacy), `src/generated/resources/` (lang, blockstates, noise settings) |

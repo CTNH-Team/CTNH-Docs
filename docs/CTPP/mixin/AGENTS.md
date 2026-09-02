@@ -1,7 +1,7 @@
 # CTPP MIXIN DOMAIN
 
 ## OVERVIEW
-Create rotation/kinetic fixes, deployer/sequenced assembly fixes, GT bucket and multiblock-state hooks (21 Java files).
+Create rotation/kinetic fixes, deployer/sequenced assembly fixes, GT bucket and multiblock-state hooks, plus a Minecraft pick-block hook (21 Java files).
 
 ## STRUCTURE
 ```text
@@ -11,7 +11,8 @@ mixin/
 |   |-- diesel/                # BasinFermentingCategoryMixin, BasinRecipeMixin, CDGJEIMixin, DistillationTankBlockEntityMixin
 |   |-- fix/                   # DeployerApplicationRecipeMixin, SequencedAssemblyCategoryMixin
 |   `-- jei/                   # RecipeSlotBuilderMixin, SequencedAssemblyCategoryMixin, SequencedAssemblySubCategoryMixin, TMRVSlotWidgetMixin
-`-- gtm/                       # GTToolTypeMixin
+|-- gtm/                       # GTToolTypeMixin
+`-- mc/                        # MinecraftPickBlockMixin
 ```
 
 ## WHERE TO LOOK
@@ -22,6 +23,7 @@ mixin/
 | Create fix patches | `mixin/create/fix/` (2) |
 | Create JEI patches | `mixin/create/jei/` (4) |
 | GT patches | `mixin/gtm/GTToolTypeMixin.java` |
+| Minecraft patches | `mixin/mc/MinecraftPickBlockMixin.java` |
 | Mixin config | `src/main/resources/ctpp.mixins.json` |
 
 ## CONVENTIONS

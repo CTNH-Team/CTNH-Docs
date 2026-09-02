@@ -1,12 +1,12 @@
 # CTNH-ASTRAL COMMON DOMAIN
 
 ## OVERVIEW
-Shared bootstrap and implementation for Astral (19 Java files): CommonProxy, blocks, enchantments, entities, machines, and the oxygen/atmosphere environment system. Rocket dimension transfer is controller-independent since the rocket assembly refactor.
+Shared bootstrap and implementation for Astral (20 Java files): CommonProxy, blocks, enchantments, entities, machines, and the oxygen/atmosphere environment system. Rocket dimension transfer is controller-independent since the rocket assembly refactor.
 
 ## STRUCTURE
 ```text
 common/
-|-- CommonProxy.java
+|-- CommonProxy.java, CAFluidInteractions.java
 |-- block/                     # AstralFlowerBlock, AstralGrass, AstralGrassBlock, AstralSaplingBlock, AstralTallGrassBlock, MarsSaplingBlock, SiliconBuddingBlock
 |-- enchantment/               # VacuumSealEnchantment
 |-- entity/                    # RocketContraptionEntity

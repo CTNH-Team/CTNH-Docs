@@ -1,20 +1,20 @@
 # CTNH-MANA INTEGRATION DOMAIN
 
 ## OVERVIEW
-EMI and Jade integration for Mana magic content (7 Java files).
+EMI and Jade integration for Mana magic content (8 Java files).
 
 ## STRUCTURE
 ```text
 integration/
 |-- emi/                       # CTNHManaEmiPlugin
-`-- jade/                      # BaseManaMachineStatusProvider, BloodAltarStatusProvider, EternalWosStatusProvider, ManaHatchStatusProvider, ManaMachineManaStatusProvider, ThirdEyeStatusProvider
+`-- jade/                      # 7: BaseManaMachineStatusProvider, BloodAltarStatusProvider, EternalWosStatusProvider, GemSublimatorStatusProvider, ManaHatchStatusProvider, ManaMachineManaStatusProvider, ThirdEyeStatusProvider
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | EMI plugin | `integration/emi/CTNHManaEmiPlugin.java` |
-| Jade providers | `integration/jade/` (6 providers) |
+| Jade providers | `integration/jade/` (7 providers) |
 
 ## CONVENTIONS
 - Keep integrations isolated and optional.
@@ -24,7 +24,7 @@ integration/
 - Do not make integration classes hard dependencies of common code.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/integration` and its child packages.
+Applies to `src/main/java/com/magicbee/ctnhmana/integration` and its child packages.
 
 ## READ WHEN
 - Changing Mana EMI/Jade integration.

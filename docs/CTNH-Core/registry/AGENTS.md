@@ -1,7 +1,7 @@
 # CTNH-CORE REGISTRY DOMAIN
 
 ## OVERVIEW
-Registrate surface for Core (43 Java files): items, blocks, block entities, creative tabs, tags, models, recipe types/modifiers/conditions, GTCEu machines and multiblocks, materials, ores, fluid veins, worldgen layers, sound events, and Jade providers.
+Registrate surface for Core (50 Java files): items, blocks, block entities, creative tabs, tags, models, recipe types/modifiers/conditions, GTCEu machines and multiblocks, materials, ores, fluid veins, worldgen layers, sound events, and Jade providers.
 
 ## STRUCTURE
 ```text

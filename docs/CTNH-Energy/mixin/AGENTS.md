@@ -1,7 +1,7 @@
 # CTNH-ENERGY MIXIN DOMAIN
 
 ## OVERVIEW
-AE2, AE2CS/AECS, Better P2P, GTM, Omni Cells, and ME Requester integration mixins (49 Java files, the largest Energy domain). These are central to Energy behavior.
+AE2, AE2CS/AECS, Better P2P, GTM, Omni Cells, and ME Requester integration mixins (59 Java files, the largest Energy domain). These are central to Energy behavior.
 
 ## STRUCTURE
 ```text
@@ -26,7 +26,7 @@ mixin/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| AE2 patches | `mixin/ae2/` + 8 subpackages (cpu/emi/energy/menu/misc/patternencodingpanel/patternprovider) |
+| AE2 patches | `mixin/ae2/` + 9 subpackages (circuit/cpu/emi/energy/menu/misc/part/patternencodingpanel/patternprovider) |
 | AE2CS/AECS patches | `mixin/aecs/` |
 | Better P2P | `mixin/betterP2P/` |
 | GTM patches | `mixin/gtm/` |

@@ -1,7 +1,7 @@
 # CTPP NETWORK DOMAIN
 
 ## OVERVIEW
-CTPP networking packets (8 Java files), all toolbox-related.
+CTPP networking packets (11 Java files) under `network/packet/`: toolbox, terminal wire selection, and emitter beam packets.
 
 ## WHERE TO LOOK
 | Concern | Location |

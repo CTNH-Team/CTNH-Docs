@@ -1,7 +1,7 @@
 # CTNH-MANA COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Mana (105 Java files, the largest Mana domain): CommonProxy, rituals, items, machines, multiblocks, block entities, events, and recipe builders for Blood Magic/Botania.
+Shared implementation for Mana (128 Java files, the largest Mana domain): CommonProxy, rituals, items, machines, multiblocks, block entities, events, and recipe builders for Blood Magic/Botania.
 
 ## STRUCTURE
 ```text
@@ -9,9 +9,10 @@ common/
 |-- CommonProxy.java, DigitalWosMachine.java
 |-- blockentity/
 |   |-- flower/                # 7: AnattaLotusBlockEntity, BlackVeinMarigoldBlockEntity, BloodAntiarisBlockEntity, DemonFlytrapBlockEntity, GenethistleBlockEntity, ParaRosiaBlockEntity, TulpenmanieBlockEntity
-|   `-- machine/               # 5: FlowerCakeBlockEntity, ManaMachineBlockEntity, IZenithMartixBlockEntity, MysticSpireBlockEntity, ZenithEyeBlockEntity
-|-- blocks/                    # CoilType, FrameBlock, ManaIndicatorLight, RuneBlock
-|-- entity/                    # DeltaSpark, OmegaSpark
+|   `-- machine/               # 5: FlowerCakeBlockEntity, IZenithMartixBlockEntity, ManaMachineBlockEntity, MysticSpireBlockEntity, ZenithEyeBlockEntity
+|-- blocks/                    # 5: CoilType, FrameBlock, ManaIndicatorLight, RuneBlock, WitherAconiteTrapBlock
+|-- capability/                # DamageClampCapability
+|-- entity/                    # 5: AbstractRampageBee, DeltaSpark, GiantBee, OmegaSpark, RoyalServantBee
 |-- event/zenith/              # 5: ZenithGlitchText, ZenithInvadeEffects, ZenithInvadeEvent, ZenithInvadeManager, ZenithInvadeMessages
 |-- gui/                       # 7: AnimationTextureY, ArcButtonWidget, BaseManaMachineGui, ExtendedCentralControlBusCircuitUi, ManaStatusGui, SelectableCircuitSlotWidget, ShroudUi
 |-- item/
@@ -19,28 +20,29 @@ common/
 |   |-- bloodmagicjade/        # JadeItem
 |   |-- bosssummoner/          # BossSummonerBehavior, IThrowableItem, ThrowItem, ThrowableSummoner
 |   |-- caduceus/              # CaduceusItem, MultiToolDefinition
+|   |-- dungeon/               # PerfectMineKeyItem
 |   |-- equipment/             # KoishiEyeItem, SaberWandItem, TaintedBloodWeepingEye, YurikoRingItem
 |   |-- manafuelstick/         # IManaFuelStick
-|   |-- manamachineupgrade/    # 8 upgrade items
+|   |-- manamachineupgrade/    # 9 upgrade items
 |   `-- rune/                  # IRuneItem, RuneElementType, SpireUpgradeRuneItem
-|-- machine/                   # FlowerCakeBlock, FlowerCakeMachine
+|-- machine/                   # FlowerCakeBlock, FlowerCakeMachine, GemSublimatorMachine
 |-- multiblock/                # 30 classes: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, ZenithMatrixMachine, EternalGarden, EternalWosMachine, WishingWill, ManaCondenserMachine, ManaFuelInfuserMachine, TwistedFusionMachine, IndustrialAltarMachine, MeteorCaptureMachine, DemonWillMachine, QuasarEye, NicollDysonBeams, ArcaneHighEnergyCompressionReactorCore, IndustrialSalvagingMachine, IndustrialGemInlayMachine, ...
 |-- parts/                     # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch
 |   `-- ManaHatches/           # BloodManaHatch, CreativeManaHatch, SparkManaHatch
 |-- ritual/                    # MachineRitualSoulNetwork, MachineRitualStoneHost
-`-- ritualtypes/               # 5: RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
+`-- ritualtypes/               # 6: RitualBeeSummon, RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | Common proxy | `common/CommonProxy.java` |
-| Rituals | `common/ritualtypes/` (5), `common/ritual/` (2) |
+| Rituals | `common/ritualtypes/` (6), `common/ritual/` (2) |
 | Items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, bosssummoner/, ...) |
 | Multiblocks | `common/multiblock/` (30) |
 | Industrial gem inlay machine | `common/multiblock/IndustrialGemInlayMachine.java` |
 | Parts | `common/parts/`, `common/parts/ManaHatches/` |
-| Machines | `common/machine/` (FlowerCake) |
+| Machines | `common/machine/` (FlowerCake, GemSublimator) |
 | Block entities | `common/blockentity/flower/` (7), `common/blockentity/machine/` (5) |
 | GUI | `common/gui/` (7) |
 | Zenith invasion | `common/event/zenith/` (5) |
@@ -56,7 +58,7 @@ common/
 - Do not change magic integration surfaces without checking recipe builders, mixins, integrations, and client packets together.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/common` and its child packages.
+Applies to `src/main/java/com/magicbee/ctnhmana/common` and its child packages.
 
 ## READ WHEN
 - Implementing rituals, magic items, machines, or multiblocks in Mana.

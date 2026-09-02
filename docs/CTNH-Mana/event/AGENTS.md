@@ -1,7 +1,7 @@
 # CTNH-MANA EVENT DOMAIN
 
 ## OVERVIEW
-EventHandler for Mana (8 Java files): machines, multiblocks, recipe types, conditions, materials, tag-prefix ignores, networking, client item properties, datagen, and Mana Ponder lang.
+EventHandler for Mana (16 Java files): machines, multiblocks, recipe types, conditions, materials, tag-prefix ignores, networking, client item properties, datagen, and Mana Ponder lang.
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -25,7 +25,7 @@ EventHandler for Mana (8 Java files): machines, multiblocks, recipe types, condi
 - Do not move event wiring into registry classes.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/event`.
+Applies to `src/main/java/com/magicbee/ctnhmana/event`.
 
 ## READ WHEN
 - Adding Forge lifecycle, material, or datagen event handling in Mana.

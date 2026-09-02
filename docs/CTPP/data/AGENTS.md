@@ -1,7 +1,7 @@
 # CTPP DATA DOMAIN
 
 ## OVERVIEW
-Datagen source for `src/generated/resources` (53 Java files): recipe providers, tags, and models. Recipe generation lives at the TOP-LEVEL `data/recipe/` (there is no `common/data/recipe`).
+Datagen source for `src/generated/resources` (52 Java files): recipe providers, tags, and models. Recipe generation lives at the TOP-LEVEL `data/recipe/` (there is no `common/data/recipe`).
 
 ## STRUCTURE
 ```text

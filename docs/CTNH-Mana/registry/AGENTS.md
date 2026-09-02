@@ -1,14 +1,15 @@
 # CTNH-MANA REGISTRY DOMAIN
 
 ## OVERVIEW
-Registrate surface for Mana (27 Java files): items, blocks, block entities, entities, machines, multiblocks, materials, elements, tag prefixes, recipe types, effects, sounds, and particles.
+Registrate surface for Mana (27 Java files: 19 root + 8 in child packages): items, blocks, block entities, entities, machines, multiblocks, materials, elements, tag prefixes, recipe types, effects, sounds, and particles.
 
 ## STRUCTURE
 ```text
 registry/
-|-- CMRegistrate.java, CMBlockEntities.java, CMBlocks.java, CMCreativeModeTabs.java, CMElements.java, CMEntities.java
-|-- CMGuiTextures.java, CMItems.java, CMMachines.java, CMMaterials.java, CMMobEffects.java, CMModelLayers.java
-|-- CMMultiblockMachines.java, CMParticleTypes.java, CMRecipeConditions.java, CMRecipeTypes.java, CMRegistrate.java, CMTagPrefixes.java, CMTags.java, GTMaterialAddon.java
+|-- 19 root classes: CMRegistrate, CMBlockEntities, CMBlocks, CMCreativeModeTabs, CMElements, CMEntities,
+|                    CMGuiTextures, CMItems, CMMachines, CMMaterials, CMMobEffects, CMModelLayers,
+|                    CMMultiblockMachines, CMParticleTypes, CMRecipeConditions, CMRecipeTypes,
+|                    CMTagPrefixes, CMTags, GTMaterialAddon
 |-- items/                    # CMFuelItems
 |-- multiblock/               # 5: BloodMagic, Botania, ManaMachine, Misc, ZenithMachine
 `-- sounds/                   # CMSoundDefinitionsProvider, CMSoundEvent
@@ -33,7 +34,7 @@ registry/
 - Do not register the same entry from both registry and EventHandler paths.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/registry` and its child packages.
+Applies to `src/main/java/com/magicbee/ctnhmana/registry` and its child packages.
 
 ## READ WHEN
 - Adding or changing Mana items, blocks, machines, multiblocks, materials, or recipe types.

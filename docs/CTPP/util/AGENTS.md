@@ -1,7 +1,7 @@
 # CTPP UTIL DOMAIN
 
 ## OVERVIEW
-Shared helper utilities for CTPP (7 Java files).
+Shared helper utilities for CTPP (6 Java files).
 
 ## WHERE TO LOOK
 | Concern | Location |

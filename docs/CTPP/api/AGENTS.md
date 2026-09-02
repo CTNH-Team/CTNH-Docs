@@ -1,7 +1,7 @@
 # CTPP API DOMAIN
 
 ## OVERVIEW
-Public API surfaces for CTPP (13 Java files): recipe capabilities, multiblock builder, predicates, parallel logic, and kinetic machine definitions.
+Public API surfaces for CTPP (17 Java files): recipe capabilities, multiblock builder, predicates, parallel logic, and kinetic machine definitions.
 
 ## STRUCTURE
 ```text

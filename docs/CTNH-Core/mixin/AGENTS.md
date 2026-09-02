@@ -1,7 +1,7 @@
 # CTNH-CORE MIXIN DOMAIN
 
 ## OVERVIEW
-Broad cross-mod mixins (38 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
+Broad cross-mod mixins (48 Java files): AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, and Vintage Improvements. Also hosts the datapack recipe removal hook.
 
 ## STRUCTURE
 ```text
@@ -31,6 +31,7 @@ mixin/
 | Concern | Location |
 |---------|----------|
 | Mixin config | `src/main/resources/ctnhcore.mixins.json` |
+| Ecliptic Seasons patches | `mixin/eclipticseasons/` (4) |
 | Minecraft core mixins | `mixin/mc/` (incl. `RecipeManagerApplyMixin.java` at `RecipeManager.apply()` HEAD) |
 | GTCEu mixins | `mixin/gtceu/`, `mixin/gtceu/orevein/` |
 | Create mixins | `mixin/create/` |

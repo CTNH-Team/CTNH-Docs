@@ -1,22 +1,22 @@
 # CTPP MODULE
 
 ## OVERVIEW
-CTPP (`CT++`) is the Create/GregTech compatibility module (219 Java files). It defines kinetic/electric machines, Create fan catalyst recipes, custom recipe builders, generated data, GTCEu addon registration, and a toolbox system under mod id `ctpp`.
+CTPP (`CT++`) is the Create/GregTech compatibility module (251 Java files). It defines kinetic/electric machines, Create fan catalyst recipes, custom recipe builders, generated data, GTCEu addon registration, and a toolbox system under mod id `ctpp`.
 
 ## STRUCTURE
 ```text
 src/main/java/com/mo_guang/ctpp/
 |-- CTPP.java / CTPPGTAddon.java / CTPPRegistration.java / CTPPRegistrate.java / CTPPEntityTypes.java
-|-- api/                      # 13: StressRecipeCapability, CTPPMultiblockBuilder, CTPPParallelLogic, KineticMachineDefinition, CTPPRecipeCapabilities/Conditions, predicates, block maps
-|-- client/                   # 26: ClientProxy, Ponder (plugin/scenes/tags + electric/kinetic/), renderers (CarbonBrushes, GeneratorCoil), toolbox UI
-|-- common/                   # 58: CommonProxy, blocks, block entities, machines (kinetic), toolbox (13), fan processing, commands
+|-- api/                      # 17: StressRecipeCapability, CTPPMultiblockBuilder, CTPPParallelLogic, CTPPPartAbility, KineticMachineDefinition, IBlockStressValues, IEnergyTransferHandler, CTPPRecipeCapabilities/Conditions + pattern/ (3), terminal/ (3)
+|-- client/                   # 33: ClientProxy, ponder/ (9), renderer/ (7), terminal/ (2), toolbox/ (5), CarbonBrushes/GeneratorCoil renderers
+|-- common/                   # 73: CommonProxy, beam/ (4), block/ (7), blockentity/ (5), command/ (2), item/ (4), kinetic/ (5), machine/ (20), menu/ (3), terminal/ (4), toolbox/ (13)
 |   |-- kinetic/fan/          # acidwashing/ (AcidWashingProcessingType), breathing/ (BreathingFanProcessingType), oiling/ (OilingRecipe)
 |   |-- machine/              # IKineticMachine, KineticWorkableTieredMachine, SimpleKineticWorkable(Multiblock)Machine, kinetic traits
 |   |   |-- multiblock/       # BigDamMachine, KineticGeneratorMachine, KineticWorkableMultiblockMachine, WindMillControlMachine (windmillController/)
 |   |   `-- simple/           # CarbonBrushesGeneratorMachine, ElectricGearBoxMachine
 |   `-- toolbox/              # 13: CTPPToolboxBinding(s), CTPPToolboxInventory, CTPPToolboxService, CTPPToolboxSnapshot, CTPPToolboxSavedData, CTPPToolboxStackData, ...
 |-- config/                   # 2: ConfigUtils, MainConfig
-|-- data/                     # 53: CTPPDatagen, CuriosTags, ToolboxBlockstates, tags/ (4), recipe/ (top-level + builders)
+|-- data/                     # 52: CTPPDatagen, CuriosTags, ToolboxBlockstates, tags/ (4), recipe/ (top-level + builders)
 |   `-- recipe/
 |       |-- 12 top-level: CTPPRecipes, BigDamRecipes, BoomOfCreateRecipes, DieselGeneratorRecipes, KineticGeneratorRecipes, KineticSteamTurbineRecipes, SmashingFactoryRecipes, SeaweedFarmRecipes, WindmillControlRecipes, OreProcessingRecipes, ItemRecipes, ToolRecipes
 |       |-- builder/          # AcidWashingRecipeGen, BreathingRecipeGen, CTPPProcessingRecipeBuilder, CTPPRecipeBuilder, CTPPRecipeHelper, CTPPRecipeProvider
@@ -26,10 +26,10 @@ src/main/java/com/mo_guang/ctpp/
 |       |   `-- vintage/      # AbstractVintageRecipeBuilder, Centrifugation, Coiling, Curving, Hammering, Pressurizing, Turning, Vacuumizing, Vibrating, VintageRecipeResult
 |       `-- fanprocessing/    # NOTE: no underscore — CTPPFanProcessingTypes, CTPPRecipeTypeInfo
 |-- dynamicPart/              # 10: QuaternionRotationState, RotationWandItem, SimpleBearingContraption, SimpleContraptionEntityRenderer, SimpleMovingContraption, FixedAxisRotatingContraptionEntity, IContraptionMultiblock, RubiksCubeContraptionEntity, SimpleRotatingContraption(+Entity)
-|-- event/                    # ForgeEventHandler
-|-- integration/              # 3: jei/ (CTPPJeiPlugin), jei/category/ (FanAcidWashingCategory, FanBreathingCategory)
-|-- mixin/                    # 23: create/ (5 + diesel/ + fix/ + jei/), fix/ (2), gtm/ (1), root (5)
-|-- network/                  # 6 toolbox packets
+|-- event/                    # ForgeEventHandler, PlaceableEmitterEventHandler
+|-- integration/              # 6: jade/ (CTPPJadePlugin, KineticOutputMachineProvider), jei/ (CTPPJeiPlugin + category/), ldlib/ (CTPPLDLibPlugin)
+|-- mixin/                    # 21: create/ (5 root + diesel/ (4) + fix/ (2) + jei/ (4)), gtm/ (1), mc/ (1), root (4)
+|-- network/packet/           # 11 packets: toolbox, terminal wire selection, emitter beam
 |-- registry/                 # 12: CTPPRegistrate-based items/blocks/entities/machines/multiblocks/menus/recipe types + CreateMaterials, GTMaterialAddon
 `-- util/                     # 7: CTPPValues, CommonTooltips, ICustomSlot, IMatrix3dAccess, IWorkingMachineStep, ItemAxisBuilder, MathUtil
 ```
@@ -40,12 +40,12 @@ src/main/java/com/mo_guang/ctpp/
 | Mod entry | `CTPP.java` |
 | GT addon | `CTPPGTAddon.java` |
 | Registrate | `CTPPRegistrate.java`, `CTPPRegistration.java` |
-| API | `api/` (13) |
+| API | `api/` (17) |
 | Dynamic contraptions | `dynamicPart/` (10) |
 | KubeJS recipe keys | `CTPPGTAddon.registerRecipeKeys()` (SU_IN/SU_OUT) |
 | Recipes/datagen | `data/recipe/` (top-level, NOT under common/) |
 | Fan processing | `data/recipe/fanprocessing/` (no underscore) |
-| Toolbox system | `common/toolbox/` (13 classes), `network/` (6 packets), `client/` toolbox UI |
+| Toolbox system | `common/toolbox/` (13 classes), `network/packet/` toolbox packets, `client/toolbox/` UI |
 | Ponder/client | `client/ponder/` |
 | Mixins | `mixin/`, `src/main/resources/ctpp.mixins.json` |
 | Generated resources | `src/generated/resources/data/ctpp/recipes/` |
@@ -105,7 +105,7 @@ CTPP wraps Create and addon recipe types with datagen-friendly builders. These a
 | `HammerRecipeBuilder` | `HammerRecipe` | createdieselgenerators |
 | `WireCuttingRecipeBuilder` | `WireCuttingRecipe` | createdieselgenerators |
 
-**Vintage Improvements (8 builders)** — extend `AbstractVintageRecipeBuilder`, use `VintageRecipes` enum:
+**Vintage Improvements (8 builders)** — extend `AbstractVintageRecipeBuilder`, use `VintageRecipes` enum (`data/recipe/builder/vintage/` holds 10 files: these 8 plus `AbstractVintageRecipeBuilder` and `VintageRecipeResult`):
 
 | Builder | VintageRecipes enum | Notes |
 |---|---|---|

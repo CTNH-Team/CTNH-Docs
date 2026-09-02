@@ -1,7 +1,7 @@
 # CTNH-ENERGY UTILS DOMAIN
 
 ## OVERVIEW
-Shared helper utilities for Energy (12 Java files), including button/widget helpers and pattern provider targets.
+Shared helper utilities for Energy (11 Java files), including button/widget helpers and pattern provider targets.
 
 ## STRUCTURE
 ```text

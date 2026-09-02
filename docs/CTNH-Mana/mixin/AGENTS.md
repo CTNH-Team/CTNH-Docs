@@ -1,15 +1,15 @@
 # CTNH-MANA MIXIN DOMAIN
 
 ## OVERVIEW
-Ars Nouveau, Blood Magic, Botania, AE2, Apotheosis, and EMI compatibility mixins (17 Java files).
+Ars Nouveau, Blood Magic, Botania, AE2, EMI, and Minecraft compatibility mixins (18 Java files).
 
 ## STRUCTURE
 ```text
 mixin/
 |-- ae2/                       # WirelessTerminalItemMixin, WirelessTerminalMenuHostMixin
-|-- apotheosis/                # AdventureJeiPluginMixin, GemCuttingMenuMixin
 |-- ars/                       # MixinEmiLecternRecipeHandler, PotionJarMixin, PotionTankMixin, StoredItemStackMixin
-|-- bloodmagic/                # BloodAltarMixin, TileAltarAccessor
+|-- bloodmagic/                # 4: BloodAltarMixin, DemonWillHolderMixin, DungeonSynthesizerMixin, TileAltarAccessor
+|-- minecraft/                 # EntityAccessor
 |-- botania/                   # BotaniaEntitiesMixin, FunctionalFlowerBaseAccessor, ManaPoolBlockEntityMixin, MixinForgePacketHandler, PetruniaMixin, WitherAconiteMixin
 `-- emi/                       # TagEmiIngredientMixin
 ```
@@ -18,9 +18,9 @@ mixin/
 | Concern | Location |
 |---------|----------|
 | AE2 patches | `mixin/ae2/` |
-| Apotheosis patches | `mixin/apotheosis/` (2) |
 | Ars Nouveau patches | `mixin/ars/` |
-| Blood Magic patches | `mixin/bloodmagic/` (incl. TileAltarAccessor) |
+| Blood Magic patches | `mixin/bloodmagic/` (4, incl. TileAltarAccessor) |
+| Minecraft patches | `mixin/minecraft/EntityAccessor.java` |
 | Botania patches | `mixin/botania/` (6) |
 | EMI patches | `mixin/emi/TagEmiIngredientMixin.java` |
 | Mixin config | `src/main/resources/ctnhmana.mixins.json` |
@@ -33,10 +33,10 @@ mixin/
 - Do not change injection points without checking upstream target members.
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhmana/mixin` and `src/main/resources/ctnhmana.mixins.json`.
+Applies to `src/main/java/com/magicbee/ctnhmana/mixin` and `src/main/resources/ctnhmana.mixins.json`.
 
 ## READ WHEN
-- Patching Ars Nouveau, Blood Magic, Botania, AE2, Apotheosis, or EMI behavior.
+- Patching Ars Nouveau, Blood Magic, Botania, AE2, EMI, or Minecraft entity behavior.
 
 ## SOURCE OF TRUTH
 - `src/main/resources/ctnhmana.mixins.json` and the mixin classes in `mixin/`.

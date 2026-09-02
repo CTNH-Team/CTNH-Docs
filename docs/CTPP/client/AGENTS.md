@@ -1,7 +1,7 @@
 # CTPP CLIENT DOMAIN
 
 ## OVERVIEW
-Client-side rendering, toolbox UI, and CTPP Ponder plugin/scenes/tags, including Carbon Brushes (26 Java files).
+Client-side rendering, toolbox UI, and CTPP Ponder plugin/scenes/tags, including Carbon Brushes (33 Java files).
 
 ## STRUCTURE
 ```text

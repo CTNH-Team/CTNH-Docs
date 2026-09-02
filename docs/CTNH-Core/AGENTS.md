@@ -36,10 +36,10 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |   |   |-- multithread/  # CNCAlloySmelter
 |   |   |   `-- rareearth/    # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
 |   |   |-- generator/        # Arc_Reactor, HyperPlasmaTurbineMachine, MegaTurbineMachine, ...
-|   |   |-- kinetic/          # IndustrialPrimitiveBlastFurnaceMachine, MeadowMachine, NoEnergyMachine
+|   |   |-- kinetic/          # 5: IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine, MeadowMachine, NoEnergyMachine
 |   |   |-- part/             # CTNHPartAbility, CatalystHatchPartMachine, Creative*PartMachine, ...
 |   |   `-- quantum/          # quantum_core
-|   |-- machine/simple/       # DigitalMiner, EfficiencyGeneratorMachine, SimpleComputationMachine
+|   |-- machine/simple/       # DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine
 |   |-- machine/trait/        # ScalableReservoirComputingLogic, providable_net/ (ProvidableNetHandler)
 |   |-- recipe/               # KeepIngredientShapedRecipe, condition classes, CTNHRecipeBuilder
 |   `-- world/                # CTNHChunkLoading
@@ -48,14 +48,14 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- CreateRecipeTypes.java
 |   |-- item/                 # CrystalItems
 |   |-- machines/             # GTNNMachines
-|   |-- materials/            # 25 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
-|   |-- recipe/               # 32 top-level + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
+|   |-- materials/            # 26 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
+|   |-- recipe/               # 34 top-level + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
 |   |-- tags/                 # biome/entity/block/fluid/item tag providers, TagClearHelper
 |   `-- worldgen/             # CTNHBiomeModifiers
 |-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
 |-- integration/              # EMI, Create Diesel, Legendary Survival, FTB Essentials
 |-- mixin/                    # cross-mod mixins across many target mods; mc/ RecipeManagerApplyMixin
-|-- registry/                 # 43 root+child classes; adventure/ jade/ machines/ material/ sound/
+|-- registry/                 # 50 root+child classes; adventure/ jade/ machines/ material/ ores/ sound/
 `-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
 ```
 
@@ -65,13 +65,13 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Mod entry | `CTNHCore.java` |
 | GT addon | `CTNHCoreGTAddon.java` |
 | Config | `CTNHConfig.java` |
-| Registries | `registry/` (43 root+child classes) |
+| Registries | `registry/` (50 root+child classes) |
 | Recipe generation root | `data/recipe/CTNHCoreRecipeAddition.java` (dispatched from `addRecipes()`) |
 | Multiblocks (electric) | `common/machine/multiblock/electric/` (including `multithread/` and `rareearth/`) |
 | Multiblocks (generator) | `common/machine/multiblock/generator/` (12 machines) |
 | Multiblocks (parts) | `common/machine/multiblock/part/` (12 machines) |
 | Machine traits/net | `common/machine/trait/providable_net/` |
-| Materials | `data/materials/` (25 sets), `registry/material/` |
+| Materials | `data/materials/` (26 sets), `registry/material/` |
 | Ponder/client | `client/ponder/`, `client/renderer/` |
 | Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
 | Sound events | `registry/sound/CTNHSoundEvents.java` |
@@ -101,7 +101,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Some generated recipe Java lives under `data/recipe/generated`; distinguish Java recipe generators from JSON generated resources.
 - Ponder `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
 - `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
-- Spelling quirk: mixin package is `dategen` (not `datagen`); `data/recipe/tconstruct/` is an empty leftover directory.
+- Spelling quirk: mixin package is `dategen` (not `datagen`).
 - Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
 
 ## ANTI-PATTERNS
