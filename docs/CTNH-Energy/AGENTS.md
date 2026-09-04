@@ -7,16 +7,17 @@ CTNH-Energy adds AE2/energy integration, pattern buffer machinery, quantum compu
 ```text
 src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 |-- CTNHEnergy.java / CTNHEnergyGTAddon.java / CEConfig.java   # mod entry, GT addon, config
-|-- api/                      # 8: CEPredicates, EUItemContext, IAutoMultiplyCPU, IGhostKeyTarget, IMaintainingContext, IPatternProviderLogic, IUpgradeableMenu
+|-- api/                      # 8: CEPredicates, EUItemContext, IAutoMultiplyCPU, ICircuitPattern, IGhostKeyTarget, IMaintainingContext, IPatternProviderLogic, IUpgradeableMenu
 |-- client/                   # ClientProxy, EUKeyRenderHandler, Ponder (plugin/scenes/tags + 15 ae2 scenes)
 |-- common/                   # CommonProxy, CESettings, AE2/EU logic (me/), machines, quantum computer
 |   |-- me/                   # 14: GenericStackEUStorage, MEMachineEUHandler, key/ (4), cell/ (2), parts/p2p/ (EUP2PTunnelPart), service/ (2), strategy/ (3)
-|   |-- machine/              # ITagFilter, MEPartMachine, energyhatch/ (3), gui/ (6 widgets), handler/ (3), iohatch/ (3), patternbuffer/ (MEPatternBuffer), utils/ (2)
+|   |-- machine/              # ITagFilter, MEPartMachine (ProgrammableCircuitSlotTrait circuitSlot), energyhatch/ (3), gui/ (6 widgets), handler/ (3), iohatch/ (3), patternbuffer/ (MEPatternBuffer), utils/ (2)
 |   |-- quantumcomputer/      # 12: cpu/ (5), gui/ (4), machine/ (QuantumComputerMultiblockMachine), port/ (2)
+|   |-- circuit/              # CircuitPatternData, CircuitPatternService (IItemHandlerModifiable via trait)
 |   |-- block/                # QuantumComputerCasingBlock
 |   |-- item/                 # DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
 |   |-- multi/                # PowerSubstationMachine
-|   `-- pattern/              # DynamicProcessingPattern
+|   `-- pattern/              # 2: DynamicProcessingPattern, PatternAuthorData
 |-- data/                     # CEDatagen, lang/ (ChineseLangHandler, EnglishLangHandler)
 |-- event/                    # ForgeEventHandler, ForgeClientEventHandler
 |-- integration/              # 9: emi/ (4), jade/ (4), ldlib/ (CELDLibPlugin)
@@ -33,8 +34,10 @@ src/main/java/tech/luckyblock/mcmod/ctnhenergy/
 | GT addon | `CTNHEnergyGTAddon.java` |
 | Config/settings | `CEConfig.java`, `common/CESettings.java` |
 | AE2/EU logic | `common/me/` (EUKey, VoltageKey, EU cells, EU container strategy, ME machine EU handler, EU P2P tunnel, energy distribution service) |
+| Circuit pattern | `common/circuit/CircuitPatternService.java`, `common/circuit/CircuitPatternData.java`, `api/ICircuitPattern.java` |
 | Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
 | AE2 machines/hatches | `common/machine/energyhatch/`, `common/machine/iohatch/`, `common/machine/handler/` |
+| ME part machine | `common/machine/MEPartMachine.java` (ProgrammableCircuitSlotTrait, Jade exposeAllSides) |
 | Quantum computer | `common/quantumcomputer/` (cpu/, gui/, machine/, port/) |
 | Maintaining card | `common/item/MaintainingCardItem.java`, `api/IMaintainingContext.java` |
 | Registries | `registry/` |
@@ -67,6 +70,8 @@ Read the matching domain guide before editing the corresponding source area.
 - Item/block/fluid references MUST use direct registration objects (`CEItems.X`, `CEBlocks.X`, `AEItems.X`, `AEParts.X`, `GTMaterials.X`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
 - AE2 mixins are central to behavior; inspect target class assumptions before changing signatures.
 - `src/generated/resources` is produced by `:modules:CTNH-Energy:runData`.
+- `MEPartMachine` circuit slot migrated from `NotifiableItemStackHandler circuitInventory @DescSynced` to `ProgrammableCircuitSlotTrait circuitSlot` via `attachPersistentTrait("circuit_slot", new ProgrammableCircuitSlotTrait(this)).shouldSearchContent(false)`; ghost-circuit config uses `circuitSlot.getStorage()`; `CircuitPatternService.setCircuit/apply` now takes `IItemHandlerModifiable` from trait.
+- `MEPartMachine.writeMachineJadeData()` persists `exposeAllSides` to Jade `CompoundTag`; tooltip uses `CN`/`EN` Lang keys `ctnhenergy.mepartmachine.allowconnectionfromallsides.{0,1,2}`.
 - Ponder `CTNHEnergyPonderSceneBuilder` is a thin adapter around CTNH-Lib's shared builder; `AE2CablePonderHelper` stays in Energy because it depends on AE2 cable bus internals.
 - `MaintainingCardItem` implements `IMaintainingContext` to track a stocking amount; lang keys are under `ctnhenergy.maintainingcarditem.*`.
 

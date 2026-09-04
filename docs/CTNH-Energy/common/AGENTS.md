@@ -7,6 +7,7 @@ Shared implementation for Energy (60 Java files): CommonProxy, AE2/EU logic, mac
 ```text
 common/
 |-- CommonProxy.java, CESettings.java
+|-- circuit/                   # CircuitPatternData, CircuitPatternService (ProgrammableCircuitSlotTrait / IItemHandlerModifiable)
 |-- me/                        # AE2/EU core logic
 |   |-- GenericStackEUStorage.java, MEMachineEUHandler.java
 |   |-- cell/                  # EUCellInventory, EuCellHandler
@@ -16,7 +17,7 @@ common/
 |   `-- strategy/              # EUContainerItemStrategy
 |       `-- context/           # CarriedContextEU, PlayerInvContextEU
 |-- machine/
-|   |-- ITagFilter.java, MEPartMachine.java   # circuitInventory is @DescSynced
+|   |-- ITagFilter.java, MEPartMachine.java (ProgrammableCircuitSlotTrait circuitSlot via attachPersistentTrait("circuit_slot"))
 |   |-- energyhatch/           # MEEnergyInputConfigurator, MEEnergyPartMachine, MESubstationHatch
 |   |-- gui/                   # AEConfigSlotWidget, AmountSetWidget, AutoPullAmountConfigurator, ConfigWidget, MEDualOutputConfigurator, TagFilterConfigurator
 |   |-- handler/               # MEStorageEUHandler, MEStorageFluidHandler, MEStorageItemHandler
@@ -31,7 +32,7 @@ common/
 |-- block/                     # QuantumComputerCasingBlock
 |-- item/                      # DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
 |-- multi/                     # PowerSubstationMachine
-`-- pattern/                   # DynamicProcessingPattern
+`-- pattern/                   # 2: DynamicProcessingPattern, PatternAuthorData
 ```
 
 ## WHERE TO LOOK
@@ -39,12 +40,14 @@ common/
 |---------|----------|
 | Common proxy | `common/CommonProxy.java` |
 | Settings | `common/CESettings.java` |
+| Circuit pattern | `common/circuit/CircuitPatternService.java` (`apply`/`setCircuit` on `IItemHandlerModifiable`), `common/circuit/CircuitPatternData.java`, `api/ICircuitPattern.java` |
 | AE2/EU keys/cells/P2P | `common/me/key/`, `common/me/cell/`, `common/me/parts/p2p/` |
 | Energy distribution | `common/me/service/` (EnergyDistributeService, IEnergyDistributor) |
 | Container strategy | `common/me/strategy/` (+ `context/`) |
 | Machine EU handler | `common/me/MEMachineEUHandler.java` |
 | Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
-| Circuit inventory sync | `common/machine/MEPartMachine.java` (`@DescSynced` on `circuitInventory`) |
+| ME part machine circuit | `common/machine/MEPartMachine.java` (`ProgrammableCircuitSlotTrait circuitSlot`) |
+| ME part machine Jade | `common/machine/MEPartMachine.java#writeMachineJadeData` (`exposeAllSides` -> Jade NBT, tooltip `ctnhenergy.mepartmachine.allowconnectionfromallsides.*`) |
 | Energy hatches | `common/machine/energyhatch/` (MEEnergyPartMachine, MESubstationHatch) |
 | I/O hatches | `common/machine/iohatch/` (MEInputMachine, MEOutputMachine, MEStokingInputMachine) |
 | Storage handlers | `common/machine/handler/` (EU/fluid/item) |
@@ -56,7 +59,9 @@ common/
 - `CommonProxy.init()` initializes config, registrate, AE menus, networking, datagen, gatherData listener, creative tabs, and AE key type registration.
 - Common setup registers `EnergyDistributeService`, EU container strategy, EU cell handler/upgrades, pattern-provider upgrade cards, and EU P2P attunement.
 - `CommonProxy.attachCapabilities()` adds `generic_eu_wrapper` through `common/me/MEMachineEUHandler.java`.
-- `MEPartMachine.circuitInventory` is `@DescSynced`; circuit slot contents are pushed from the server part to the client so GUI slots stay synchronized.
+- `MEPartMachine` circuit slot is `ProgrammableCircuitSlotTrait circuitSlot` attached via `attachPersistentTrait("circuit_slot", new ProgrammableCircuitSlotTrait(this)).shouldSearchContent(false)`; null when `circuitSlotEnabled==false`. Ghost-circuit persistence via `MEConfigUtil.writeGhostCircuit/readGhostCircuit(tag, circuitSlot.getStorage())`. `CircuitPatternService.setCircuit(IItemHandlerModifiable, int)` and `apply()` resolve trait via `machine.getTrait(ProgrammableCircuitSlotTrait.class)`.
+- `MEPartMachine` `nodeHost` is trait-hosted via `attachTrait(createNodeHost())`; `onRotated()` updates `exposeAllSides` exposed sides.
+- `MEPartMachine.writeMachineJadeData()` writes `exposeAllSides` boolean; Jade provider renders `Allow connection from all sides: Yes/No` via `@CN`/`@EN` + `Lang` keys `ctnhenergy.mepartmachine.allowconnectionfromallsides.*`. Do not duplicate `@DescSynced` fields into Jade NBT.
 - Do not register EU key/cell behavior only in item code; AE2 key types, storage cell handler, container strategy, upgrades, and P2P attunement are separate CommonProxy hooks.
 - `MaintainingCardItem` implements `api/IMaintainingContext` and provides right-click configuration for stocking amount.
 
@@ -69,9 +74,10 @@ Energy 侧 trait 落点：`MEStorageEUHandler` / `MEStorageFluidHandler` / `MESt
 - 能量容器由 tiered machine 的工厂创建；子类特殊容器需要额外参数时用构造时传入的工厂闭包，让父类调用 `createEnergyContainer` 时保留子类参数，禁止延迟绑定绕开构造参数。
 - 量子计算机与 pattern buffer 的 UI 进度属客户端同步状态：`@DescSynced` 已覆盖的字段禁止再写进 Jade NBT。
 
-
 ## ANTI-PATTERNS
 - Do not treat quantum computer/menu updates as server-only; UI progress sync is part of the module.
+- Do not reintroduce `NotifiableItemStackHandler circuitInventory` or `IHasCircuitSlot` on `MEPartMachine`; use `ProgrammableCircuitSlotTrait`.
+- Do not write `exposeAllSides` or other trait-persisted fields as unrelated NBT outside `writeMachineJadeData`.
 
 ## SCOPE
 Applies to `src/main/java/tech/luckyblock/mcmod/ctnhenergy/common` and its child packages.
@@ -81,6 +87,7 @@ Applies to `src/main/java/tech/luckyblock/mcmod/ctnhenergy/common` and its child
 
 ## SOURCE OF TRUTH
 - `common/CommonProxy.java` and `common/me/` contracts.
+- `common/machine/MEPartMachine.java`, `common/circuit/CircuitPatternService.java` for trait-based circuit handling.
 
 ## WORKFLOW
 1. Check `CommonProxy.init()` / common setup hook order before adding behavior.

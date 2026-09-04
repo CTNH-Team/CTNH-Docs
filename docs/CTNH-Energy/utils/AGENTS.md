@@ -8,7 +8,7 @@ Shared helper utilities for Energy (11 Java files), including button/widget help
 utils/
 |-- CEDrawHelper.java, CEUtil.java, MEConfigUtil.java
 |-- CEPatternProviderTarget.java, ProviderRecord.java
-|-- FakePccCard.java, FakeSizedIntList.java, TempColorSprayBehaviour.java
+|-- FakeSizedIntList.java, TempColorSprayBehaviour.java
 `-- button/                    # BlitterButton, Blitters, CETextures, ToggleBlitterButton
 ```
 

@@ -1,7 +1,7 @@
 # CTNH-ENERGY API DOMAIN
 
 ## OVERVIEW
-Shared API surfaces for Energy (8 Java files): predicates, EU item context, multiblock/CPU contracts, pattern provider logic, and maintaining context.
+Shared API surfaces for Energy (8 Java files): predicates, EU item context, multiblock/CPU contracts, circuit pattern, pattern provider logic, and maintaining context.
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -9,6 +9,7 @@ Shared API surfaces for Energy (8 Java files): predicates, EU item context, mult
 | Predicates | `api/CEPredicates.java` |
 | EU item context | `api/EUItemContext.java` |
 | CPU auto-multiply | `api/IAutoMultiplyCPU.java` |
+| Circuit pattern | `api/ICircuitPattern.java` (implemented by `common/pattern/DynamicProcessingPattern.java`, consumed by `common/circuit/CircuitPatternService.java`) |
 | Ghost key target | `api/IGhostKeyTarget.java` |
 | Pattern provider logic | `api/IPatternProviderLogic.java` |
 | Maintaining context | `api/IMaintainingContext.java` |
@@ -17,6 +18,7 @@ Shared API surfaces for Energy (8 Java files): predicates, EU item context, mult
 ## CONVENTIONS
 - API classes must not leak client-only classes into common construction paths.
 - `IAutoMultiplyCPU` and `IPatternProviderLogic` back quantum computer and pattern buffer behavior.
+- `ICircuitPattern` exposes circuit number (`NO_CIRCUIT` sentinel) for `CircuitPatternService.apply/resolveTargets`; `DynamicProcessingPattern` is the primary implementor.
 - `IMaintainingContext` provides get/set for a maintaining amount, used by `MaintainingCardItem`.
 
 ## ANTI-PATTERNS
