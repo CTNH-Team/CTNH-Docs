@@ -11,7 +11,7 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |-- CTNHConfig.java           # module config
 |-- api/                      # public APIs: multiblock builder, patterns, machine features
 |   |-- CTNHMultiblockBuilder.java
-|   |-- Pattern/              # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates
+|   |-- Pattern/              # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates (AsynBlockPattern now null/empty guards for AE extract)
 |   |-- data/material/        # icon sets/types, property keys, catalyst property
 |   |-- gui/                  # CTNHGuiTextures
 |   |-- jade/                 # multithread recipe/output/thread providers
@@ -34,28 +34,34 @@ src/main/java/io/github/cpearl0/ctnhcore/
 |   |-- machine/multiblock/   # 5 top-level + electric/ + generator/ + kinetic/ + part/ + quantum/
 |   |   |-- electric/         # WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, ...
 |   |   |   |-- multithread/  # CNCAlloySmelter
-|   |   |   `-- rareearth/    # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
+|   |   |   `-- rareearth/    # ProcessControlMachine, ProcessControlProfile, ...
 |   |   |-- generator/        # Arc_Reactor, HyperPlasmaTurbineMachine, MegaTurbineMachine, ...
-|   |   |-- kinetic/          # 5: IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine, MeadowMachine, NoEnergyMachine
+|   |   |-- kinetic/          # 5: IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, ...
 |   |   |-- part/             # CTNHPartAbility, CatalystHatchPartMachine, Creative*PartMachine, ...
 |   |   `-- quantum/          # quantum_core
-|   |-- machine/simple/       # DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine
+|   |-- machine/simple/       # DigitalMiner, EfficiencyGeneratorMachine, ...
 |   |-- machine/trait/        # ScalableReservoirComputingLogic, providable_net/ (ProvidableNetHandler)
 |   |-- recipe/               # KeepIngredientShapedRecipe, condition classes, CTNHRecipeBuilder
 |   `-- world/                # CTNHChunkLoading
 |-- data/                     # datagen: recipes, tags, materials, worldgen
 |   |-- CTNHCoreDatagen.java  # datagen entry
-|   |-- CreateRecipeTypes.java
+|   |-- CreateRecipeTypes.java # mechanicalTier now Math.min(tier,5) (was *2)
 |   |-- item/                 # CrystalItems
 |   |-- machines/             # GTNNMachines
-|   |-- materials/            # 26 material sets (NaquadahMaterials, PlatinumLineMaterials, ...)
-|   |-- recipe/               # 34 top-level + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
+|   |-- materials/            # 26 sets: BoronChainMaterials NEW (borax_acid_solution, boron_trioxide), GoldChainMaterials RENAMED from CrudeGoldRefiningMaterials, Boric Acid now dust+components H3BO3 + DISABLE_DECOMPOSITION, NaquadahMaterials, PlatinumLineMaterials, ...
+|   |-- recipe/               # 35 top-level (WaferRecipes NEW) + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
+|   |   |-- CTNHCoreRecipeAddition.java # now dispatches BoronChain.init() + WaferRecipes.init()
+|   |   |-- RecipeRemoval.java      # adds gtceu:electrolyzer/decomposition_electrolyzing_borax, wildcard engrave_ram_*/lpic_*/ssoc_*
+|   |   |-- WaferRecipes.java       # NEW: precision circuit wafer masking (rubber-masked wafers)
+|   |   |-- chain/BoronChain.java   # NEW: boron chain
 |   |-- tags/                 # biome/entity/block/fluid/item tag providers, TagClearHelper
 |   `-- worldgen/             # CTNHBiomeModifiers
 |-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
-|-- integration/              # EMI, Create Diesel, Legendary Survival, FTB Essentials
+|-- integration/              # EMI, Create Diesel, Legendary Survival, FTB Essentials, CTPP
+|   `-- emi/CTNHCoreEmiPlugin.java # now CTPPDisable() hides CTPPMachines.PLACEABLE_EMITTER
 |-- mixin/                    # cross-mod mixins across many target mods; mc/ RecipeManagerApplyMixin
 |-- registry/                 # 50 root+child classes; adventure/ jade/ machines/ material/ ores/ sound/
+|   `-- CTNHItems.java        # NEW: BSC_CHIP, BSC_WAFER, BSC_WAFER_RUBBER_MASKED, LPIC_WAFER_RUBBER_MASKED, RAM_WAFER_RUBBER_MASKED, RUBBER_MASKED_SILICON_WAFER, SSOC_WAFER_RUBBER_MASKED (renamed from *_masked)
 `-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
 ```
 
@@ -67,6 +73,11 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Config | `CTNHConfig.java` |
 | Registries | `registry/` (50 root+child classes) |
 | Recipe generation root | `data/recipe/CTNHCoreRecipeAddition.java` (dispatched from `addRecipes()`) |
+| Boron chain | `data/materials/BoronChainMaterials.java`, `data/recipe/chain/BoronChain.java` |
+| Wafer/precision circuits | `data/recipe/WaferRecipes.java`, `registry/CTNHItems.java` (BSC_*, *_RUBBER_MASKED) |
+| Gold chain rename | `data/materials/GoldChainMaterials.java` (was `CrudeGoldRefiningMaterials.java`) |
+| Create kinetic conversion | `data/CreateRecipeTypes.java` (mechanicalTier Math.min(tier,5)) |
+| Recipe removals | `data/recipe/RecipeRemoval.java` + `mixin/mc/RecipeManagerApplyMixin.java` |
 | Multiblocks (electric) | `common/machine/multiblock/electric/` (including `multithread/` and `rareearth/`) |
 | Multiblocks (generator) | `common/machine/multiblock/generator/` (12 machines) |
 | Multiblocks (parts) | `common/machine/multiblock/part/` (12 machines) |
@@ -74,9 +85,9 @@ src/main/java/io/github/cpearl0/ctnhcore/
 | Materials | `data/materials/` (26 sets), `registry/material/` |
 | Ponder/client | `client/ponder/`, `client/renderer/` |
 | Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
+| EMI + CTPP hiding | `integration/emi/CTNHCoreEmiPlugin.java` (`CTPPDisable()` iterates `CTPPMachines.PLACEABLE_EMITTER`) |
 | Sound events | `registry/sound/CTNHSoundEvents.java` |
-| Create Diesel integration | `integration/creatediesel/DistillationCategoryLayout.java`, `mixin/creatediesel/DistillationCategoryMixin.java`, `mixin/emi/JemiRecipeMixin.java` |
-| FTB Essentials integration | `integration/ftbessentials/AsyncRtpManager.java` |
+| AE pattern fix | `api/Pattern/AsynBlockPattern.java` (null/empty guard on foundItemStack) |
 
 ## ARCHITECTURE CONTRACT
 Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `docs/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
@@ -91,7 +102,7 @@ Read the matching domain guide before editing the corresponding source area.
 | `common` | `docs/CTNH-Core/common/AGENTS.md` | Blocks, machines, capabilities, items, entities |
 | `data` | `docs/CTNH-Core/data/AGENTS.md` | Recipe generators, tags, worldgen, materials datagen |
 | `event` | `docs/CTNH-Core/event/AGENTS.md` | Forge event handlers, task managers |
-| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI, Create Diesel, Legendary Survival, and FTB Essentials integration |
+| `integration` | `docs/CTNH-Core/integration/AGENTS.md` | EMI, Create Diesel, Legendary Survival, FTB Essentials, CTPP integration |
 | `mixin` | `docs/CTNH-Core/mixin/AGENTS.md` | Cross-mod mixins, recipe removal at `RecipeManager.apply()` |
 | `registry` | `docs/CTNH-Core/registry/AGENTS.md` | Items, blocks, machines, recipe types, materials, sound events |
 | `utils` | `docs/CTNH-Core/utils/AGENTS.md` | Shared helpers and recipe utilities |
@@ -106,6 +117,12 @@ Read the matching domain guide before editing the corresponding source area.
 - `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
 - Spelling quirk: mixin package is `dategen` (not `datagen`).
 - Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
+- When referencing items/blocks/fluids, MUST use direct registration objects — static field references (`GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`) or registered `ItemLike`/`Fluid` values — never `ResourceLocation` string parsing with `ForgeRegistries.ITEMS/BLOCKS/FLUIDS.getValue(...)` or similar lookups. String ids are allowed only where no registration object exists (upstream-mod-only ids, recipe ids, tag keys, dimension ids). See root AGENTS.md CONVENTIONS.
+- Material rename: `CrudeGoldRefiningMaterials` → `GoldChainMaterials` (same file, class rename); imports updated in `AlumiumChain.java`, `SunRecipes.java`.
+- New boron materials: `BORAX_ACID_SOLUTION` (liquid, formula 2NaCl+4H3BO3+5H2O) and `BORON_TRIOXIDE` (dust, B2O3, DISABLE_DECOMPOSITION) in `BoronChainMaterials`; `BORIC_ACID` changed to dust+liquid with components H3BO3 and DISABLE_DECOMPOSITION.
+- Create kinetic tier fix: `CreateRecipeTypes` mechanicalTier now `Math.min(GTUtil.getTierByVoltage(EUt),5)` for pressor/mixer/centrifuge/sifter/lathe (removed `*2`).
+- Recipe removal now uses wildcards `engrave_ram_*`, `engrave_lpic_*`, `engrave_ssoc_*` and removes `gtceu:electrolyzer/decomposition_electrolyzing_borax`.
+- Wafer items renamed `*_masked` → `*_rubber_masked` plus new `RUBBER_MASKED_SILICON_WAFER` and `SSOC_WAFER_RUBBER_MASKED`; models under `assets/ctnhcore/models/item/*rubber_masked*.json` and lang keys updated.
 
 ## ANTI-PATTERNS
 - Do not manually reformat huge multiblock registry sections protected by Spotless toggles.

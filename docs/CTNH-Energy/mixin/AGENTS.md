@@ -7,6 +7,7 @@ AE2, AE2CS/AECS, Better P2P, GTM, Omni Cells, and ME Requester integration mixin
 ```text
 mixin/
 |-- ae2/                       # CableBusContainerMixin, SettingsMixin
+|   |-- circuit/               # PatternDetailsHelperMixin, ProcessingPatternMixin
 |   |-- cpu/                   # CraftingCPUMenuMixin, CraftingCpuLogicMixin, CraftingServiceMixin, ExecutingCraftingJobCircuitMixin
 |   |-- emi/                   # 9 mixins: AbstractRecipeHandlerMixin, CraftingHelperMixin, EmiAeBaseScreenStackProviderMixin, EmiEncodePatternHandlerMixin, EmiItemStackConverterMixin, EmiScreenBaseMixin, EmiStackHelperCircuitMixin, EmiUseCraftingRecipeHandlerMixin, FillCraftingGridFromRecipePacketMixin
 |   |-- energy/                # 7: ChestBlockEntityMixin, DriveBlockEntityMixin, EnergyOverlayGridMixin, InterfaceEnergyDistributorLogic, MEInventoryHandlerMixin, PatternProviderEnergyDistributorLogic, StorageBusPartMixin
@@ -27,6 +28,8 @@ mixin/
 | Concern | Location |
 |---------|----------|
 | AE2 patches | `mixin/ae2/` + 9 subpackages (circuit/cpu/emi/energy/menu/misc/part/patternencodingpanel/patternprovider) |
+| Circuit EMI handling | `mixin/ae2/emi/EmiStackHelperCircuitMixin.java` (GTEmiRecipe -> append `IntCircuitBehaviour.stack(0)` when no programmed circuit, gated by `CEConfig.client.enableCircuitInPatternEncoding`) |
+| Pattern provider circuit | `mixin/ae2/patternprovider/PatternProviderLogicMixin.java` (ICircuitPattern -> `CircuitPatternService.apply/resolveTargets` from `be.getBlockPos().relative(direction)`) |
 | AE2CS/AECS patches | `mixin/aecs/` |
 | Better P2P | `mixin/betterP2P/` |
 | GTM patches | `mixin/gtm/` |
@@ -37,6 +40,8 @@ mixin/
 ## CONVENTIONS
 - AE2 mixins are central to behavior; inspect target class assumptions before changing signatures.
 - Keep mixin JSON and package entries synchronized.
+- `EmiStackHelperCircuitMixin` only acts on `GTEmiRecipe`; it falls back to `IntCircuitBehaviour.stack(0)` instead of no-op when catalysts lack `PROGRAMMED_CIRCUIT`.
+- `PatternProviderLogicMixin` resolves circuit targets via `CircuitPatternService.resolveTargets(level, be.getBlockPos().relative(direction), direction, 5)` to avoid queuing the provider itself.
 
 ## ANTI-PATTERNS
 - Do not change AE2 mixins without checking both mixin JSON and the target AE2 behavior.
