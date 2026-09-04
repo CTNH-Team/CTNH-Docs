@@ -77,6 +77,7 @@ description: |
 
   在以下场景使用本 skill：
   - 修改 CTNH 模块代码前，需要读取对应模块的 AGENTS.md 指南
+  - 改动机器/trait/recipe capability/Jade 代码前，需要读取架构契约 docs/_architecture/AGENTS.md
   - 需要了解模块的注册入口、配方生成、机器结构、域划分
   - 需要按 init-deep 更新模式维护 docs/ 层级文档
   - 排查与 CTNH-Modules 仓库结构、约定、反模式相关的问题
@@ -97,11 +98,13 @@ CTNH-Modules 的层级知识库。每个模块是独立 git submodule；本 skil
 - 读取 `docs/<Module>/AGENTS.md` 了解模块入口、注册、约定与反模式。
 - 读取 `docs/<Module>/<domain>/AGENTS.md` 了解具体域（api/client/common/data/event/integration/mixin/registry/utils 等）。
 - 变更代码前先读对应模块指南，遵守其中的 CONVENTIONS 与 ANTI-PATTERNS。
+- 改动 machine / trait / recipe capability / Jade 前，先读 `docs/_architecture/AGENTS.md`（所有权边界、字段同步与持久化规则、Jade 数据最小化、迁移步骤）。
 
 ## Module routing
 
-| Module | Guide |
-|--------|-------|
+| Scope | Guide |
+|-------|-------|
+| **架构契约（跨模块，优先）** | `docs/_architecture/AGENTS.md` |
 | CTNH-Core | `docs/CTNH-Core/AGENTS.md` |
 | CTNH-Lib | `docs/CTNH-Lib/AGENTS.md` |
 | CTNH-Bio | `docs/CTNH-Bio/AGENTS.md` |
@@ -118,6 +121,9 @@ CTNH-Modules 的层级知识库。每个模块是独立 git submodule；本 skil
 - GT/GMT 配方经 `*GTAddon.addRecipes()` 注册为运行时动态数据包，`runData` 不产出其 JSON。
 - 引用物品/方块/流体必须用静态注册对象，禁止 `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找。
 - 保留拼写怪癖：`mixin/dategen`、`data/recipe/fanprocessing`（无下划线）、`multiblock`（无 `Mutiblock`）。
+- 机器状态一份一个所有者：机器字段与 trait 字段禁止并存；trait 在构造阶段挂载完毕。
+- `@DescSynced` 管同步、`@Persisted` 管存档，同用前确认两者都必要；同一份数据禁止注解与 attach 式持久化并存。
+- Jade 服务端数据只写客户端推导不出的信息；`lastRecipe` 已同步，禁止在 Jade 中重复序列化。
 """
     with open(os.path.join(staging, "SKILL.md"), "w", encoding="utf-8") as f:
         f.write(skill_md)

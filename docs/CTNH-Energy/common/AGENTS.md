@@ -60,6 +60,16 @@ common/
 - Do not register EU key/cell behavior only in item code; AE2 key types, storage cell handler, container strategy, upgrades, and P2P attunement are separate CommonProxy hooks.
 - `MaintainingCardItem` implements `api/IMaintainingContext` and provides right-click configuration for stocking amount.
 
+## TRAIT OWNERSHIP
+Energy 侧 trait 落点：`MEStorageEUHandler` / `MEStorageFluidHandler` / `MEStorageItemHandler`（`NotifiableRecipeHandlerTrait<T>`，前者同时实现 `IEnergyContainer`）、`PowerStationEnergyBank extends MachineTrait`。`MEMachineEUHandler` 只实现 `IEnergyContainer`，不是 trait —— 它由 trait 或机器持有，不要当作 trait 挂载。
+
+约束以 `docs/_architecture/AGENTS.md` 为准，本域重点：
+
+- EU/AE2 状态一份一个所有者：AE key 类型、存储单元 handler、容器策略、升级与 P2P attunement 是各自独立的 CommonProxy 挂载点，不要在物品代码里重复登记（见本文件 ANTI-PATTERNS）。
+- 能量容器由 tiered machine 的工厂创建；子类特殊容器需要额外参数时用构造时传入的工厂闭包，让父类调用 `createEnergyContainer` 时保留子类参数，禁止延迟绑定绕开构造参数。
+- 量子计算机与 pattern buffer 的 UI 进度属客户端同步状态：`@DescSynced` 已覆盖的字段禁止再写进 Jade NBT。
+
+
 ## ANTI-PATTERNS
 - Do not treat quantum computer/menu updates as server-only; UI progress sync is part of the module.
 

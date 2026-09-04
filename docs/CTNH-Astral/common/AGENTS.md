@@ -39,6 +39,14 @@ common/
 - `RocketContraptionEntity` persists rocket fields via `writeAdditional`/`readAdditional` (RocketAssembled, RocketLaunching, RocketLaunchTicks, RocketCountdownTicks, RocketLanding, RocketLandingPad, RocketThrust, RocketFuelCapacity, RocketRemainingFuel) and removes the legacy `CTNHAstralRocket` persistent-data key on read.
 - `setPersistenceAnchor()` keeps `controllerPos` as an inert anchor for `SimpleRotatingContraptionEntity` compatibility without tying the rocket to a controller multiblock.
 
+## TRAIT OWNERSHIP
+`OxygenEnricherMachine` 内联 `OxygenEnricherRecipeLogic extends RecipeLogic`。约束以 `docs/_architecture/AGENTS.md` 为准，本域重点：
+
+- 氧气/大气环境状态（`common/oxygen/`）的所有权归 service 与机器，不要在 trait 与机器间重复持有。
+- 需要客户端读取的环境状态用 `@DescSynced` 承载，不要为 Jade/HUD 另开一条 NBT 通道。
+- `RecipeLogic` 不做 capability 类型判断；配方内容解释归 recipe capability。
+
+
 ## ANTI-PATTERNS
 - Do not bypass CommonProxy registration order.
 - Do not reintroduce `RocketAssemblyPlatformMachine` controller calls in `RocketDimensionTravelHandler` for dimension transfer; use `RocketState` capture/apply.

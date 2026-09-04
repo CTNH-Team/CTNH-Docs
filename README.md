@@ -10,6 +10,7 @@ CTNH-Modules 主仓库的 `AGENTS.md` 通过 DOMAIN GUIDE ROUTING 路由到本�
 
 ```text
 docs/                         # 层级 AGENTS.md 指南（webfetch 获取）
+├── _architecture/        # 跨模块架构契约（machine/trait/capability/Jade），手工维护，不由自动同步生成
 ├── CTNH-Core/            # 模块主文档 + 9 域
 ├── CTNH-Lib/             # 模块主文档 + 11 域
 ├── CTNH-Bio/             # 模块主文档 + 10 域
@@ -56,6 +57,8 @@ CTNH-Modules 的代理（agent）优先使用 **`ctnh-docs` skill**（从本仓�
 3. 对每个有新提交的模块，`scripts/doc_gen.py` 将 init-deep 更新模式提示词 + 现有文档 + 源码结构 + 提交 diff 发给 LLM
 4. LLM 返回 `{path, action, content}` 更新清单，脚本写入 `docs/<Module>/`
 5. 有新改动时自动创建 PR（`peter-evans/create-pull-request`，固定分支 `auto-doc-update`）；存在**未合并的同步 PR** 时跳过本轮（`state.json` 的推进依赖 PR 合并，跳过可避免同一批提交重复生成/重复开 PR），手动 `force_latest` 不受此限制
+
+`doc_gen.py` 的写入校验限定 `docs/<Module>/**AGENTS.md`（路径越界会被拒绝），因此 `docs/_architecture/` **不在自动同步的写入范围内**，是手工维护的跨模块架构契约；它仍会被 `check_release.py` 的 `copytree(docs/)` 整树打进 skill 包。
 
 ### 所需 Secrets
 

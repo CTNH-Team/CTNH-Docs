@@ -45,6 +45,9 @@ src/main/java/com/ctnhlang/   # separate annotation namespace
 | Mixins | `mixin/`, `src/main/resources/ctnhlib.mixins.json` |
 | Shared helpers | `utils/` (AllBuilder2, ChunkList, CodecBuilder, EnvUtils, ExtendNbtUtils, InfiniteMeteorTerrain, LockIdentityHashMap, MachineUtils) |
 
+## ARCHITECTURE CONTRACT
+Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `docs/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
+
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
 
@@ -66,6 +69,7 @@ Read the matching domain guide before editing the corresponding source area.
 - Main library namespace is `tech.vixhentx.mcmod.ctnhlib`; lang annotation namespace is `com.ctnhlang`.
 - `CTNHDynamicDataPack` is the runtime pack that carries GT/GMT recipes (via `GTDynamicPackContents`) into the recipe manager; that is why `runData` never emits JSON for GT/GMT recipes. See root AGENTS.md CONVENTIONS.
 - Item/block/fluid references MUST use direct registration objects (`GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. In Lib, `ResourceLocation` appears only for recipe/tag/advancement ID path generation, not item resolution. See root AGENTS.md CONVENTIONS.
+- GTCEu 的 trait 基础设施（`api/machine/trait/`：`MachineTrait`、`RecipeLogic`、`WorkLogic`、`ICapabilityTrait`、`Notifiable*`、`*ComputationPortTrait` 等 17 个类）属 **vendored 上游**，不在 CTNH-Lib 内；Lib 只提供 `api/CrossParallelRecipeLogic`（跨并行共享 `RecipeLogic`）与 `jade/` 排序设施。改 trait 基类只在任务明确针对 GTCEu 内部时进行。
 - Resource count is intentionally tiny compared with gameplay modules.
 - Changes here can affect all CTNH modules through shared builders, annotations, Jade provider ordering, highlight packets, and shared Ponder support.
 

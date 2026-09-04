@@ -54,6 +54,16 @@ api/
 - Recipe capability multiplier methods are `copyWithMultiplier(content, float multiplier)` in `EntityRecipeCapability`, `ModelRecipeCapability`, and `NutrientRecipeCapability`; `EntityIngredient` / `ChancedEntityIngredient` also accept `float` and truncate multiplied integral fields back to `int`.
 - NOTE: there is no `api/recipe/content/` subpackage; nutrient serialization lives under `api/capability/recipe/`.
 
+## TRAIT OWNERSHIP
+`api/machine/trait/` 的三个 trait 均为 `NotifiableRecipeHandlerTrait<T>` 子类：`NeuralModelContainer`（`ModelIngredient`）、`NotifiableEntityContainer`（`EntityIngredient`）、`NotifiableNutrientHandler`（`Float`）。另有机器内联 `RecipeLogic` 子类 `BasicLivingRecipeLogic`、`CogniAssemblerRecipeLogic`，以及 `ParabioticBridgeHandler extends NotifiableItemStackHandler`。
+
+约束以 `docs/_architecture/AGENTS.md` 为准，本域重点：
+
+- capability 四层分工：Forge capability 对外暴露、recipe capability 描述配方语义与并行/XEI 逻辑、trait 持有 handler 与机器侧状态、机器子类只放机器特有规则。生物 recipe capability 的匹配逻辑属 recipe capability 层，不要下沉进 trait。
+- 需要同步或持久化的字段放 trait 并用 managed field 承载；`@DescSynced` 与 `@Persisted` 同用前确认两者都必要；装不下的走 `saveCustomPersistedData` / `loadCustomPersistedData`。
+- 一份状态一个所有者：机器字段与 trait 字段禁止并存。
+
+
 ## ANTI-PATTERNS
 - Do not bypass `PropertyOperators` / `EntityProperties` when adding entity-model recipe matching.
 - Do not collapse biological recipe capabilities into Core; this module owns its living-machine abstractions.

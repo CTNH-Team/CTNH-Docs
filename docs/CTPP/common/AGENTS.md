@@ -51,6 +51,21 @@ common/
 - `TerminalWirePayment` builds an all-or-nothing fine-wire extraction plan; `TerminalNetwork.handleUse()` uses it instead of direct stack shrink.
 - Kinetic multiblock machines require all kinetic inputs to run at the same rotation speed; `RPMCondition` uses `Math.abs(controller.speed)`.
 
+## TRAIT / CAPABILITY LAYERING
+动能应力的分层落点（约束以 `docs/_architecture/AGENTS.md` §4 为准）：
+
+| 层 | 实现 |
+|----|------|
+| Recipe capability | `api/StressRecipeCapability`（`"su"`, Float），并行上限经 `getMaxParallelByInput`；`CTPPRecipeCapabilities.SU` 是其别名 |
+| Machine trait | `NotifiableStressTrait extends NotifiableRecipeHandlerTrait<Float> implements ICapabilityTrait` 持有应力 I/O 状态 |
+| RecipeLogic | `KineticRecipeLogic`（`KineticMultiblockMachine` 内） |
+| Machine 子类 | 只放动能机器特有规则（RPM/tier 判定、结构约束） |
+
+- 应力 I/O 不要用裸 JSON 键拼；`StressRecipeCapability` + KubeJS `SU_IN`/`SU_OUT` + `CTPPRecipeBuilder` 三者配套使用。
+- 并行计算属 recipe capability 与 `CTPPParallelLogic`，不要在机器子类里重算。
+- 机器字段与 trait 字段禁止并存形成双重所有权。
+
+
 ## ANTI-PATTERNS
 - Do not change kinetic/electric machine tiers without checking both registry code and generated models/recipes.
 - Do not bypass `TerminalWirePayment` for wire extraction; use the plan to ensure atomicity.

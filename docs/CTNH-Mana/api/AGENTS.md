@@ -28,6 +28,15 @@ api/
 ## CONVENTIONS
 - API classes must not leak client-only classes into common construction paths.
 
+## RECIPE LOGIC BOUNDARY
+`api/recipe/customlogic/` 的 6 个类与 `ZenithMatrixRecipeLogic` 都落在 `RecipeLogic` 层。约束以 `docs/_architecture/AGENTS.md` §6 为准：
+
+- `RecipeLogic` 负责当前 recipe、工作状态、配方上下文，以及经 `ContentListMap.forEachEntry` 按 capability 顺序分发输出 tooltip。
+- 输出内容的解释属 `RecipeCapability` 自己的职责；**不要在 `RecipeLogic` 里加 capability 类型判断**。
+- 遍历 recipe 内容统一走 `forEachEntry`，不要遍历 `asMap().entrySet()` 再手排。
+- `lastRecipe` 已由 `@DescSynced` 同步，Jade 中禁止重复序列化。
+
+
 ## ANTI-PATTERNS
 - Do not add gameplay logic to API classes; keep implementation in `common/` or `registry/`.
 

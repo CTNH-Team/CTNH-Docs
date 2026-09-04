@@ -38,6 +38,9 @@ src/main/java/com/ctnh/ctnhastral/
 | Mixins | `mixin/`, `src/main/resources/ctnhastral.mixins.json` |
 | Resources | `src/main/resources/assets/ctnhastral/`, `assets/gtceu/` (legacy), `src/generated/resources/` (lang, blockstates, noise settings) |
 
+## ARCHITECTURE CONTRACT
+Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `docs/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
+
 ## DOMAIN GUIDE ROUTING
 Read the matching domain guide before editing the corresponding source area.
 

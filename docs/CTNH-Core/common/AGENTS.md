@@ -62,6 +62,21 @@ common/
 - Electric multiblocks follow `*Machine` naming (some legacy files use `*_old` or snake_case); parts implement `CTNHPartAbility`.
 - The `rareearth/` subpackage under electric machines contains process-control machine abstractions and their profiles; treat it as part of the electric multiblock hierarchy.
 
+## TRAIT OWNERSHIP
+所有权与字段规则以 `docs/_architecture/AGENTS.md` 为准（§1 边界、§2 字段、§4 capability 分层）。Core 侧落点：
+
+- `common/machine/trait/`：`ScalableReservoirComputingLogic`（`RecipeLogic` 子类）、`SimpleComputationContainer`（`NetworkedComputationContainer` 子类）、`providable_net/`（`ProvidableNetHandler`、`ProvidableNetInfo`、`ProviderInfo`、`IProviableNetHandlerMachine`）。
+- 机器内联 `RecipeLogic` 子类：`INFFluidDrillLogic`、`VoidMinerRecipeLogic`、`NeutronActivatorLogic`、`DigestingTankLogic`、`ProcessControlRecipeLogic`。
+- 部件侧 `Notifiable*` 子类：`CircuitItemHandler`、`InfinityEnergyContainer`、`InfinityItemStackHandler`、`InfinityFluidTank`、`DroneHolderHandler`。
+
+硬约束：
+
+- **一份状态只能有一个所有者。** 机器字段与 trait 字段禁止并存形成双重所有权；迁移时先让 trait 成为唯一所有者，再删机器字段与委托方法。
+- trait 在构造阶段挂载完毕（`attachTraits` 不支持运行期添加）；父类工厂需要的子类参数用构造时传入的工厂闭包，禁止 `Object... args` 与延迟绑定。
+- `@DescSynced` 与 `@Persisted` 各有语义，同用前确认字段确实既需同步又需保存；managed field 装不下的走 `saveCustomPersistedData` / `loadCustomPersistedData`。同一份数据禁止注解与 attach 式持久化并存。
+- 新增 trait 不要在机器基类堆类型特判；让 trait 自己实现能力与生命周期。
+
+
 ## ANTI-PATTERNS
 - Do not bypass `CommonProxy` registration order; registry dependencies are deliberate.
 - Do not put client-only rendering in common machine classes.

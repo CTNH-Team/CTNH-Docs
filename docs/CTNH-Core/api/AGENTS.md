@@ -32,6 +32,13 @@ api/
 - Prefer interface surfaces (`ICoilMachine`, `IDigitalMiner`, `IDynamicCasing`) over concrete implementations when exposing machines to other modules.
 - Jade provider interfaces in `api/jade/` back the registry-level `CTNHJadePlugin`.
 
+## JADE PROVIDERS
+`api/jade/` 的 `MultithreadRecipeLogicProvider`、`MultithreadRecipeOutputProvider`、`ThreadStatusProvider` 是 GTCEu `RecipeLogicProvider` / `RecipeOutputProvider` 的多线程变体，经 CTNH-Lib `JadePriorityManager` 注册（现状优先级表见 `docs/CTNH-Lib/jade/AGENTS.md`）。
+
+- 统一单入口机器 provider 是迁移目标（`docs/_architecture/AGENTS.md` §8/§9）；这三个 provider 属该迁移的下游，改动前先读架构契约。
+- Jade 服务端数据只写客户端推导不出的信息：`lastRecipe` 已由 `@DescSynced` 同步，禁止在 Jade 中重复序列化；能耗、并行、线程状态能推导则不写 NBT。
+
+
 ## ANTI-PATTERNS
 - Do not add gameplay logic to API classes; keep implementation in `common/` or `registry/`.
 - Do not reference module-specific classes from shared API surfaces.
