@@ -7,7 +7,7 @@ Public API surfaces for Core (18 Java files): the multiblock builder, machine fe
 ```text
 api/
 |-- CTNHMultiblockBuilder.java
-|-- Pattern/                   # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates
+|-- Pattern/                   # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates (AsynBlockPattern extract/search now guards null/empty foundItemStack)
 |-- data/material/             # CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty
 |-- gui/                       # CTNHGuiTextures
 |-- jade/                      # MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider
@@ -22,6 +22,7 @@ api/
 | Multiblock builder | `api/CTNHMultiblockBuilder.java`, `api/machine/multiblock/` |
 | Machine features | `api/machine/feature/` (`ICoilMachine`, `IDigitalMiner`, `IDynamicCasing`) |
 | Pattern helpers | `api/Pattern/` (`AsynBlockPattern`, `CTNHBlockMaps`, `CTNHPredicates`) |
+| AE pattern NPE fix | `api/Pattern/AsynBlockPattern.java` (`extractInventory` and `searchAEStorage` now `foundItemStack != null && !isEmpty()` before `AEItemKey.of`) |
 | Material data | `api/data/material/` (icon sets/types, property keys, catalyst property) |
 | GUI textures | `api/gui/CTNHGuiTextures.java` |
 | Jade providers | `api/jade/` (multithread recipe/output/thread status) |
@@ -37,7 +38,6 @@ api/
 
 - 统一单入口机器 provider 是迁移目标（`docs/_architecture/AGENTS.md` §8/§9）；这三个 provider 属该迁移的下游，改动前先读架构契约。
 - Jade 服务端数据只写客户端推导不出的信息：`lastRecipe` 已由 `@DescSynced` 同步，禁止在 Jade 中重复序列化；能耗、并行、线程状态能推导则不写 NBT。
-
 
 ## ANTI-PATTERNS
 - Do not add gameplay logic to API classes; keep implementation in `common/` or `registry/`.

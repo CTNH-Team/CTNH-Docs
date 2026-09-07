@@ -1,28 +1,29 @@
 # CTNH-LIB MIXIN DOMAIN
 
 ## OVERVIEW
-Shared mixins (4 Java files): GT Jade provider ordering, GT recipe/machine builder adjustments, TMRV compatibility, and Forge datagen shutdown behavior.
+Shared mixins (3 Java files): GT recipe/machine builder adjustments, TMRV compatibility.
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| GT Jade ordering | `mixin/GTJadePluginMixin.java` |
 | GT recipe/machine builders | `mixin/GTRecipesMixin.java`, `mixin/MachineBuilderMixin.java` |
 | TMRV compatibility | `mixin/TMRVMixin.java` |
-| Mixin config | `src/main/resources/ctnhlib.mixins.json` (4 mixins registered) |
+| Mixin config | `src/main/resources/ctnhlib.mixins.json` (3 mixins registered) |
 
 ## CONVENTIONS
 - Mixins here adjust shared GTCEu and third-party behavior for all CTNH modules; keep them minimal and compatible.
-- All four registered mixins are common-side; the client list in `ctnhlib.mixins.json` is empty.
+- All three registered mixins are common-side; the client list in `ctnhlib.mixins.json` is empty.
+- `GTJadePluginMixin` / Jade priority ordering was removed in f9951f9 along with `jade/GTProvidersRegistrar.java` and `jade/JadePriorityManager.java`; do not reintroduce Jade ordering here.
 
 ## ANTI-PATTERNS
 - Do not add module-specific mixins to Lib; they belong in the owning module.
+- Do not re-add Jade-related mixins; Jade provider ordering is now owned outside Lib.
 
 ## SCOPE
 Applies to `src/main/java/tech/vixhentx/mcmod/ctnhlib/mixin` and `src/main/resources/ctnhlib.mixins.json`.
 
 ## READ WHEN
-- Changing shared GT builder or Jade ordering behavior.
+- Changing shared GT builder behavior.
 
 ## SOURCE OF TRUTH
 - `src/main/resources/ctnhlib.mixins.json` and the mixin classes in `mixin/`.

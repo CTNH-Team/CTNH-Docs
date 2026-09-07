@@ -9,10 +9,9 @@ data/
 |-- CTPPDatagen.java, CuriosTags.java, ToolboxBlockstates.java
 |-- tags/                      # BlockTags, CustomTags, FluidTags, ItemTags
 `-- recipe/
-    |-- 12 top-level: CTPPRecipes, BigDamRecipes, BoomOfCreateRecipes, DieselGeneratorRecipes, ItemRecipes, KineticGeneratorRecipes, KineticSteamTurbineRecipes, OreProcessingRecipes, SeaweedFarmRecipes, SmashingFactoryRecipes, ToolRecipes, WindmillControlRecipes
+    |-- 12 top-level: CTPPRecipes, BigDamRecipes, BoomOfCreateRecipes, DieselGeneratorRecipes, ItemRecipes, KineticGeneratorRecipes, KineticSteamTurbineRecipes, PlaceableEmitterRecipes, SeaweedFarmRecipes, SmashingFactoryRecipes, ToolRecipes, WindmillControlRecipes (OreProcessingRecipes removed)
     |-- builder/               # AcidWashingRecipeGen, BreathingRecipeGen, CTPPProcessingRecipeBuilder, CTPPRecipeBuilder, CTPPRecipeHelper, CTPPRecipeProvider
     |   |-- create/            # 11 builders: Compacting, Crushing, Cutting, Filling, ItemApplication, MechanicalCrafting, Milling, Mixing, Pressing, SequencedAssembly, Splashing
-    |   |-- ctpp/              # MetalSmeltingRecipeBuilder
     |   |-- diesel/            # BasinFermenting, Distillation, Hammer, WireCutting
     |   `-- vintage/           # AbstractVintageRecipeBuilder, Centrifugation, Coiling, Curving, Hammering, Pressurizing, Turning, Vacuumizing, Vibrating, VintageRecipeResult
     `-- fanprocessing/         # NOTE: no underscore — CTPPFanProcessingTypes, CTPPRecipeTypeInfo
@@ -23,10 +22,10 @@ data/
 |---------|----------|
 | Datagen entry | `data/CTPPDatagen.java` |
 | Recipe generation | `data/recipe/` (12 top-level classes, dispatched from `CTPPGTAddon.addRecipes()` via `CTPPRecipes`) |
+| Placeable emitter | `data/recipe/PlaceableEmitterRecipes.java` |
 | Create builders | `data/recipe/builder/create/` (11) |
 | Diesel builders | `data/recipe/builder/diesel/` (4) |
 | Vintage builders | `data/recipe/builder/vintage/` (8 + abstract base) |
-| CTPP builders | `data/recipe/builder/ctpp/MetalSmeltingRecipeBuilder.java` |
 | Fan processing | `data/recipe/fanprocessing/` (CTPPFanProcessingTypes, CTPPRecipeTypeInfo) |
 | Tags | `data/tags/` (BlockTags, CustomTags, FluidTags, ItemTags) |
 | Models | `common/data/model/CTPPMachineModels.java` |
@@ -38,10 +37,13 @@ data/
 - Static machine part models exist under `src/main/resources`; check the path before regenerating.
 - The fan-processing package is spelled `fanprocessing` (no underscore); do not "fix" it.
 - `MillingRecipeBuilder` now supports a configurable `processingTime` (default 100 ticks); it must be positive and is serialized as `processingTime` in the recipe JSON.
+- `builder/ctpp/MetalSmeltingRecipeBuilder.java` has been removed; do not re-add.
+- `PlaceableEmitterRecipes` generates emitter/mirror recipes for `CTPPMachines.PLACEABLE_EMITTER` tiers (LV-UIV plus OpV etc.); check `CTPPMachines` for tier list.
 
 ## ANTI-PATTERNS
 - Do not treat all recipe JSON as equivalent: fan catalyst/generated outputs and static assets live in different source roots.
 - Do not set `processingTime` to zero or negative in `MillingRecipeBuilder`; it throws `IllegalArgumentException`.
+- Do not hand-edit generated lang/blockstate JSON for emitter tiers.
 
 ## SCOPE
 Applies to `src/main/java/com/mo_guang/ctpp/data` and its child packages.

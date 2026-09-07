@@ -1,7 +1,7 @@
 # CTNH-CORE INTEGRATION DOMAIN
 
 ## OVERVIEW
-Optional third-party integrations owned by Core (7 Java files): EMI, Create Diesel, Legendary Survival, and FTB Essentials.
+Optional third-party integrations owned by Core (7 Java files): EMI, Create Diesel, Legendary Survival, FTB Essentials, and CTPP (placeable emitter hiding).
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -10,6 +10,7 @@ Optional third-party integrations owned by Core (7 Java files): EMI, Create Dies
 | Create Diesel | `integration/creatediesel/DistillationCategoryLayout.java`, `integration/creatediesel/GTBedrockOilBridge.java` |
 | Legendary Survival | `integration/legendary/ArmorModifier.java`, `integration/legendary/UnderfloorHeatingSystemTempModifier.java` |
 | FTB Essentials | `integration/ftbessentials/AsyncRtpManager.java` |
+| CTPP emitter hiding | `integration/emi/CTNHCoreEmiPlugin.java#CTPPDisable()` iterating `CTPPMachines.PLACEABLE_EMITTER` |
 
 ## CONVENTIONS
 - Keep integrations isolated and optional; they must not become hard dependencies of common code.
@@ -17,6 +18,7 @@ Optional third-party integrations owned by Core (7 Java files): EMI, Create Dies
 - Legendary Survival modifiers integrate with the Underfloor Heating System machine.
 - FTB Essentials integration is compile-only (`modCompileOnly`); the `AsyncRtpManager` replaces the synchronous `/rtp` with an async chunk-loading search, using the `ServerChunkCacheAccessor` mixin.
 - Create Diesel integration centers on `DistillationCategoryLayout`, which dynamically centers variable-height distillation recipes; its client mixins live under `mixin/creatediesel/` and `mixin/emi/`.
+- EMI `CTNHCoreEmiPlugin.initialize()` now calls `CTPPDisable()` in addition to `EIODisable()`/`CreateDisable()`: iterates `CTPPMachines.PLACEABLE_EMITTER` and adds `definition::getItem` to disabled stacks because placeable emitter machine items are unobtainable intermediates (placement/drop uses vanilla GT emitter components, registered with null creative tab, should not appear in EMI). Disabled via `registry.disableStack(EmiStack.of(item.get()))`.
 
 ## ANTI-PATTERNS
 - Do not move optional integrations into base modules.
@@ -26,7 +28,7 @@ Optional third-party integrations owned by Core (7 Java files): EMI, Create Dies
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/integration`.
 
 ## READ WHEN
-- Changing EMI, Create Diesel, Legendary Survival, or FTB Essentials compatibility in Core.
+- Changing EMI, Create Diesel, Legendary Survival, FTB Essentials, or CTPP compatibility in Core.
 
 ## SOURCE OF TRUTH
 - `integration/emi/`, `integration/creatediesel/`, `integration/legendary/`, and `integration/ftbessentials/` classes; wiring in `common/CommonProxy.java`.
