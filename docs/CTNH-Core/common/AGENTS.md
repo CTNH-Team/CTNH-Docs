@@ -20,8 +20,8 @@ common/
 |   `-- debug/                    # ReloadItem
 |-- machine/
 |   |-- cover/                    # CreativeEnergyCover
-|   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine, MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine
-|   |   |-- electric/             # 29 top-level machines (34 incl. multithread/ and rareearth/): WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, VoidMinerProcessingMachine (+VoidMinerRecipeLogic), INFFluidDrillMachine (+INFFluidDrillLogic), MegaLCRMachine, NeuroMatrixCompiler, ScalableReservoirComputingMachine, Superconducting_Penning_Trap, ...
+|   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine (now MultiblockFluidRendererTrait), MultiblockComputationMachine (attachTrait NetworkedComputationContainer), SlaughterHouseMachine/FactoryMachine (attachTrait storage)
+|   |   |-- electric/             # 29 top-level machines (34 incl. multithread/ and rareearth/): WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, BlazeBlastFurnaceMachine (CoilMachineTrait), FermentingTankMachine (CoilMachineTrait), ...
 |   |   |   |-- multithread/      # CNCAlloySmelter
 |   |   |   `-- rareearth/        # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
 |   |   |-- generator/            # 12 machines: Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine, LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator, NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine, WaterPowerStationMachine, WindPowerArrayMachine
@@ -47,12 +47,15 @@ common/
 | Entities | `common/entity/monster/` |
 | GUIs | `common/gui/`, `common/gui/terminal/`, `common/gui/widget/` |
 | Items | `common/item/`, `common/item/debug/` |
-| Electric multiblocks | `common/machine/multiblock/electric/` (29 + multithread + rareearth) |
+| Electric multiblocks | `common/machine/multiblock/electric/` (29 + multithread + rareearth) — coil via `CoilMachineTrait` |
 | Generator multiblocks | `common/machine/multiblock/generator/` (12) |
 | Kinetic multiblocks | `common/machine/multiblock/kinetic/` (5) |
 | Machine parts | `common/machine/multiblock/part/` (12) |
 | Simple machines | `common/machine/simple/` (4) |
 | Machine traits | `common/machine/trait/`, `common/machine/trait/providable_net/` |
+| Computation machine | `common/machine/multiblock/MultiblockComputationMachine.java` (`attachTrait(new NetworkedComputationContainer(...))`) |
+| Fluid bottle machine | `common/machine/multiblock/LargeBottleMachine.java` (`attachTrait(new MultiblockFluidRendererTrait(this, this::saveOffsets))`, `saveOffsets()` returns `Set<BlockPos>`) |
+| Storage trait migration | `common/machine/multiblock/SlaughterHouseMachine.java`, `FactoryMachine.java` (`attachTrait(createMachineStorage(...))`, subscription via `getRecipeLogic().getTraitSubscriptions()`) |
 | Recipe builders | `common/recipe/`, `common/recipe/builder/` |
 | World | `common/world/CTNHChunkLoading.java` |
 
@@ -61,6 +64,10 @@ common/
 - Machine implementations live here; their registrate entries live in `registry/machines/` and `registry/CTNHMachines.java`.
 - Electric multiblocks follow `*Machine` naming (some legacy files use `*_old` or snake_case); parts implement `CTNHPartAbility`.
 - The `rareearth/` subpackage under electric machines contains process-control machine abstractions and their profiles; treat it as part of the electric multiblock hierarchy.
+- GT/GMT recipes are runtime dynamic-pack data (`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`); `runData` produces no JSON for them.
+- When referencing items/blocks/fluids, MUST use direct registration objects — never `ResourceLocation` string parsing with `ForgeRegistries` lookups except where no registration object exists.
+- Spelling quirk: mixin package is `dategen` (not `datagen`).
+- Trait ownership migrated: `NetworkedComputationContainer`, `NotifiableItemStackHandler`, `MultiblockFluidRendererTrait`, `CoilMachineTrait` are now attached via `attachTrait()` in construction; do not duplicate state as machine fields. `BlazeBlastFurnaceMachine`/`FermentingTankMachine` query coil via `getTraitOrThrow(CoilMachineTrait.class)`.
 
 ## TRAIT OWNERSHIP
 所有权与字段规则以 `docs/_architecture/AGENTS.md` 为准（§1 边界、§2 字段、§4 capability 分层）。Core 侧落点：
@@ -68,6 +75,7 @@ common/
 - `common/machine/trait/`：`ScalableReservoirComputingLogic`（`RecipeLogic` 子类）、`SimpleComputationContainer`（`NetworkedComputationContainer` 子类）、`providable_net/`（`ProvidableNetHandler`、`ProvidableNetInfo`、`ProviderInfo`、`IProviableNetHandlerMachine`）。
 - 机器内联 `RecipeLogic` 子类：`INFFluidDrillLogic`、`VoidMinerRecipeLogic`、`NeutronActivatorLogic`、`DigestingTankLogic`、`ProcessControlRecipeLogic`。
 - 部件侧 `Notifiable*` 子类：`CircuitItemHandler`、`InfinityEnergyContainer`、`InfinityItemStackHandler`、`InfinityFluidTank`、`DroneHolderHandler`。
+- 新迁移：`MultiblockComputationMachine.computationContainer`、`SlaughterHouseMachine.machineStorage`、`FactoryMachine.machineStorage`、`LargeBottleMachine` fluid offsets、`BlazeBlastFurnaceMachine`/`FermentingTankMachine` coil — 均改为 trait 单一所有者。
 
 硬约束：
 
@@ -76,11 +84,11 @@ common/
 - `@DescSynced` 与 `@Persisted` 各有语义，同用前确认字段确实既需同步又需保存；managed field 装不下的走 `saveCustomPersistedData` / `loadCustomPersistedData`。同一份数据禁止注解与 attach 式持久化并存。
 - 新增 trait 不要在机器基类堆类型特判；让 trait 自己实现能力与生命周期。
 
-
 ## ANTI-PATTERNS
 - Do not bypass `CommonProxy` registration order; registry dependencies are deliberate.
 - Do not put client-only rendering in common machine classes.
 - Do not treat `WPA_old.java` or `MachineModeFancyConfiguratorTest` as current implementation; both are legacy leftovers.
+- Do not reintroduce machine-owned `@DescSynced fluidBlockOffsets` or `ICoilMachine`; use `MultiblockFluidRendererTrait` and `CoilMachineTrait`.
 
 ## SCOPE
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/common` and its child packages.
