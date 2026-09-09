@@ -1,7 +1,7 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH-Lib is the shared support module for CTNH code (57 Java files: 11 in `com.ctnhlang`, 46 in `tech.vixhentx.mcmod.ctnhlib`). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, language annotations, shared Ponder support, and client highlight networking. Jade priority infrastructure removed in f9951f9.
+CTNH-Lib is the shared support module for CTNH code (59 Java files: 11 in `com.ctnhlang`, 48 in `tech.vixhentx.mcmod.ctnhlib`). It contains common proxies, registrate builder wrappers, dynamic datapack helpers, datapack recipe-removal filter, language annotations, shared Ponder support, and client highlight networking. Jade priority infrastructure removed in f9951f9.
 
 ## STRUCTURE
 ```text
@@ -15,8 +15,9 @@ src/main/java/tech/vixhentx/mcmod/ctnhlib/
 |-- command/                 # CTNHCommandChatHelper, CTNHCommandInspector, CTNHCommands (3)
 |-- common/                  # CommonProxy, MultiblockHelper (2)
 |-- data/                    # CTNHDynamicDataPack, DataFilterPack (2)
+|   `-- recipe/              # RecipeRemovalHelper (1)
 |-- langprovider/            # Lang, LangProcessor (2)
-|-- mixin/                   # GTRecipesMixin, MachineBuilderMixin, TMRVMixin (3)
+|-- mixin/                   # GTRecipesMixin, MachineBuilderMixin, RecipeManagerApplyMixin, TMRVMixin (4)
 |-- network/packets/         # BlockHighlightPacket (1)
 |-- registrate/              # CNRegistrate, CTNHLibNetworking (14 total)
 |   |-- builders/            # 10 builders (CTNHItemBuilder, CTNHMachineBuilder, CTNHRecipeType, ...)
@@ -36,11 +37,12 @@ src/main/java/com/ctnhlang/   # separate annotation namespace (11)
 | Registrate helpers | `registrate/` |
 | Builder APIs | `registrate/builders/` (10 builders) |
 | Dynamic data | `data/` (`CTNHDynamicDataPack`, `DataFilterPack`) |
+| Recipe removal | `data/recipe/RecipeRemovalHelper.java` + `mixin/RecipeManagerApplyMixin.java` |
 | Client bootstrap | `client/ClientProxy.java` |
 | Highlight rendering | `client/render/highlight/` (`HighlightHandler`, `HighlightRender`), `network/packets/BlockHighlightPacket.java` |
 | Ponder framework | `client/ponder/` (`CTNHPonderLang`, `CTNHPonderSceneBuilder`, `CTNHPonderTagHelper`) |
 | Lang annotations | `com/ctnhlang/` (separate namespace: `CN`, `EN`, `Category`, `Domain`, `IgnoreLang`, `Key`, `Lang`, `LangFactory`, `Prefix`, `Suffix`; `langprovider/LangKeyBuilder.java`) |
-| Mixins | `mixin/` (`GTRecipesMixin`, `MachineBuilderMixin`, `TMRVMixin`), `src/main/resources/ctnhlib.mixins.json` (3 mixins) |
+| Mixins | `mixin/` (`GTRecipesMixin`, `MachineBuilderMixin`, `RecipeManagerApplyMixin`, `TMRVMixin`), `src/main/resources/ctnhlib.mixins.json` (4 mixins) |
 | Shared helpers | `utils/` (AllBuilder2, ChunkList, CodecBuilder, EnvUtils, ExtendNbtUtils, InfiniteMeteorTerrain, LockIdentityHashMap, MachineUtils) |
 | Commands | `command/CTNHCommands.java` (`/ctnh hand` + dev `/ctnh showores`) |
 
@@ -96,7 +98,7 @@ Applies to `modules/CTNH-Lib` and every CTNH module that consumes its shared API
 
 ## SOURCE OF TRUTH
 - Registration/lifecycle: `CTNHLib.java`, `common/CommonProxy.java`, `registrate/CNRegistrate.java`.
-- Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctnhlib.mixins.json` (3 mixins).
+- Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctnhlib.mixins.json` (4 mixins).
 - Lang annotation processing: the `com.ctnhlang.langprovider` Gradle plugin and `registrate/lang/RegistrateCNLangProvider.java` via `registrate/data/ProviderTypes.CNLANG` (`ctnhlib_cnlang`).
 
 ## WORKFLOW
