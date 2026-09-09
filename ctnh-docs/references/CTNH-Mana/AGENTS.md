@@ -1,105 +1,71 @@
-# CTNH-MANA MODULE
+# CTNH-Mana MODULE
 
 ## OVERVIEW
-CTNH-Mana adds magic-themed CTNH content, Botania/Blood Magic style integrations, mana multiblocks, rituals, custom items, client radial UI, and generated resources under mod id `ctnhmana` (331 Java files, the second-largest module). Mana persistence migrated from BlockEntity fields to `api/machine/trait/` traits.
+Botania / BloodMagic / Apotheosis x GT integration module. ~333 Java files under `com.magicbee.ctnhmana`. Entry: `CTNHMana`, `CTNHManaGTAddon`, `CMConfig`, `common/CommonProxy`, `client/ClientProxy`.
 
 ## STRUCTURE
-```text
-src/main/java/com/magicbee/ctnhmana/
-|-- CTNHMana.java / CTNHManaGTAddon.java / CMConfig.java   # mod entry, GT addon, config
-|-- api/                      # 35: effect/ (16), machine/gem/ (1), machine/trait/ (3), mixin/ (IBloodAltarLogic), networks/ (2), pattern/ (2), recipe/condition/ (4), recipe/customlogic/ (6)
-|-- client/                   # 41: ZenithInvadeClient, radial menu (4), Ponder (7), models (8), renderers (17), particles
-|-- common/                   # 123: CommonProxy, DigitalWosMachine, blocks (5), blockentities (9), capability, entities (18), events, items (28), machines (3), multiblocks (31), parts (8), rituals
-|   |-- blockentity/          # flower/ (7), machine/ (1: FlowerCakeBlockEntity), WitherAconiteTrapBlockEntity
-|   |-- item/                 # bloodmagicjade/ bosssummoner/ (4) caduceus/ dungeon/ equipment/ (4) manafuelstick/ manamachineupgrade/ (9) rune/ (3) + FlowerCakeItem/TooltipsBlockItem/ZenithDebugToolItem
-|   |-- multiblock/           # 31: ManaReactor, HellForgeMachine, MysticSpire, ZenithMachine, EternalGarden, WishingWill, IndustrialSalvagingMachine, IndustrialGemInlayMachine, ...
-|   |-- parts/                # CMPartsAbility, CentralControlBus, ExtendedCentralControlBus, ManaHatch, RedstoneSignalBroadcastHatch + ManaHatches/ (3)
-|   |-- ritualtypes/          # 6: RitualBeeSummon, RitualBossSummon, RitualCharger, RitualDragonCloud, RitualLifeExtractor, RitualShroudSight
-|   `-- ritual/               # MachineRitualSoulNetwork, MachineRitualStoneHost
-|-- data/                     # 55: CMDatagen, ManaData, recipes (35 + builders), lang (3), materials, tags
-|-- event/                    # 16: EventHandler, ForgeEventHandler, CMKeyBindings, ArmorBreakEventHandler, DamageClampHandler, IndexEventHandler, MagicalAntagonismEventHandler, MinerEliteHandler, MythicBossPool, PainShieldEventHandler, PhysicalAntagonismEventHandler, RealityDissociationEventHandler, SoulLeechEventHandler, TaintedBloodWeepingEyeEventHandler, ThirdEyeEventHandler, YurikoRingEventHandler
-|-- integration/              # 3: emi/ (1), jade/ (2)
-|-- mixin/                    # 18: ae2/ (2), ars/ (4), bloodmagic/ (4), botania/ (6), emi/ (1), minecraft/ (1)
-|-- networking/packets/       # 7: CMNetworking, AntagonismPacket, CaduceusPacket, IndexFortunaPacket, IndexTargetBlockPacket, IndexTargetParticlePacket, ZenithInvadePacket
-|-- registry/                 # 27: 19 root classes (CMRegistrate, ...) + items/ (1) + multiblock/ (5) + sounds/ (2)
-`-- utils/                    # 3: CTNHManaUtils, EnvUtils, ModUtils
 ```
+com.magicbee.ctnhmana/
+  CTNHMana.java // mod entry
+  CTNHManaGTAddon.java // GT addon: addRecipes/removeRecipes
+  CMConfig.java
+  api/ // effect(16), machine/gem+trait, mixin/IBloodAltarLogic, networks, pattern, recipe/condition(4)+customlogic(6)
+  client/ // ClientProxy, ZenithInvadeClient, ZenithMatrixEffect, gui/radial, model(8), ponder, render(17)+particle, utils
+  common/ // CommonProxy, DigitalWosMachine, blockentity+flower(7), blocks(5), capability, entity+ai+navigation+projectile, event/zenith(5), gui(7), item/*, machine(3), multiblock(31), parts, ritual/ritualtypes
+  data/ // CMDatagen, ManaData, lang(3), materials, recipe(35+builder11+utils1), tags(2)
+  event/ (16)
+  integration/ // emi(1), jade(2)
+  mixin/ // ae2(2), ars(4), bloodmagic(4), botania(6), emi(1), minecraft(1)
+  networking/packets(7) // CMNetworking
+  registry/ (19+items1+multiblock5+sounds2)
+  utils/ (3)
+```
+Mixins config: `src/main/resources/*.mixins.json` (verify actual filename in resources).
 
 ## WHERE TO LOOK
 | Concern | Location |
-|---------|----------|
-| Mod entry | `CTNHMana.java` |
-| GT addon | `CTNHManaGTAddon.java` |
-| Config | `CMConfig.java` |
-| Pattern helpers | `api/pattern/` (CMBlockMaps, CMPredicates) |
-| Mana traits | `api/machine/trait/` (BTManaContainerTrait, MysticSpireManaTrait, ExtendedControlBusCircuitTrait) |
-| Multiblocks | `common/multiblock/` (31 machines) |
-| Rituals | `common/ritualtypes/` (6), `common/ritual/` (2) |
-| Magic items | `common/item/` (8 subpackages: caduceus/, equipment/, manamachineupgrade/, rune/, ...) |
-| Block entities | `common/blockentity/flower/` (7), `common/blockentity/machine/FlowerCakeBlockEntity.java` (shell delegating to trait) |
-| Registries | `registry/` (27) |
-| Recipe builders | `data/recipe/builder/bloodmagic/`, `data/recipe/builder/botania/`, `data/recipe/builder/apotheosis/` |
-| Networking | `networking/packets/` (7) |
-| Client UI/Ponder | `client/` (radial menu, ponder/mana/ scenes) |
-| Mixins/integrations | `mixin/` (18), `integration/emi/` (1), `integration/jade/` (2) |
-| Zenith invasion | `common/event/zenith/`, `client/ZenithInvadeClient.java` |
-
-## ARCHITECTURE CONTRACT
-Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `references/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
+|---|---|
+| Mod init / proxies | `CTNHMana.java`, `common/CommonProxy.java`, `client/ClientProxy.java`, `CMConfig.java` |
+| GT recipes add/remove | `CTNHManaGTAddon.java` -> `data/recipe/*`, delegates removal to `data/recipe/ManaRecipeRemoval` + CTNH-Lib `RecipeRemovalHelper` |
+| Registries | `registry/CMBlocks`, `CMItems`, `CMBlockEntities`, `CMEntities`, `CMMachines`, `CMMultiblockMachines`, `CMRecipeTypes`, `CMMobEffects`, `CMMaterials`, `GTMaterialAddon` |
+| Multiblocks / machines | `common/multiblock/*` (31: `MysticSpire`, `ZenithMachine`, `EternalGarden`, `HellForgeMachine`...), `common/machine/*`, `common/parts/*`, `api/machine/trait/*` |
+| Datagen / recipes / tags / lang | `data/CMDatagen.java`, `data/ManaData.java`, `data/recipe/*`, `data/tags/*`, `data/lang/*` -> see `data/AGENTS.md` |
+| Client render/ponder | `client/render/*`, `client/model/*`, `client/ponder/*` |
+| Network / integration | `networking/packets/CMNetworking.java`, `integration/emi+jade/*` |
+| Mixins | `mixin/*` + `api/mixin/IBloodAltarLogic.java` |
 
 ## DOMAIN GUIDE ROUTING
-Read the matching domain guide before editing the corresponding source area.
-
 | Source area | Guide | Read before |
-|-------------|-------|-------------|
-| `api` | `references/CTNH-Mana/api/AGENTS.md` | Pattern helpers, effects, recipe/network APIs, mana traits |
-| `client` | `references/CTNH-Mana/client/AGENTS.md` | Caduceus radial menu, Ponder plugin/scenes/tags, ZenithInvadeClient |
-| `common` | `references/CTNH-Mana/common/AGENTS.md` | Proxy, rituals, items, machines, multiblocks, recipe builders |
-| `data` | `references/CTNH-Mana/data/AGENTS.md` | Recipe generators, lang, materials, tags |
-| `event` | `references/CTNH-Mana/event/AGENTS.md` | EventHandler wiring |
-| `integration` | `references/CTNH-Mana/integration/AGENTS.md` | EMI, Jade integration |
-| `mixin` | `references/CTNH-Mana/mixin/AGENTS.md` | Ars/Blood Magic/Botania/AE2/EMI/Minecraft patches |
-| `networking` | `references/CTNH-Mana/networking/AGENTS.md` | Packets |
-| `registry` | `references/CTNH-Mana/registry/AGENTS.md` | Items, machines, multiblocks, recipe types |
-| `utils` | `references/CTNH-Mana/utils/AGENTS.md` | Shared helpers |
+|---|---|---|
+| `data/` recipes/removal/builders/tags/lang | `data/AGENTS.md` | editing any `data/recipe/*`, `ManaRecipeRemoval` |
+| `common/multiblock`, `common/machine`, `api/machine` | module doc only (no sub-guide) | adding machine/trait/logic |
+| `registry/*` | module doc only | adding block/item/machine/effect |
+| `mixin/*`, `integration/*`, `networking/*`, `event/*`, `client/*` | module doc only | cross-mod compat / packets / render |
 
 ## CONVENTIONS
-- Namespace is `com.magicbee.ctnhmana`; registry prefixes generally use `CM`.
-- GT/GMT recipes are runtime dynamic-pack data (`CTNHManaGTAddon.addRecipes()`); `runData` produces no JSON for them. See root AGENTS.md CONVENTIONS.
-- Item/block/fluid references MUST use direct registration objects (`CMItems.X`, `CMBlocks.X`, `CMMaterials.X`, `GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
-- Mana persistence belongs to `api/machine/trait/` (`BTManaContainerTrait`, `MysticSpireManaTrait`, `ExtendedControlBusCircuitTrait`) on `MetaMachine`; BlockEntities (`FlowerCakeBlockEntity`) are rendering shells delegating via `getManaTrait()`. Do not reintroduce `ManaMachineBlockEntity`/`MysticSpireBlockEntity`/`IZenithMartixBlockEntity` fields.
-- `MysticSpireManaTrait` stores true mana as persisted String BigInteger (`trueMana`/`trueManaCapacity`) with int `BTMana` cache via `SpireBigMath`; `BTManaContainerTrait.setMaxBTMana()` clamps to >=0 and re-clamps stored mana.
-- `ExtendedControlBusCircuitTrait` owns persistent 32-lane `CustomItemStackHandler` filtered by `IntCircuitBehaviour::isIntegratedCircuit` exclusively for `ExtendedCentralControlBus`.
-- Generated resources are large; use `:modules:CTNH-Mana:runData` after datagen or Ponder text changes.
-- Ponder `CTNHManaPonderSceneBuilder` is a thin adapter around CTNH-Lib's shared builder; keep Mana-specific scenes/tags/plugins in CTNH-Mana, not Core or Lib.
-- Blood Magic/Botania/Ars/Apotheosis/EMI compatibility is spread across recipe builders, mixins, integrations, and client packets; check all four before changing a magic integration surface. Apotheosis support lives in `data/recipe/builder/apotheosis/`, not in `mixin/`.
+- GTM dynamic pack: GT/GMT recipes via `*GTAddon.addRecipes()` register as runtime dynamic datapack (`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`), `runData` produces NO JSON for them; static `src/generated/resources` only tags/lang/models/worldgen/non-GT recipes; verify in-game or `ConfigHolder.dev.dumpRecipes`.
+- Reference items/blocks/fluids via static registry objects (`GTMaterials.*`, `CMBlocks.*`, `CMItems.*`, `TagPrefix.*`, `AEItems.*`, `CBBlocks.*`, `CEItems.*`, `CMItems.*`, `CABlocks.*`, `CTPPBlocks.*`), forbid `ResourceLocation` string parse + `ForgeRegistries` lookup; string IDs only when no registry object exists (upstream mod-specific ID, recipe ID, tag key, dimension ID).
+- Recipe removal via CTNH-Lib: `ManaRecipeRemoval.init()` + `RecipeRemovalHelper.remove(new RemoveFilter().id/type/idRegex(...))` called from `CTNHManaGTAddon.removeRecipes(Consumer<ResourceLocation> ignoredConsumer)`; no local `Consumer.accept` loop, no `DataFilterPack`.
 
 ## ANTI-PATTERNS
-- Do not assume magic integrations are isolated from GTCEu; machine/recipe registration still flows through GT addon patterns.
-- Do not change Caduceus/Saber client behavior without checking both networking packets and item property model predicates.
-- Do not store BTMana/mystic mana fields on BlockEntity; use the trait. Do not add `@Setter` to `BTManaContainerTrait.maxBTMana` — use `setMaxBTMana(int)` for clamping logic.
+- No `DataFilterPack.removeRecipe*` in Mana; no resurrected `data/recipe/RecipeRemoval` with `Consumer<ResourceLocation>` loop.
+- No `ResourceLocation.parse + ForgeRegistries` lookup where registry object exists.
+- No expecting GT recipe JSON under `src/generated/resources`; no static JSON for `addRecipes()` output.
+- No new top-level domain package without module-doc routing update.
 
 ## COMMANDS
-```text
-./gradlew :modules:CTNH-Mana:build
-./gradlew :modules:CTNH-Mana:runData
-./gradlew :modules:CTNH-Mana:spotlessCheck
-```
+- `./gradlew :modules:CTNH-Mana:build`
+- `./gradlew :modules:CTNH-Mana:runData` // static only; GT recipes not emitted
+- Verify removal in-game or `ConfigHolder.dev.dumpRecipes`.
 
 ## SCOPE
-Applies to `modules/CTNH-Mana` and its submodule repository. It is a reference guide loaded through the root routing table, not an additional source-tree instruction file.
+Mana-multiblock/magic-system + compat recipes only. Core GT/registrate infra -> CTNH-Core/CTNH-Lib.
 
 ## READ WHEN
-- Adding or changing magic content, rituals, mana multiblocks, or Botania/Blood Magic integration.
-- Changing Mana datagen providers or Ponder scenes.
+Touching `CTNHManaGTAddon`, `data/recipe/*`, registry, multiblock, mixin, packets.
 
 ## SOURCE OF TRUTH
-- Registration/lifecycle: `CTNHMana.java`, `CTNHManaGTAddon.java`, `event/EventHandler.java`.
-- Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctnhmana.mixins.json`.
-- Static generated data: providers plus `src/generated/resources`.
+`modules/CTNH-Mana/src/main/java` tree + `CTNHManaGTAddon.java` diff; `src/main/resources/*.mixins.json`.
 
 ## WORKFLOW
-1. Map the changed symbol to its domain and read that domain guide.
-2. Check GT addon hook order, EventHandler wiring, and networking packets.
-3. Run the narrowest Gradle task (`runData` for datagen, `build` for compilation).
-4. Re-read the root routing table if the change introduces a new module boundary.
+Discovery -> Scoring -> Generate -> Review; module-doc for entry/registry/structure, `data/AGENTS.md` for recipe/removal changes; telegraphic, no fabrication.

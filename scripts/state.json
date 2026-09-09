@@ -1,13 +1,13 @@
 {
     "repos": {
         "__main__": {
-            "last_sha": "6826032b2f572b8eec02642ea4193694ff97ea14"
+            "last_sha": "f0bfb16478e699f84080f743e242bdd82a220ca9"
         },
         "CTNH-Core": {
-            "last_sha": "2f8207f797d4e98a3a04bfba100eb65efdd66b29"
+            "last_sha": "afc0042ba3699289916aae69755e1cc1348bb7e5"
         },
         "CTNH-Lib": {
-            "last_sha": "f9951f91d674fc32ced7e590af4eeeca3d866f4e"
+            "last_sha": "8856eec6f70ad7dd5c8c5424898673c203ddb74b"
         },
         "CTNH-Bio": {
             "last_sha": "c09776ce0b828eb5bda6faecc964cab071985092"
@@ -16,7 +16,7 @@
             "last_sha": "ae03dd12338b9ce54ff381ea818f08a079f0971e"
         },
         "CTNH-Mana": {
-            "last_sha": "a8939fecee79789bd7862d0c937608533dd7b2ec"
+            "last_sha": "72b5b886f7004f2d33e63cecefa9ab88f12b084f"
         },
         "CTNH-Astral": {
             "last_sha": "8cc6d06439118f09731b74a80a7a529c3518aabd"

@@ -1,32 +1,35 @@
 # CTNH-LIB DATA DOMAIN
 
 ## OVERVIEW
-Dynamic datapack and filter support shared by CTNH modules (2 Java files).
+Datapack runtime support: dynamic pack + filter + shared removal. 3 Java files.
 
 ## WHERE TO LOOK
 | Concern | Location |
-|---------|----------|
-| Dynamic datapack | `data/CTNHDynamicDataPack.java` |
-| Data filter pack | `data/DataFilterPack.java` |
+| Dynamic pack host | CTNHDynamicDataPack.java |
+| Static datapack filter | DataFilterPack.java |
+| Shared removal registry | recipe/RecipeRemovalHelper.java: FILTERS, remove(), clear(), getFilters(), RemoveFilter |
+| Filter fields | RemoveFilter: id/list, idRegex, mod, type, not/or, matches(ResourceLocation) |
+| Enforcement point | ../mixin/AGENTS.md: RecipeManagerApplyMixin |
 
 ## CONVENTIONS
-- `CTNHDynamicDataPack` implements `PackResources` and serializes `FinishedRecipe` into GTCEu's `GTDynamicPackContents` at runtime; this is why GT/GMT recipes registered via `*GTAddon.addRecipes()` never appear as `runData` output. See the root AGENTS.md CONVENTIONS.
-- `CTNHDynamicDataPack.addRecipe()` writes recipe/advancement/tag IDs as `ResourceLocation` paths; with dev dump enabled it also dumps recipes to `gtceu/dumped/data`.
-- The `ctnhlib:filter_data` server data pack source is added from `common/CommonProxy.java`.
-- `DataFilterPack` provides runtime datapack filtering.
+- Filters applied before RecipeManager parses datapack recipes; dynamic recipes unaffected.
+- Top-level fields AND-combined; `not` excludes match, `or` requires one child match.
+- `type` derived as namespace + first path segment.
+- Module reload must `clear()` before re-registering rules.
 
 ## ANTI-PATTERNS
-- Do not add module-specific datapack content here; register packs in the owning module.
+- Reimplementing removal in modules; use RecipeRemovalHelper.
+- Filtering dynamic GT recipes here; only datapack map is stripped.
+- String ForgeRegistries lookup for filtered outputs; use registry objects to construct filters.
 
 ## SCOPE
-Applies to `src/main/java/tech/vixhentx/mcmod/ctnhlib/data`.
+Datapack ingress only. No recipe creation.
 
 ## READ WHEN
-- Changing runtime datapack or filter behavior.
+Adding/removing datapack recipes across modules.
 
 ## SOURCE OF TRUTH
-- `data/CTNHDynamicDataPack.java`, `data/DataFilterPack.java`, and the CommonProxy wiring.
+`tech.vixhentx.mcmod.ctnhlib.data` source; mixin applies it.
 
 ## WORKFLOW
-1. Check datapack registration flow in `common/CommonProxy.java`.
-2. Run `:modules:CTNH-Lib:build` after changes.
+Register RemoveFilter via helper -> verify RecipeManagerApplyMixin strips map -> in-game check.
