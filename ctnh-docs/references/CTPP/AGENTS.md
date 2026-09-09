@@ -1,0 +1,192 @@
+# CTPP MODULE
+
+## OVERVIEW
+CTPP (`CT++`) is the Create/GregTech compatibility module (248 Java files). It defines kinetic/electric machines, Create fan catalyst recipes, custom recipe builders, generated data, GTCEu addon registration, and a toolbox system under mod id `ctpp`.
+
+## STRUCTURE
+```text
+src/main/java/com/mo_guang/ctpp/
+|-- CTPP.java / CTPPGTAddon.java / CTPPRegistration.java / CTPPRegistrate.java / CTPPEntityTypes.java
+|-- api/                      # 17: StressRecipeCapability, CTPPMultiblockBuilder, CTPPParallelLogic, CTPPPartAbility, KineticMachineDefinition, IBlockStressValues, IEnergyTransferHandler, CTPPRecipeCapabilities/Conditions + pattern/ (3), terminal/ (3 incl. TerminalWireGeometry)
+|-- client/                   # 33: ClientProxy, ponder/ (9), renderer/ (7), terminal/ (2), toolbox/ (5), CarbonBrushes/GeneratorCoil renderers
+|-- common/                   # 71: CommonProxy, beam/ (4), block/ (7 incl. MirrorBlock), blockentity/ (5), command/ (2), item/ (4), kinetic/ (5), machine/ (20), menu/ (3), terminal/ (4), toolbox/ (13)
+|   |-- kinetic/fan/          # acidwashing/ (AcidWashingProcessingType), breathing/ (BreathingFanProcessingType), oiling/ (OilingRecipe)
+|   |-- machine/              # IKineticMachine, NotifiableStressTrait, SimpleKineticElectricWorkableMachine, kinetic traits
+|   |   |-- multiblock/       # BigDamMachine, KineticGeneratorMachine (tier-penalty), KineticWorkableMultiblockMachine, WindMillControlMachine (windmillController/)
+|   |   `-- simple/           # CarbonBrushesGeneratorMachine, ElectricGearBoxMachine, PlaceableEmitterMachine
+|   `-- toolbox/              # 13: CTPPToolboxBinding(s), CTPPToolboxInventory, CTPPToolboxService, CTPPToolboxSnapshot, CTPPToolboxSavedData, CTPPToolboxStackData, ...
+|-- config/                   # 2: ConfigUtils, MainConfig
+|-- data/                     # 52: CTPPDatagen, CuriosTags, ToolboxBlockstates, tags/ (4), recipe/ (top-level + builders)
+|   `-- recipe/
+|       |-- 12 top-level: CTPPRecipes, BigDamRecipes, BoomOfCreateRecipes, DieselGeneratorRecipes, KineticGeneratorRecipes, KineticSteamTurbineRecipes, PlaceableEmitterRecipes, SeaweedFarmRecipes, SmashingFactoryRecipes, WindmillControlRecipes, ItemRecipes, ToolRecipes
+|       |-- builder/          # AcidWashingRecipeGen, BreathingRecipeGen, CTPPProcessingRecipeBuilder, CTPPRecipeBuilder, CTPPRecipeHelper, CTPPRecipeProvider
+|       |   |-- create/       # 11: Compacting, Crushing, Cutting, Filling, ItemApplication, MechanicalCrafting, Milling, Mixing, Pressing, SequencedAssembly, Splashing
+|       |   |-- diesel/       # BasinFermenting, Distillation, Hammer, WireCutting
+|       |   `-- vintage/      # AbstractVintageRecipeBuilder, Centrifugation, Coiling, Curving, Hammering, Pressurizing, Turning, Vacuumizing, Vibrating, VintageRecipeResult
+|       `-- fanprocessing/    # CTPPFanProcessingTypes, CTPPRecipeTypeInfo
+|-- dynamicPart/              # 10: QuaternionRotationState, RotationWandItem, SimpleBearingContraption, SimpleContraptionEntityRenderer, SimpleMovingContraption, FixedAxisRotatingContraptionEntity, IContraptionMultiblock, RubiksCubeContraptionEntity, SimpleRotatingContraption(+Entity)
+|-- event/                    # 2: ForgeEventHandler, PlaceableEmitterEventHandler
+|-- integration/              # 5: jade/ (CTPPJadePlugin), jei/ (CTPPJeiPlugin + category/), ldlib/ (CTPPLDLibPlugin) — emi moved to Core, KineticOutputMachineProvider removed
+|-- mixin/                    # 21: create/ (5 root + diesel/ (4) + fix/ (2) + jei/ (4)), gtm/ (1), mc/ (1), root (4)
+|-- network/packet/           # 11 packets: toolbox, terminal wire selection, emitter beam
+|-- registry/                 # 12: CTPPRegistrate-based items/blocks/entities/machines/multiblocks/menus/recipe types + CreateMaterials, GTMaterialAddon
+|-- syncdata/                 # 1: TerminalLinkStateAccessor
+`-- util/                     # 6: CommonTooltips, ICustomSlot, IMatrix3dAccess, IWorkingMachineStep, ItemAxisBuilder, MathUtil (CTPPValues removed)
+```
+
+## WHERE TO LOOK
+| Concern | Location |
+|---------|----------|
+| Mod entry | `CTPP.java` |
+| GT addon | `CTPPGTAddon.java` |
+| Registrate | `CTPPRegistrate.java`, `CTPPRegistration.java` |
+| API | `api/` (17) incl. `api/terminal/TerminalWireGeometry.java` |
+| Dynamic contraptions | `dynamicPart/` (10) |
+| KubeJS recipe keys | `CTPPGTAddon.registerRecipeKeys()` (SU_IN/SU_OUT) |
+| Recipes/datagen | `data/recipe/` (top-level, NOT under common/) |
+| Fan processing | `data/recipe/fanprocessing/` |
+| Toolbox system | `common/toolbox/` (13 classes), `network/packet/` toolbox packets, `client/toolbox/` UI |
+| Placeable emitter | `common/machine/simple/PlaceableEmitterMachine.java`, `common/block/MirrorBlock.java`, `common/beam/`, `data/recipe/PlaceableEmitterRecipes.java` |
+| Mirror | `common/block/MirrorBlock.java` |
+| Terminal wires | `api/terminal/TerminalWireGeometry.java`, `common/terminal/TerminalWireHazardManager.java`, `common/terminal/TerminalWireDamageDebug.java`, `client/renderer/VoltageTerminalRenderer.java` |
+| Ponder/client | `client/ponder/` |
+| Mixins | `mixin/`, `src/main/resources/ctpp.mixins.json` |
+| Sync data | `syncdata/TerminalLinkStateAccessor.java` |
+| Generated resources | `src/generated/resources/data/ctpp/recipes/` |
+| Static resources | `src/main/resources/assets/ctpp/` |
+
+## RECIPE TYPES
+CTPP defines two recipe-type families: GT-style `GTRecipeType` for kinetic/electric machines, and Create-style `ProcessingRecipe` for fan catalyst processing.
+
+### GT Recipe Types (`registry/CTPPRecipeTypes.java`)
+Registered via `CTPPRegistration.REGISTRATE.recipeType(...)`. Kinetic types use `StressRecipeCapability` (key `"su"`, Float) instead of EU, with `RPMCondition` + `MechanicalTierCondition`.
+
+| Constant | Registry ID | 中文 | Group | I/O items | I/O fluids | Notes |
+|---|---|---|---|---|---|---|
+| `KINETIC_MIXER_RECIPES` | `kinetic_mixer` | 应力搅拌 | KINETIC | 6/1 | 2/1 | Commented out |
+| `SMASHING_FACTORY_RECIPES` | `smashing_factory_recipes` | 粉碎工厂 | KINETIC | 1/4 | 0/0 | Auto-gen from `MACERATOR_RECIPES`; strips chanced outputs; reads tier/voltage limits from config |
+| `KINETIC_GENERATOR_RECIPES` | `kinetic_generator` | 应力发电 | KINETIC | 0/0 | 1/0 | Stress → EU; limit now `(tier>2 ? (tier-2)*4*V[tier-2] : 32)`; HV+ hatch penalty `-10pp` per tier above MV |
+| `KINETIC_STEAM_TURBINE_RECIPES` | `kinetic_steam_turbine` | 蒸汽动力 | KINETIC | 0/0 | 1/1 | Steam → EU |
+| `SEAWEED_FARM` | `seaweed_farm` | 海草养殖 | ELECTRIC | 2/4 | 0/1 | Multiblock |
+| `WINDMILL_CONTROL` | `windmill_control_center` | 风车控制中心 | ELECTRIC | 0/0 | 1/0 | Multiblock |
+| `BOOM_OF_CREATE` | `boom_of_create` | 聚爆应力 | KINETIC | 1/0 | 1/0 | EU IN, explosive catalyst → stress |
+| `BIG_DAM` | `big_dam` (GTCEu namespace) | 三峡大坝 | ELECTRIC | 0/0 | 1/0 | Registered under `GTCEu.id(...)` |
+
+### Create Fan Processing Recipes (`data/recipe/fanprocessing/CTPPRecipeTypeInfo.java`)
+Uses `IRecipeTypeInfo` / `ProcessingRecipe` from Create. Registered as `DeferredRegister` entries under `ctpp` namespace. `CTPPFanProcessingTypes.java` holds the enum of types.
+
+| Enum | ID | Max In/Out | Purpose |
+|---|---|---|---|
+| `BREATHING` | `ctpp:breathing` | 1/12 | Fan blowing catalyst |
+| `ACIDWASHING` | `ctpp:acidwashing` | 4/12 | Fan washing - acid catalyst |
+| `OILING` | `ctpp:oiling` | 1/12 | Fan processing - oil catalyst |
+
+### Wrapped Create / Addon Recipe Builders (`data/recipe/builder/`)
+CTPP wraps Create and addon recipe types with datagen-friendly builders. These are NOT new recipe types; they produce standard Create/addon recipe JSON.
+
+**Create vanilla (11 builders)** — direct JSON builders with `"type": "create:<name>"`:
+
+| Builder | Recipe type | Notes |
+|---|---|---|
+| `CompactingRecipeBuilder` | `create:compacting` | item/fluid I/O, heated/superheated |
+| `CrushingRecipeBuilder` | `create:crushing` | item I/O with chanced outputs per entry |
+| `CuttingRecipeBuilder` | `create:cutting` | item I/O |
+| `FillingRecipeBuilder` | `create:filling` | item/fluid I/O, supports string fluid IDs |
+| `ItemApplicationRecipeBuilder` | `create:item_application` | item I/O (deployer-style) |
+| `MechanicalCraftingRecipeBuilder` | `create:mechanical_crafting` | shaped pattern with key |
+| `MillingRecipeBuilder` | `create:milling` | item I/O with chanced outputs per entry |
+| `MixingRecipeBuilder` | `create:mixing` | item/fluid I/O, heated/superheated |
+| `PressingRecipeBuilder` | `create:pressing` | item I/O |
+| `SequencedAssemblyRecipeBuilder` | `create:sequenced_assembly` | multi-step (filling, pressing, deploying, cutting, curving) |
+| `SplashingRecipeBuilder` | `create:splashing` | item I/O |
+
+**Create Diesel Generators (4 builders)** — use `ProcessingRecipeBuilder<>`:
+
+| Builder | Target recipe class | Mod |
+|---|---|---|
+| `BasinFermentingRecipeBuilder` | `BasinFermentingRecipe` | createdieselgenerators |
+| `DistillationRecipeBuilder` | `DistillationRecipe` | createdieselgenerators |
+| `HammerRecipeBuilder` | `HammerRecipe` | createdieselgenerators |
+| `WireCuttingRecipeBuilder` | `WireCuttingRecipe` | createdieselgenerators |
+
+**Vintage Improvements (8 builders)** — extend `AbstractVintageRecipeBuilder`, use `VintageRecipes` enum (`data/recipe/builder/vintage/` holds 10 files: these 8 plus `AbstractVintageRecipeBuilder` and `VintageRecipeResult`):
+
+| Builder | VintageRecipes enum | Notes |
+|---|---|---|
+| `CentrifugationRecipeBuilder` | `CENTRIFUGATION` | item/fluid I/O, RPM, heat |
+| `CoilingRecipeBuilder` | `COILING` | item/fluid I/O, RPM, heat |
+| `CurvingRecipeBuilder` | `CURVING` | item/fluid I/O, RPM, heat |
+| `HammeringRecipeBuilder` | `HAMMERING` | item/fluid I/O, RPM, heat |
+| `PressurizingRecipeBuilder` | `PRESSURIZING` | item/fluid I/O, RPM, heat |
+| `TurningRecipeBuilder` | `TURNING` | item/fluid I/O, RPM, heat |
+| `VacuumizingRecipeBuilder` | `VACUUMIZING` | item/fluid I/O, RPM, heat |
+| `VibratingRecipeBuilder` | `VIBRATING` | item/fluid I/O, RPM, heat |
+
+### Custom recipe infrastructure
+- **Capability** `StressRecipeCapability` (`"su"` key, Float) — kinetic stress I/O for GT recipes; drives parallel calculation in `KineticWorkableMultiblockMachine` / `KineticOutputMachine`. Lang keys now `ctpp.stressrecipecapability.capabilityname` / `stressconsumption` / `stressproduction` / `stressinput` / `stressoutput` (old `recipe.capability.su.name` and `ctpp.top.*` removed).
+- **KubeJS keys** `CTPPGTAddon.SU_IN` / `SU_OUT` — script-facing stress recipe components registered by `registerRecipeKeys()`.
+- **Conditions** `RPMCondition` (`"rpm"`) and `MechanicalTierCondition` (`"mechanical_tier"`) — RPM/tier requirements on kinetic recipes. `MechanicalTierCondition` now displays `GTValues.VNF[tier]` (CTPPValues.MT removed).
+- **Modifiers** `KINETIC_PARALLEL` (stress-multiplier + accurate parallel) and `KINETIC_PERFECT_PARALLEL` (perfect parallel variant) — both target `KineticWorkableMultiblockMachine`.
+- **Recipe builder** `CTPPRecipeBuilder` extends `GTRecipeBuilder` with `.rpm(float)`, `.tier(int)`, `.inputStress(float)`, `.outputStress(float)`, `.noEUt()`.
+
+## ARCHITECTURE CONTRACT
+Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `references/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
+
+## DOMAIN GUIDE ROUTING
+Read the matching domain guide before editing the corresponding source area.
+
+| Source area | Guide | Read before |
+|-------------|-------|-------------|
+| `api` | `references/CTPP/api/AGENTS.md` | Recipe capabilities, multiblock builder, predicates, TerminalWireGeometry |
+| `client` | `references/CTPP/client/AGENTS.md` | Ponder plugin/scenes/tags, renderers, toolbox UI |
+| `common` | `references/CTPP/common/AGENTS.md` | Proxy, machines, kinetic logic, toolbox, fan processing, mirror/emitter |
+| `config` | `references/CTPP/config/AGENTS.md` | Module config |
+| `data` | `references/CTPP/data/AGENTS.md` | Recipe providers, tags, models |
+| `dynamicPart` | `references/CTPP/dynamicPart/AGENTS.md` | Moving/rotating contraptions |
+| `event` | `references/CTPP/event/AGENTS.md` | Forge event handlers |
+| `integration` | `references/CTPP/integration/AGENTS.md` | JEI/Jade/LDLib integration |
+| `mixin` | `references/CTPP/mixin/AGENTS.md` | Create/GT patches |
+| `network` | `references/CTPP/network/AGENTS.md` | Toolbox packets |
+| `registry` | `references/CTPP/registry/AGENTS.md` | Items, blocks, machines, recipe types |
+| `syncdata` | `references/CTPP/syncdata/AGENTS.md` | Terminal link sync accessor |
+| `util` | `references/CTPP/util/AGENTS.md` | Shared helpers |
+
+## CONVENTIONS
+- Namespace is `com.mo_guang.ctpp`; class prefixes use `CTPP`.
+- GT/GMT recipes are runtime dynamic-pack data (`CTPPGTAddon.addRecipes()`); `runData` produces no JSON for them. See root AGENTS.md CONVENTIONS.
+- Item/block/fluid references MUST use direct registration objects (`CTPPBlocks.X`, `CTPPItems.X`, `GTMaterials.X`, `TagPrefix.ingot`) — never `ResourceLocation` string parsing + `ForgeRegistries` lookups. See root AGENTS.md CONVENTIONS.
+- `src/generated/resources` contains many Create/Forge/Minecraft tag outputs from datagen.
+- Static machine part models also exist under `src/main/resources`; check path before regenerating or editing.
+- Create kinetic behavior is patched through mixins and dynamic contraption classes; inspect both when changing rotation or moving-block behavior.
+- Recipe generation lives at the top-level `data/recipe/` (there is no `common/data/recipe`).
+
+## ANTI-PATTERNS
+- Do not treat all recipe JSON as equivalent: fan catalyst/generated outputs and static assets live in different source roots.
+- Do not change kinetic/electric machine tiers without checking both registry code and generated models/recipes.
+- Do not add stress I/O by raw JSON keys alone; use `StressRecipeCapability`, KubeJS recipe keys, and `CTPPRecipeBuilder` together.
+
+## COMMANDS
+```text
+./gradlew :modules:CTPP:build
+./gradlew :modules:CTPP:runData
+./gradlew :modules:CTPP:spotlessCheck
+```
+
+## SCOPE
+Applies to `modules/CTPP` and its submodule repository. It is a reference guide loaded through the root routing table, not an additional source-tree instruction file.
+
+## READ WHEN
+- Adding or changing kinetic/electric machines, fan catalyst recipes, or recipe builders.
+- Changing Create kinetic behavior through mixins or dynamic contraption classes.
+- Changing the toolbox system.
+
+## SOURCE OF TRUTH
+- Registration/lifecycle: `CTPP.java`, `CTPPGTAddon.java`, `common/CommonProxy.java`.
+- Recipe types: `registry/CTPPRecipeTypes.java`, `data/recipe/fanprocessing/CTPPRecipeTypeInfo.java`, builders under `data/recipe/builder/`.
+- Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctpp.mixins.json`.
+
+## WORKFLOW
+1. Map the changed symbol to its domain and read that domain guide.
+2. Check GT addon hook order, recipe capability registration, and datagen references.
+3. Run the narrowest Gradle task (`runData` for datagen, `build` for compilation).
+4. Re-read the root routing table if the change introduces a new module boundary.

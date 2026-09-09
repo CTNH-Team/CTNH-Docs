@@ -46,8 +46,8 @@ class Config:
         "CTPP": ("CTNH-Team/CTPP", "dev"),
         "Create-Enough-Items": ("CTNH-Team/Create-Enough-Items", "dev"),
     }
-    # 每个模块文档对应根目录: docs/<Module>/
-    DOCS_ROOT = "docs"
+    # 每个模块文档对应根目录: ctnh-docs/references/<Module>/
+    DOCS_ROOT = "ctnh-docs/references"
     STATE_FILE = "scripts/state.json"
     PROMPT_FILE = "prompts/init_deep_update.md"
 

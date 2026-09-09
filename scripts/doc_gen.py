@@ -9,7 +9,7 @@ from llm_client import HttpError, generate_text
 
 
 class DocGenerator:
-    """按 init-deep 更新模式，用 LLM 自动更新 docs/<Module>/ 下的 AGENTS.md。"""
+    """按 init-deep 更新模式，用 LLM 自动更新 ctnh-docs/references/<Module>/ 下的 AGENTS.md。"""
 
     def __init__(self):
         if not config.GEMINI_API_KEY:
@@ -81,7 +81,7 @@ class DocGenerator:
             return f.read()
 
     def _existing_docs_context(self, module: str) -> str:
-        """收集 docs/<Module>/ 下现有 AGENTS.md 作为上下文。"""
+        """收集 references/<Module>/ 下现有 AGENTS.md 作为上下文。"""
         module_docs = os.path.join(self.docs_root, module)
         if not os.path.isdir(module_docs):
             return "(该模块尚无文档)"
@@ -160,29 +160,28 @@ class DocGenerator:
 # 模块源码结构（当前）
 {source}
 
-# 现有文档（docs/{module}/）
-{existing}
+# 现有文档（{self.docs_root}/{module}/）
 
 # 代码变更（该模块仓库的新提交）
 {diffs}
 
 # 任务
-按 init-deep 更新模式对 docs/{module}/ 下的 AGENTS.md 执行更新：
+按 init-deep 更新模式对 {self.docs_root}/{module}/ 下的 AGENTS.md 执行更新：
 1. 对比"源码结构"与"现有文档"，找出差异（新类/新子包/删除/拼写变化/文件数变化）。
 2. 决定动作：
-   - 模块入口/注册/整体结构变化 → update 或 create docs/{module}/AGENTS.md
-   - 某域变化 → update 或 create docs/{module}/<domain>/AGENTS.md
+   - 模块入口/注册/整体结构变化 → update 或 create {self.docs_root}/{module}/AGENTS.md
+   - 某域变化 → update 或 create {self.docs_root}/{module}/<domain>/AGENTS.md
    - 无实质变化 → action "noop"
 3. 生成内容必须：
    - 完整覆盖该文档的全部小节（不要因为 diff 只涉及一部分就丢弃其他小节内容）
    - 保持现有文档风格：OVERVIEW / STRUCTURE / WHERE TO LOOK / DOMAIN GUIDE ROUTING / CONVENTIONS / ANTI-PATTERNS / COMMANDS / SCOPE / READ WHEN / SOURCE OF TRUTH / WORKFLOW
-   - 保留既定声明（GTM 动态包、注册对象优先、拼写怪癖）——见规范
+   - 保留既定声明（GTM 动态包、注册对象优先）——见规范
    - 只描述 diff/源码中可佐证的内容，禁止编造类名/路径
    - 中文或英文均可，与现有文档一致
 
 # 输出格式（严格 JSON）
 {{"updates": [
-  {{"action": "create|update|noop", "path": "docs/{module}/AGENTS.md 或 docs/{module}/<domain>/AGENTS.md", "content": "完整文档内容（仅 action 非 noop 时需要）"}}
+  {{"action": "create|update|noop", "path": "{self.docs_root}/{module}/AGENTS.md 或 {self.docs_root}/{module}/<domain>/AGENTS.md", "content": "完整文档内容（仅 action 非 noop 时需要）"}}
 ], "summary": "一句话说明本次改动"}}
 """
         try:
@@ -203,7 +202,8 @@ class DocGenerator:
                 continue
             # 强制限定模块目录，防止跨目录写入
             path = upd["path"].replace("\\", "/")
-            if not path.startswith(f"docs/{module}/") and path != f"docs/{module}/AGENTS.md":
+            prefix = f"{self.docs_root}/{module}/"
+            if not path.startswith(prefix) and path != f"{self.docs_root}/{module}/AGENTS.md":
                 print(f"[doc_gen] {module} 路径越界拒绝: {path}")
                 continue
             valid.append(upd)
@@ -214,9 +214,9 @@ class DocGenerator:
         written = []
         for upd in updates:
             path = upd["path"].replace("\\", "/")
-            if not path.startswith("docs/"):
+            if not path.startswith(self.docs_root + "/"):
                 continue
-            full = os.path.join(self.docs_root, *path.split("/")[1:])
+            full = path  # path 已是 ctnh-docs/references/... 根相对路径
             os.makedirs(os.path.dirname(full), exist_ok=True)
             with open(full, "w", encoding="utf-8") as f:
                 f.write(upd["content"])

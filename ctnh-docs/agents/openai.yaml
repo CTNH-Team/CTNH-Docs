@@ -1,0 +1,4 @@
+interface:
+  display_name: "CTNH Docs"
+  short_description: "CTNH-Modules 层级知识库权威指南：8 模块主文档、域文档与跨模块架构契约"
+  default_prompt: "Use $ctnh-docs to read the authoritative module / domain guide before editing CTNH module code, machines, traits, recipe capabilities, or Jade integration."
