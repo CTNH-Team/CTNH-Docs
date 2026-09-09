@@ -1,7 +1,7 @@
 # CTNH-CORE REGISTRY DOMAIN
 
 ## OVERVIEW
-Registrate surface for Core (50 root+child classes): items, blocks, block entities, creative tabs, tags, models, recipe types/modifiers/conditions, GTCEu machines and multiblocks, materials, ores, fluid veins, worldgen layers, sound events, and Jade providers. Recently added BSC/wafer rubber-masked items.
+Registrate surface for Core (50 root+child classes): items, blocks, block entities, creative tabs, tags, models, recipe types/modifiers/conditions, GTCEu machines and multiblocks, materials, ores, fluid veins, worldgen layers, sound events, and Jade providers. Precision assembly wiring lives in GTMachineModify.
 
 ## STRUCTURE
 ```text
@@ -9,7 +9,6 @@ registry/
 |-- CTNHRegistrate.java        # registrate root
 |-- CTNHRegistration.java      # registration entry (coexists with CTNHRegistrate)
 |-- CTNHItems.java / CTNHBlocks.java / CTNHBlockEntities.java
-|   `-- CTNHItems.java now: BSC_CHIP, BSC_WAFER, BSC_WAFER_RUBBER_MASKED, LPIC_WAFER_RUBBER_MASKED, RAM_WAFER_RUBBER_MASKED, RUBBER_MASKED_SILICON_WAFER, SSOC_WAFER_RUBBER_MASKED (renamed from *_masked, models ctnhcore:item/chips/*, lang updated)
 |-- CTNHCreativeModeTabs.java / CTNHTags.java / CTNHModels.java / CTNHModelLayers.java / CTNHRenders.java
 |-- CTNHRecipeTypes.java / CTNHRecipeModifiers.java / CTNHRecipeConditions.java / CTNHRecipeCategories.java / CTNHRecipes.java
 |-- CTNHChanceLogic.java / CTNHGuiTextures.java
@@ -19,7 +18,7 @@ registry/
 |-- CTNHTemperatureModifierRegister.java
 |-- adventure/                 # CTNHEnchantments
 |-- jade/                      # CTNHJadePlugin
-|-- machines/                  # CTNHMachines, GTMachineModify
+|-- machines/                  # CTNHMachines, GTMachineModify (LARGE_ASSEMBLER -> MultiblockComputationMachine + PRECISION_ASSEMBLY_RECIPES)
 |   `-- multiblock/            # GTNNMultiblocks, HyperPlasmaTurbineRegister, Mechanical, MultiblocksA/B/C, WindPowerArrayRegister
 |-- material/                  # CTNHMaterialBlocks, CTNHMaterialFlags, CTNHMaterials, GTMaterialAddon
 `-- sound/                     # CTNHSoundEvents (easter_egg_clown)
@@ -30,9 +29,9 @@ registry/
 |---------|----------|
 | Registrate/root | `registry/CTNHRegistrate.java`, `registry/CTNHRegistration.java` |
 | Items/blocks/block entities | `registry/CTNHItems.java`, `registry/CTNHBlocks.java`, `registry/CTNHBlockEntities.java` |
-| New chip/wafers | `registry/CTNHItems.java`: `BSC_CHIP`, `BSC_WAFER`, `BSC_WAFER_RUBBER_MASKED`, `LPIC_WAFER_RUBBER_MASKED`, `RAM_WAFER_RUBBER_MASKED`, `RUBBER_MASKED_SILICON_WAFER`, `SSOC_WAFER_RUBBER_MASKED` (GTModels.createTextureModel with `ctnhcore:item/chips/*`; old `bsc_wafer_masked` etc renamed) |
 | Creative tabs/tags/models | `registry/CTNHCreativeModeTabs.java`, `registry/CTNHTags.java`, `registry/CTNHModels.java`, `registry/CTNHModelLayers.java` |
-| GTCEu machines | `registry/machines/CTNHMachines.java`; multiblocks under `registry/machines/multiblock/` (GTNNMultiblocks, MultiblocksA/B/C) plus `registry/CTNHMultiblockMachines.java` |
+| GTCEu machines | `registry/machines/CTNHMachines.java`; multiblocks under `registry/machines/multiblock/` plus `registry/CTNHMultiblockMachines.java` |
+| Precision assembly | `registry/machines/GTMachineModify.java#modifyGTAssembly()` — sets `GCYMMachines.LARGE_ASSEMBLER.setMachineSupplier(MultiblockComputationMachine::new)` and appends `CTNHRecipeTypes.PRECISION_ASSEMBLY_RECIPES` to recipeTypes |
 | Materials/worldgen | `registry/material/CTNHMaterials.java`, `registry/material/GTMaterialAddon.java`, `registry/CTNHTagPrefixes.java`, `registry/CTNHOres.java`, `registry/CTNHFluidVeins.java`, `registry/CTNHWorldgenLayers.java` |
 | Recipe types/modifiers/conditions | `registry/CTNHRecipeTypes.java`, `registry/CTNHRecipeModifiers.java`, `registry/CTNHRecipeConditions.java`, `registry/CTNHRecipeCategories.java` |
 | Enchantments | `registry/adventure/CTNHEnchantments.java` |
@@ -46,11 +45,14 @@ registry/
 - `CTNHRegistrate` and `CTNHRegistration` coexist; treat `CTNHRegistration` as the entry that wires the registrate, not a duplicate.
 - Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
 - When referencing items/blocks/fluids, MUST use direct registration objects — static field references (`GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`) or registered `ItemLike`/`Fluid` values — never `ResourceLocation` string parsing with `ForgeRegistries.ITEMS/BLOCKS/FLUIDS.getValue(...)` or similar lookups. String ids are allowed only where no registration object exists (upstream-mod-only ids, recipe ids, tag keys, dimension ids). See root AGENTS.md CONVENTIONS.
-- New wafer items use `GTModels.createTextureModel(ctx,prov,CTNHCore.id("item/chips/*"))` except `RUBBER_MASKED_SILICON_WAFER` which reuses `gtceu:item/naquadah_wafer` texture; lang keys migrated from `bsc_wafer_masked` etc to `*_rubber_masked` plus additions `rubber_masked_silicon_wafer` and `ssoc_wafer_rubber_masked`.
+- GT/GMT recipes are runtime dynamic-pack data (`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`); `runData` produces no JSON for them.
+- Spelling quirk: mixin package is `dategen` (not `datagen`); CTPP `fanprocessing` (no underscore).
+- Precision assembly: `GTMachineModify` mutates vanilla `GCYMMachines.LARGE_ASSEMBLER` definition at `modifyGTAssembly()` — supplier change to `common/machine/multiblock/MultiblockComputationMachine` must stay after machine registration and before tooltip building.
 
 ## ANTI-PATTERNS
 - Do not manually reformat huge multiblock registry sections protected by Spotless toggles.
 - Do not register the same entry from both registry and CommonProxy paths.
+- Do not duplicate GTMachineModify supplier changes elsewhere; single mutation point.
 
 ## SCOPE
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/registry` and its child packages.

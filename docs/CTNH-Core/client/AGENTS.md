@@ -1,7 +1,7 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-Client-side bootstrap, models, renderers, and Core-owned Create Ponder scenes, tags, and plugin (23 Java files).
+Client-side bootstrap, models, renderers, and Core-owned Create Ponder scenes, tags, and plugin (22 Java files).
 
 ## STRUCTURE
 ```text
@@ -12,10 +12,11 @@ client/
 |-- ponder/                    # CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags
 |   |-- Electric/              # GregTechMultiblocks, NeutronActivator
 |   `-- Kinetic/               # Meadow, MechanicalExporter
-|-- renderer/                  # ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender, LargeBottleRender, MartialMoralityEyeRender, TurbineRotorRender
+|-- renderer/                  # ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender, MartialMoralityEyeRender, TurbineRotorRender
 |-- renderer/utils/            # RenderUtils
 `-- util/                      # SnowOverlayQuadOffset
 ```
+Deleted: `client/renderer/LargeBottleRender.java` — fluid rendering now via server trait `MultiblockFluidRendererTrait` attached in `LargeBottleMachine`; no custom `DynamicRender` subclass needed.
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -25,17 +26,20 @@ client/
 | Core Ponder scenes | `client/ponder/Kinetic/` (Meadow, MechanicalExporter), `client/ponder/Electric/` (GregTechMultiblocks, NeutronActivator) |
 | Ponder adapter builder | `client/ponder/CTNHCorePonderSceneBuilder.java` |
 | Models | `client/model/` (ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel) |
-| Renderers | `client/renderer/` (ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, ...) |
+| Renderers | `client/renderer/` (ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, AstralPlanetSpecialEffects) |
 | Client utility | `client/util/SnowOverlayQuadOffset.java` |
 
 ## CONVENTIONS
 - Ponder scenes use `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` with text embedded directly in scene files.
 - `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
 - Ponder registration happens from `ClientProxy.onClientSetupEvent()`; client datagen lang extraction happens in `CommonProxy.gatherData()` via `CTNHPonderLang.init(new CTNHCorePonderPlugin())`.
+- When referencing items/blocks/fluids, MUST use direct registration objects — never `ResourceLocation` string parsing with `ForgeRegistries` lookups except where no registration object exists.
+- Spelling quirk: mixin package is `dategen` (not `datagen`).
 
 ## ANTI-PATTERNS
 - Do not move Core Ponder scenes/tags/plugin into CTNH-Lib; only the shared builder belongs there.
 - Do not make client-only classes reachable from common construction paths.
+- Do not reintroduce `LargeBottleRender`; use `MultiblockFluidRendererTrait`.
 
 ## SCOPE
 Applies to `src/main/java/io/github/cpearl0/ctnhcore/client` and its child packages.
