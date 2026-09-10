@@ -127,10 +127,26 @@ jobs:
             echo "DEEPSEEK_BASE_URL=$DEEPSEEK_BASE_URL_RAW" >> "$GITHUB_ENV"
             echo "using custom DEEPSEEK_BASE_URL."
           fi
-          # 组合校验：profile 首次使用会自动初始化；overlay 非法会在这里直接失败
+          # 1) 组合校验：profile 首次使用会自动初始化；overlay 非法会在这里直接失败
           npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
             --patch prompts/headless.ci.patch.yml --dump-config > /dev/null
           echo "profile composition OK (dsh $DSH_VERSION, tools=$DSH_TOOLS_MODE)."
+          # 2) 装配校验：--dump-config 只打印组合树、不加载插件，因此插件装配期错误
+          #    （例如权限预设与沙箱/审批组合不匹配）只有真正 boot 才会暴露。
+          #    这里用一次性探针 key 跑一次短任务：boot 成功后会以鉴权失败告终，所以只对
+          #    "插件树装配失败"硬失败，其余输出仅打印，避免把网关的鉴权文案当成判据。
+          set +e
+          probe=$(DEEPSEEK_API_KEY="dsh-preflight-probe" timeout 180 \
+            npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
+            --patch prompts/headless.ci.patch.yml "preflight probe" 2>&1 | tail -n 20)
+          set -e
+          if printf '%s' "$probe" | grep -qE "plugin tree failed to load|failed to apply loader entry"; then
+            echo "::error::dsh 插件树装配失败，组合非法（详见下方输出）"
+            printf '%s\n' "$probe"
+            exit 1
+          fi
+          printf '%s\n' "$probe" | head -n 5
+          echo "plugin tree loaded."
 
       - name: Run docs sync agent
         if: steps.plan.outputs.has_modules == 'true'

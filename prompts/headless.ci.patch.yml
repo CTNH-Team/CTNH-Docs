@@ -1,11 +1,13 @@
 # CTNH-Docs CI overlay：叠加在 headless profile 之上（--patch 层最后应用）。
-# 只解决两件事：CI 无人值守的审批姿态，以及模型选择。
-
-- id: approval
-  config:
-    # headless 没有审批应答者，默认 ask 会让所有写入以"不可用"关闭。
-    # 设为 never 后普通工作区写入照常执行；沙箱仍保持 workspace-write。
-    policy: never
+# 只解决模型选择与 PTC 呈现模式；沙箱与审批保持 base 默认。
+#
+# 注意（踩过的坑）：不要单独覆盖 id: approval 的 policy。
+# 权限预设要求「沙箱模式 + 审批策略」的组合命中 presets 表中的一项，否则
+# dsh-permission-presets 直接在装配阶段抛
+# "composed sandbox and approval defaults match no preset"。
+# 而 headless 也用不着覆盖：base 默认就是 workspace-write 预设
+# （sandbox=workspace-write、approval=ask），工作区内的写入由沙箱直接放行、
+# 不经过审批；只有越界写入才会请求升权，届时在无人值守下按拒绝关闭——正是我们要的行为。
 
 - id: agent-default-model
   config:
