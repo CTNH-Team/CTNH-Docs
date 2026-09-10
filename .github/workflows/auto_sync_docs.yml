@@ -248,6 +248,27 @@ jobs:
       - name: Verify docs
         if: steps.plan.outputs.has_modules == 'true'
         run: python scripts/verify_docs.py
+      - name: Ensure base branch is current
+        # 放在推进水位之前：无法产出 PR 的轮次不应该动 state
+        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
+        env:
+          BASE_REF: ${{ github.ref_name }}
+        run: |
+          # create-pull-request 以「当前分支」为工作基点，不会 rebase：它把改动提交在本地
+          # HEAD 之上，再建 PR 分支。因此运行期间基点一旦前进，分支树就等于把那段期间的
+          # 提交整体回退（PR diff 会显示成撤销别人的改动）。若被回退的文件里有 workflow，
+          # GitHub 还会以「App 缺少 workflows 权限」拒绝推送——那道拒绝其实是在保护仓库。
+          # 这里主动检出该情形并明确失败：本轮放弃，等下一轮以最新基点重跑。
+          git fetch --no-tags --quiet origin "$BASE_REF"
+          local_sha=$(git rev-parse HEAD)
+          remote_sha=$(git rev-parse "origin/$BASE_REF")
+          if [ "$local_sha" != "$remote_sha" ]; then
+            echo "::error::基点 $BASE_REF 已前进：本轮基点 ${local_sha:0:8}，远端 ${remote_sha:0:8}。本轮放弃（不推进水位、不开 PR），等待下次轮询以最新基点重跑。"
+            echo "期间新增的提交："
+            git log --oneline "$local_sha..$remote_sha" | head -n 10 || true
+            exit 1
+          fi
+          echo "base $BASE_REF is current at ${local_sha:0:8}."
 
       - name: Advance sync state
         id: round
