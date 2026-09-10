@@ -51,6 +51,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          # 按 requirements.txt 的哈希缓存 ~/.cache/pip
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -109,6 +111,19 @@ jobs:
         with:
           # PTC 运行时使用 node:module 的类型剥离能力，官方 CI 亦使用 Node 24
           node-version: '24'
+
+      - name: Cache dsh package
+        if: steps.plan.outputs.has_modules == 'true'
+        uses: actions/cache@v4
+        with:
+          # 缓存 npm 的 tarball 仓库（_cacache）而不是解压后的 ~/.npm/_npx：
+          # _npx 目录名是 npx 自己算的哈希，跨 npx 版本可能变化；_cacache 更稳。
+          # 命中时 npx 直接从缓存解压，省掉 ~246 MB 的下载。
+          path: ~/.npm/_cacache
+          key: dsh-npm-${{ runner.os }}-${{ env.DSH_VERSION }}-v1
+          restore-keys: |
+            dsh-npm-${{ runner.os }}-${{ env.DSH_VERSION }}-
+            dsh-npm-${{ runner.os }}-
 
       - name: Preflight dsh
         if: steps.plan.outputs.has_modules == 'true'
