@@ -1,153 +1,153 @@
 # CTNH-CORE MODULE
 
 ## OVERVIEW
-CTNH-Core is the aggregate/core mod and CI release target (largest module). It hosts shared CTNH gameplay systems, GTCEu integration, large machine registries, generated data, Core-owned Ponder scenes, and cross-mod content.
+CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，约 430 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
-```text
-src/main/java/io/github/cpearl0/ctnhcore/
-|-- CTNHCore.java             # Forge mod initialization
-|-- CTNHCoreGTAddon.java      # GTCEu addon hooks; addRecipes() dispatches data/recipe/**
-|-- CTNHConfig.java           # module config
-|-- api/                      # public APIs: multiblock builder, patterns, machine features (17 Java files)
-|   |-- CTNHMultiblockBuilder.java
-|   |-- Pattern/              # AsynBlockPattern, CTNHBlockMaps, CTNHBoilerFireboxType, CTNHPredicates (AsynBlockPattern null/empty guards for AE extract)
-|   |-- data/material/        # icon sets/types, property keys, catalyst property
-|   |-- gui/                  # CTNHGuiTextures
-|   |-- jade/                 # multithread recipe/output/thread providers
-|   |-- machine/feature/      # IDigitalMiner, IDynamicCasing (ICoilMachine removed -> CoilMachineTrait in GTCEu)
-|   |-- machine/multiblock/   # UnlimitedItemStackTransfer
-|   `-- recipe/               # DigitalMinerLogic
-|-- client/                   # ClientProxy, models, renderers, Core Ponder (22 Java files)
-|   |-- ClientProxy.java / ClientUtil.java
-|   |-- model/                # ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel
-|   |-- ponder/               # plugin/scenes/tags + Electric/ and Kinetic/ scene groups
-|   |-- renderer/             # ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, MartialMoralityEyeRender, TurbineRotorRender, AstralPlanetSpecialEffects (+ utils/RenderUtils)
-|   `-- util/                 # SnowOverlayQuadOffset
-|-- common/                   # CommonProxy, blocks, machines, capabilities, items, entities (125 Java files)
-|   |-- block/                # CoilType, PhotovoltaicBlock, TurbineRotorBlock, blockdata/
-|   |-- capability/           # EIOCapacitorProvider
-|   |-- entity/monster/       # AstralSlime, SightSeerSpitter
-|   |-- gui/                  # WPAAcceleratorGui, terminal/widget widgets
-|   |-- item/                 # ArkOfHomoItem, AstronomyCircuitItem, MEAdvancedTerminalItem, ...
-|   |-- machine/cover/        # CreativeEnergyCover
-|   |-- machine/multiblock/   # LargeBottleMachine (now delegates to MultiblockFluidRendererTrait), MultiblockComputationMachine (attachTrait NetworkedComputationContainer), SlaughterHouseMachine/FactoryMachine (attachTrait machineStorage)
-|   |   |-- electric/         # BlazeBlastFurnaceMachine now getTraitOrThrow(CoilMachineTrait.class), 29 top-level + multithread/ + rareearth/
-|   |   |-- generator/        # 12 machines
-|   |   |-- kinetic/          # 5
-|   |   |-- part/             # 12 parts
-|   |   `-- quantum/          # quantum_core
-|   |-- machine/simple/       # DigitalMiner, EfficiencyGeneratorMachine, ...
-|   |-- machine/trait/        # ScalableReservoirComputingLogic, providable_net/
-|   |-- recipe/               # KeepIngredientShapedRecipe, condition classes, CTNHRecipeBuilder
-|   `-- world/                # CTNHChunkLoading
-|-- data/                     # datagen: recipes, tags, materials, worldgen (152 Java files)
-|   |-- CTNHCoreDatagen.java
-|   |-- CreateRecipeTypes.java # mechanicalTier Math.min(tier,5)
-|   |-- materials/            # 26 sets: BauxiteProcessingMaterials (IMPURE/PURE_SODIUM_ALUMINATE_SOLUTION renamed from ALUMINIUM_HYDROXIDE, formula updates TiO2/NaAl(OH)4), BoronChainMaterials NEW, GoldChainMaterials RENAMED
-|   |-- recipe/               # 35 top-level + age/ chain/ create/ wood/ migrated/ modmodify/ multiblock/ ...
-|   |   |-- CTNHCoreRecipeAddition.java # dispatches BoronChain.init() + WaferRecipes.init()
-|   |   |-- WaferRecipes.java       # precision circuit wafer masking
-|   |   `-- chain/               # AlumiumChain (Ti/Al yield/HCl tuning)
-|   |-- tags/                 # biome/entity/block/fluid/item tag providers
-|   `-- worldgen/             # CTNHBiomeModifiers
-|-- event/                    # ForgeEventHandler, BuildTaskManager, DimensionFlightHandler
-|-- integration/              # EMI, Create Diesel, Legendary Survival, FTB Essentials, CTPP
-|-- mixin/                    # cross-mod mixins; mc/ RecipeManagerApplyMixin
-|-- registry/                 # 50 root+child classes; adventure/ jade/ machines/ material/ ores/ sound/
-|   `-- registry/machines/GTMachineModify.java # LARGE_ASSEMBLER now setMachineSupplier(MultiblockComputationMachine::new) + add PRECISION_ASSEMBLY_RECIPES
-`-- utils/                    # CTNHCommonTooltips, CoilTierHelper, LayeredBiMap, ...
+源码根 `modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/`（括号内为该域 Java 文件数）
+
+```
+ctnhcore/
+├── CTNHCore / CTNHCoreGTAddon / CTNHConfig      # mod 入口、GT addon、配置
+├── api/        (~17) CTNHMultiblockBuilder；Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}；
+│                     data/material/{CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty}；
+│                     gui/CTNHGuiTextures；jade/{MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider}；
+│                     machine/feature/{IDigitalMiner, IDynamicCasing}；machine/multiblock/UnlimitedItemStackTransfer；recipe/DigitalMinerLogic
+├── client/     (~22) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
+│                     ponder/{CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags,
+│                             Electric/{GregTechMultiblocks, NeutronActivator}, Kinetic/{Meadow, MechanicalExporter}}；
+│                     renderer/{ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender,
+│                               MartialMoralityEyeRender, TurbineRotorRender, utils/RenderUtils}；util/SnowOverlayQuadOffset
+├── common/     (~124) 代理与机器/方块/物品实现
+│   ├── block/ (CTNHFusionCasingType, CoilType, MaterialTurbineRotorBlock, PhotovoltaicBlock, SpaceStructuralFramework,
+│   │           TurbineRotorBlock, blockdata/{IPBData, ISSFData, PlanetMinerData})
+│   ├── blockentity/TurbineRotorBE；capability/EIOCapacitorProvider；enchantment/TemperatureEnchantment
+│   ├── entity/monster/{astralslime/AstralSlime, sightseerspitter/SightSeerSpitter}
+│   ├── gui/ (MachineModeFancyConfiguratorTest, SimpleNumberInputWidget, WPAAcceleratorGui,
+│   │         terminal/TerminalInputWidget, widget/SimpleNumberInputWidget)
+│   ├── item/ (~18) ArkOfHomoItem, AstronomyCircuitItem, CatalystBehavior, ConnectTerminalItem, IDataItem, IDroneItem,
+│   │              IThrowableItem, MEAdvancedTerminalItem/Behavior, MultiblockHelper, ProgramItem,
+│   │              TurbineRotorItem/MaterialTurbineRotorItem, TagPrefixBehavior, ThrowableSummoner, debug/ReloadItem ...
+│   ├── machine/ cover/CreativeEnergyCover；multiblock/{KineticElectricMultiblockMachine, LargeBottleMachine,
+│   │            MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine}
+│   │   ├── electric/ (29) AstronomicalMachine, BioMachine, ChemicalPlantMachine, FactoryMachine, MegaLCRMachine,
+│   │   │                   NeutronActivatorMachine, PlanetMiner, WideParticleAccelerator, multithread/CNCAlloySmelter,
+│   │   │                   rareearth/{ProcessControlMachine, ProcessControlProfile, ProcessControlled*MultiblockMachine} ...
+│   │   ├── generator/ (12) Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine,
+│   │   │                    LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator,
+│   │   │                    NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine,
+│   │   │                    WaterPowerStationMachine, WindPowerArrayMachine
+│   │   ├── kinetic/ (5) IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine,
+│   │   │                 MeadowMachine, NoEnergyMachine
+│   │   ├── part/ (12) CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine,
+│   │   │                Creative*HatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock,
+│   │   │                NeutronAcceleratorMachine, NeutronSensorMachine
+│   │   └── quantum/quantum_core
+│   ├── simple/ (DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine)
+│   ├── trait/ (ScalableReservoirComputingLogic, SimpleComputationContainer,
+│   │           providable_net/{ProvidableNetInfo, ProvidableNetTrait, ProviderInfo})
+│   ├── recipe/ (KeepIngredientShapedRecipe, NeutronActivatorCondition, PlantCasingCondition, TierCasingCondition,
+│   │            builder/CTNHRecipeBuilder)
+│   └── world/CTNHChunkLoading
+├── data/       (~149) CTNHCoreDatagen, CTNHMaterialFlags, CreateRecipeTypes；item/CrystalItems；machines/GTNNMachines；
+│                     materials/ (26 个材料集，如 RareEarthMaterials, NaquadahMaterials, WetWareLineMaterials ...)；
+│                     recipe/ (34 顶层 + age/10 + chain/30 + multiblock/11 + create/6 + migrated/4 + mana/3 + wood/3 +
+│                              utils/3 + cogniassembly/1 + immersiveaircraft/1 + modmodify/1 + generated/1)；
+│                     tags/ (8) CTNH*TagsProvider, ItemTags, StoneTags, TagClearHelper；worldgen/CTNHBiomeModifiers
+├── event/      (~5)  BuildTaskManager, DimensionFlightHandler, ForgeClientEventHandler, ForgeEventHandler,
+│                     ProvidableNetEventHandler
+├── integration/(~7)  creatediesel/{DistillationCategoryLayout, GTBedrockOilBridge}；
+│                     emi/{CTNHCoreEmiPlugin, CTNHExtraEmiPlugin}；ftbessentials/AsyncRtpManager；
+│                     legendary/{ArmorModifier, UnderfloorHeatingSystemTempModifier}
+├── mixin/      (~47) 按目标 mod 分组：aecs, apotheosis, ars_nouveau, avaritia, create, creatediesel, dategen,
+│                     eclipticseasons, eio, emi, ftbchunks, ftbessentials, gtceu(+orevein), javd, legendarysurvival,
+│                     mc, tmrv, vintageimprovements；顶层 ChunkMixin, ChunkSerializerMixin, TagLoaderMixin
+├── registry/   (~50) 注册中枢：CTNHRegistration/CTNHRegistrate, CTNHItems, CTNHBlocks, CTNHBlockEntities,
+│                     CTNHMultiblockMachines, CTNHRecipeTypes/Categories/Recipes/Conditions/Modifiers,
+│                     machines/{CTNHMachines, GTMachineModify, multiblock/*}, material/{CTNHMaterials, CTNHMaterialFlags,
+│                     CTNHMaterialBlocks, GTMaterialAddon}, ores/* (7), adventure/CTNHEnchantments, jade/CTNHJadePlugin,
+│                     sound/CTNHSoundEvents ...
+└── utils/      (~8)  CTNHCommonTooltips, CTNHMachineUtils, CTNHRecipeHelper, CoilTierHelper, LayeredBiMap,
+                      MathUtils, OrientedItem, StructureUtils
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Mod entry | `CTNHCore.java` |
-| GT addon | `CTNHCoreGTAddon.java` |
-| Config | `CTNHConfig.java` |
-| Registries | `registry/` (50 root+child classes) |
-| Precision assembly | `registry/machines/GTMachineModify.java` (LARGE_ASSEMBLER -> MultiblockComputationMachine, PRECISION_ASSEMBLY_RECIPES) |
-| Bauxite/sodium aluminate | `data/materials/BauxiteProcessingMaterials.java` (IMPURE/PURE_SODIUM_ALUMINATE_SOLUTION), `data/recipe/chain/AlumiumChain.java` |
-| Boron chain | `data/materials/BoronChainMaterials.java`, `data/recipe/chain/BoronChain.java` |
-| Wafer/precision circuits | `data/recipe/WaferRecipes.java`, `registry/CTNHItems.java` |
-| Recipe generation root | `data/recipe/CTNHCoreRecipeAddition.java` |
-| Multiblocks (electric) | `common/machine/multiblock/electric/` |
-| Multiblocks (generator) | `common/machine/multiblock/generator/` (12) |
-| Multiblocks (parts) | `common/machine/multiblock/part/` (12) |
-| Coil handling | `common/machine/multiblock/electric/BlazeBlastFurnaceMachine.java` via `CoilMachineTrait`, `FermentingTankMachine.java` |
-| Fluid rendering | `common/machine/multiblock/LargeBottleMachine.java` via `MultiblockFluidRendererTrait` |
-| Computation trait | `common/machine/multiblock/MultiblockComputationMachine.java` via `attachTrait(NetworkedComputationContainer)` |
-| Materials | `data/materials/` (26 sets), `registry/material/` |
-| Ponder/client | `client/ponder/`, `client/renderer/` (LargeBottleRender removed) |
-| Mixins | `mixin/`, `src/main/resources/ctnhcore.mixins.json` |
-| EMI + CTPP hiding | `integration/emi/CTNHCoreEmiPlugin.java` (`CTPPDisable()` iterates `CTPPMachines.PLACEABLE_EMITTER`) |
-
-## ARCHITECTURE CONTRACT
-Machine/trait/capability/Jade 的所有权边界、字段同步与持久化规则、Jade 数据最小化原则和迁移步骤在 `references/_architecture/AGENTS.md`。改动机器、trait、recipe capability 或 Jade 代码前先读它；本文件只描述本模块的落点。
+| mod 入口 / addon / 配置 | `CTNHCore`, `CTNHCoreGTAddon`, `CTNHConfig` |
+| 注册框架与注册对象 | `registry/CTNHRegistration`, `registry/CTNHRegistrate`, `registry/CTNHItems`, `registry/CTNHBlocks`, `registry/CTNHBlockEntities`, `registry/CTNHCreativeModeTabs` |
+| 机器注册与 GT 机器改动 | `registry/machines/CTNHMachines`, `registry/machines/GTMachineModify`, `registry/machines/multiblock/{MultiblocksA, MultiblocksB, MultiblocksC, GTNNMultiblocks, Mechanical, HyperPlasmaTurbineRegister, WindPowerArrayRegister}` |
+| 配方类型 / 条件 / 修饰符 | `registry/CTNHRecipeTypes`, `registry/CTNHRecipeCategories`, `registry/CTNHRecipeConditions`, `registry/CTNHRecipeModifiers` |
+| 材料与材料标志 | `registry/material/{CTNHMaterials, CTNHMaterialFlags, CTNHMaterialBlocks, GTMaterialAddon}`；材料集定义在 `data/materials/*` |
+| 矿物与矿脉 | `registry/ores/*`（按维度拆分）, `registry/CTNHOres`, `registry/CTNHWorldgenLayers`, `registry/CTNHFluidVeins` |
+| 多方块机器实现 | `common/machine/multiblock/electric/**`（29）、`generator/**`（12）、`kinetic/**`（5）、`part/**`（12）、`quantum/**`、顶层 5 个通用多方块 |
+| 多方块构建与图案 | `api/CTNHMultiblockBuilder`, `api/Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}` |
+| 方块数据 / 方块实体 | `common/block/blockdata/{IPBData, ISSFData, PlanetMinerData}`, `common/blockentity/TurbineRotorBE`, `common/block/*` |
+| 机器 GUI / widget | `common/gui/**`（含 `WPAAcceleratorGui`, `terminal/TerminalInputWidget`）, `api/gui/CTNHGuiTextures` |
+| 客户端渲染 / 模型 / Ponder | `client/renderer/**`, `client/model/*`, `client/ponder/**` |
+| 配方实现 | `data/recipe/**`（顶层 34；`age/`, `chain/`, `create/`, `multiblock/`, `migrated/`, `mana/`, `wood/`, `utils/`）, `data/recipe/CTNHCoreRecipeAddition` |
+| 配方移除 | `data/recipe/RecipeRemoval`（配合 `mixin/tmrv/RecipeManagerMixin` 统一处理） |
+| 数据生成 | `data/CTNHCoreDatagen`, `data/tags/**`, `data/worldgen/CTNHBiomeModifiers` |
+| 跨 mod 集成 | `integration/**`（creatediesel, emi, ftbessentials, legendary） |
+| Mixin 补丁 | `mixin/**`（按目标 mod 分组）；GT/GTCEu 相关在 `mixin/gtceu/**` |
+| 通用工具 | `utils/{CTNHMachineUtils, CTNHRecipeHelper, CoilTierHelper, StructureUtils, MathUtils}` |
 
 ## DOMAIN GUIDE ROUTING
-Read the matching domain guide before editing the corresponding source area.
-
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
-| `api` | `references/CTNH-Core/api/AGENTS.md` | Multiblock builder, machine features, recipe APIs |
-| `client` | `references/CTNH-Core/client/AGENTS.md` | Models, renderers, Core Ponder scenes/tags/plugin |
-| `common` | `references/CTNH-Core/common/AGENTS.md` | Blocks, machines, capabilities, items, entities |
-| `data` | `references/CTNH-Core/data/AGENTS.md` | Recipe generators, tags, worldgen, materials datagen |
-| `event` | `references/CTNH-Core/event/AGENTS.md` | Forge event handlers, task managers |
-| `integration` | `references/CTNH-Core/integration/AGENTS.md` | EMI, Create Diesel, Legendary Survival, FTB Essentials, CTPP integration |
-| `mixin` | `references/CTNH-Core/mixin/AGENTS.md` | Cross-mod mixins, recipe removal at `RecipeManager.apply()` |
-| `registry` | `references/CTNH-Core/registry/AGENTS.md` | Items, blocks, machines, recipe types, materials, sound events |
-| `utils` | `references/CTNH-Core/utils/AGENTS.md` | Shared helpers and recipe utilities |
+| `api/**` | `ctnh-docs/references/CTNH-Core/api/AGENTS.md` | 新增多方块构建器 / 图案谓词 / 机器 feature 接口 |
+| `client/**` | `ctnh-docs/references/CTNH-Core/client/AGENTS.md` | 新增渲染器 / 模型 / Ponder 场景 |
+| `common/**` | `ctnh-docs/references/CTNH-Core/common/AGENTS.md` | 新增或修改机器、物品、方块、BE、GUI |
+| `data/**` | `ctnh-docs/references/CTNH-Core/data/AGENTS.md` | 新增材料、配方、tag、矿石与世界生成 |
+| `event/**` | `ctnh-docs/references/CTNH-Core/event/AGENTS.md` | 监听 Forge 事件 / 构建任务 / 区块网络 |
+| `integration/**` | `ctnh-docs/references/CTNH-Core/integration/AGENTS.md` | 对接 EMI / Create Diesel / FTB / Legendary 等外置 mod |
+| `mixin/**` | `ctnh-docs/references/CTNH-Core/mixin/AGENTS.md` | 打补丁到上游 mod 或 MC 本体 |
+| `registry/**` | `ctnh-docs/references/CTNH-Core/registry/AGENTS.md` | 新增任何注册对象（物品/方块/BE/机器/配方类型） |
+| `utils/**` | `ctnh-docs/references/CTNH-Core/utils/AGENTS.md` | 复用工具类而非另起实现 |
 
 ## CONVENTIONS
-- Namespace is `io.github.cpearl0.ctnhcore`.
-- `src/generated/resources` is large and produced by `:modules:CTNH-Core:runData`.
-- GT/GMT recipes are runtime dynamic-pack data (`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`); `runData` produces no JSON for them, and their absence from `src/generated/resources` is expected. See root AGENTS.md CONVENTIONS.
-- CI builds this module only; changes in other modules should still be validated through `:modules:CTNH-Core:build` when they affect aggregation.
-- Some generated recipe Java lives under `data/recipe/generated`; distinguish Java recipe generators from JSON generated resources.
-- Ponder `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
-- `ctnhcore.mixins.json` covers broad integrations (AECs, Apotheosis, Ars Nouveau, Avaritia, Create, Create Diesel, EIO/JEI, EMI, FTB Chunks, FTB Essentials, GTCEu, JAVD, LDLib, Legendary Survival, Minecraft reload/spawner, Sophisticated, TConstruct, TMRV, Vintage Improvements); inspect target mod versions before changing injection signatures.
-- Sound events are registered via `CTNHSoundEvents.SOUND_EVENTS` in `CommonProxy.init()`; the corresponding `sounds.json` and audio assets live under `src/main/resources/assets/ctnhcore/`.
-- When referencing items/blocks/fluids, MUST use direct registration objects — static field references (`GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`) or registered `ItemLike`/`Fluid` values — never `ResourceLocation` string parsing with `ForgeRegistries.ITEMS/BLOCKS/FLUIDS.getValue(...)` or similar lookups. String ids are allowed only where no registration object exists (upstream-mod-only ids, recipe ids, tag keys, dimension ids). See root AGENTS.md CONVENTIONS.
-- Trait migration: machines now attach computation/storage/fluid/capability via `attachTrait()` (`NetworkedComputationContainer`, `NotifiableItemStackHandler`, `MultiblockFluidRendererTrait`, `CoilMachineTrait`); deleted `api/machine/feature/ICoilMachine` — use `getTraitOrThrow(CoilMachineTrait.class).getCoilType()`; `LargeBottleMachine` no longer owns `@DescSynced fluidBlockOffsets` field, instead supplies offsets via `MultiblockFluidRendererTrait` lambda.
-- Material rename: `CrudeGoldRefiningMaterials` → `GoldChainMaterials`; `IMPURE_ALUMINIUM_HYDROXIDE_SOLUTION`/`PURE_ALUMINIUM_HYDROXIDE_SOLUTION` → `IMPURE/PURE_SODIUM_ALUMINATE_SOLUTION` (BauxiteProcessingMaterials) with updated formulas (TiO2/NaAl(OH)4/H2O) and lang keys.
-- Registry: `GTMachineModify.modifyGTAssembly()` now sets `GCYMMachines.LARGE_ASSEMBLER` supplier to `MultiblockComputationMachine::new` and appends `CTNHRecipeTypes.PRECISION_ASSEMBLY_RECIPES`.
+- **GTM 动态包**：GT/GMT 配方经 `CTNHCoreGTAddon.addRecipes()` 注册为运行时动态数据包（`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其**不产出 JSON**；静态 `src/generated/resources` 只含 tags/lang/models/worldgen/非 GT 配方。验证方式为游戏内或 `ConfigHolder.dev.dumpRecipes`。
+- **注册对象优先**：引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `CTNHItems.*`, `TagPrefix.ingot`, `AEItems.X`, `CBBlocks.X`, `CEItems.X`, `CMItems.X`, `CABlocks.X`, `CTPPBlocks.X`），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找；字符串 ID 仅限无注册对象的场景（上游 mod 专属 ID、配方 ID、tag key、维度 ID）。
+- **发电机功率读取**：发电机类机器（`common/machine/multiblock/generator/**`）计算并行、输出功率与 GUI 显示时，必须使用 `recipe.getOutputEUt()`（正数发电量）；`RecipeHelper.getRealEUtWithIO()` 返回带符号净 EU（发电配方为负），只适用于耗电机器，不要在发电机中使用（参见 fb74ed5：`ChemicalGeneratorMachine`, `HyperPlasmaTurbineMachine`, `MegaTurbineMachine`, `WaterPowerStationMachine`）。
+- **注册中枢集中**：新注册对象一律落在 `registry/**`，机器实现在 `common/machine/**`、配方数据在 `data/**`，不要跨域散落注册代码。
+- **Mixin 按目标 mod 分组**：新增 Mixin 放到 `mixin/<targetmod>/`，避免堆在 `mixin/mc/`。
+- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（fb74ed5 修复了 `RecipeRemoval` 的此类违规）。
 
 ## ANTI-PATTERNS
-- Do not manually reformat huge multiblock registry sections protected by Spotless toggles.
-- Do not patch `src/generated/resources` as the first choice; change datagen sources instead.
-- Do not assume Core-only validation catches module-specific runtime/datagen issues.
-- When referencing items/blocks/fluids, MUST use direct registration objects — static field references (`GTMaterials.Iron`, `CTNHBlocks.MY_BLOCK`, `TagPrefix.ingot`, `AEItems.X`) or registered `ItemLike`/`Fluid` values — never `ResourceLocation` string parsing with `ForgeRegistries.ITEMS/BLOCKS/FLUIDS.getValue(...)` or similar lookups. String ids are allowed only where no registration object exists (upstream-mod-only ids, recipe ids, tag keys, dimension ids). See root AGENTS.md CONVENTIONS.
-- Do not add broad cross-mod recipes to feature modules unless the feature module owns the whole mechanic; Core is the aggregator for most migrated/script compatibility recipes.
-- Do not treat `WPA_old.java` or `MachineModeFancyConfiguratorTest` as current implementation; both are legacy leftovers.
-- Do not reintroduce `ICoilMachine` or client `LargeBottleRender`; coil is via `CoilMachineTrait`, fluid render is via `MultiblockFluidRendererTrait`.
+- 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
+- 用字符串 ID + `ForgeRegistries` 查找代替已存在的静态注册对象。
+- 在 `common/machine/**` 内直接调用注册 API 注册物品/方块/配方类型（应走 `registry/**`）。
+- 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
+- 在通用工具类里复制 `utils/**` 已有能力（`CTNHRecipeHelper`, `CoilTierHelper` 等）。
 
 ## COMMANDS
-```text
-./gradlew :modules:CTNH-Core:build
-./gradlew :modules:CTNH-Core:runData
-./gradlew :modules:CTNH-Core:spotlessCheck
-./gradlew :modules:CTNH-Core:spotlessApply
+```bash
+./gradlew :modules:CTNH-Core:build              # 编译 + 校验
+./gradlew :modules:CTNH-Core:spotlessApply      # 格式化（提交前必跑）
+./gradlew :modules:CTNH-Core:runData            # 数据生成（不含 GT 动态配方）
+./gradlew :modules:CTNH-Core:runClient          # 游戏内验证机器/配方
 ```
 
 ## SCOPE
-Applies to `modules/CTNH-Core` and the CI release artifacts it aggregates. It is a reference guide loaded through the root routing table, not an additional source-tree instruction file.
+本模块覆盖 CTNH 的核心机器、材料、配方、注册、数据生成、客户端渲染与上游 mod Mixin 补丁。
 
 ## READ WHEN
-- Adding or changing cross-mod recipes, Core-owned gameplay systems, or GTCEu machine registries.
-- Changing Core Ponder scenes/tags or datagen providers that produce `src/generated/resources`.
-- A change affects aggregation behavior validated by `:modules:CTNH-Core:build`.
+- 新增或修改 GT 多方块机器 / 发电机 / 动力机器
+- 新增材料、材料标志或配方链
+- 新增注册对象（物品、方块、BE、配方类型、创造栏）
+- 修改标签、世界生成或矿石分布
+- 打补丁到上游 mod / MC 本体
+- 调整客户端渲染、模型或 Ponder 场景
 
 ## SOURCE OF TRUTH
-- Registration/lifecycle: `CTNHCore.java`, `CTNHCoreGTAddon.java`, `common/CommonProxy.java`.
-- Recipe root: `data/recipe/CTNHCoreRecipeAddition.java` and `data/CTNHCoreDatagen.java`.
-- Forge metadata and mixins: `src/main/resources/META-INF/mods.toml` and `ctnhcore.mixins.json`.
-- Static generated data: providers plus `src/generated/resources`, never the generated files alone.
-- Sound events: `registry/sound/CTNHSoundEvents.java` and `src/main/resources/assets/ctnhcore/sounds.json`.
+- 源码：`modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/`
+- 资源与 mixin 配置：`modules/CTNH-Core/src/main/resources/`
+- 生成物：`modules/CTNH-Core/src/generated/resources/`
+- 本目录层级文档：`ctnh-docs/references/CTNH-Core/**`
 
 ## WORKFLOW
-1. Map the changed symbol to its domain and read that domain guide.
-2. Check GT addon hook order, event registration, and recipe removal filters.
-3. Run the narrowest Gradle task for the affected surface (`runData` for datagen, `build` for aggregation).
-4. Re-read the root routing table if the change introduces a new module boundary.
+1. 先读本文件与对应域的 `AGENTS.md`（见 DOMAIN GUIDE ROUTING）。
+2. 改动落在正确域：注册 → `registry/`，机器 → `common/machine/`，配方 → `data/recipe/`，渲染 → `client/renderer/`。
+3. 修改后跑 `spotlessApply` 与 `:modules:CTNH-Core:build`。
+4. GT 配方相关改动在游戏内或用 `ConfigHolder.dev.dumpRecipes` 验证，不要依赖 `runData`。
+5. 结构变化（新增/删除类、新子包）时同步更新本文件与对应域文档。

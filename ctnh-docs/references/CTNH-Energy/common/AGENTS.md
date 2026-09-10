@@ -1,95 +1,83 @@
 # CTNH-ENERGY COMMON DOMAIN
 
 ## OVERVIEW
-Shared implementation for Energy (60 Java files): CommonProxy, AE2/EU logic, machines, quantum computer, items, and pattern machinery.
+`common/` 是 CTNH-Energy 的实现核心（60 个 Java 文件）：ME 机器与仓室（能源仓 / 输入输出仓 / 仓储仓 / 样板缓冲）、EU 存储与键类型、电路样板与样板署名、量子计算机多块、能量分配服务，以及物品 / 流体 / EU 三套存储 handler。
 
 ## STRUCTURE
-```text
+```
 common/
-|-- CommonProxy.java, CESettings.java
-|-- circuit/                   # CircuitPatternData, CircuitPatternService (ProgrammableCircuitSlotTrait / IItemHandlerModifiable)
-|-- me/                        # AE2/EU core logic
-|   |-- GenericStackEUStorage.java, MEMachineEUHandler.java
-|   |-- cell/                  # EUCellInventory, EuCellHandler
-|   |-- key/                   # EUKey, EUKeyType, VoltageKey, VoltageKeyType
-|   |-- parts/p2p/             # EUP2PTunnelPart
-|   |-- service/               # EnergyDistributeService, IEnergyDistributor
-|   `-- strategy/              # EUContainerItemStrategy
-|       `-- context/           # CarriedContextEU, PlayerInvContextEU
-|-- machine/
-|   |-- ITagFilter.java, MEPartMachine.java (ProgrammableCircuitSlotTrait circuitSlot via attachPersistentTrait("circuit_slot"))
-|   |-- energyhatch/           # MEEnergyInputConfigurator, MEEnergyPartMachine, MESubstationHatch
-|   |-- gui/                   # AEConfigSlotWidget, AmountSetWidget, AutoPullAmountConfigurator, ConfigWidget, MEDualOutputConfigurator, TagFilterConfigurator
-|   |-- handler/               # MEStorageEUHandler, MEStorageFluidHandler, MEStorageItemHandler
-|   |-- iohatch/               # MEInputMachine, MEOutputMachine, MEStokingInputMachine
-|   |-- patternbuffer/         # MEPatternBuffer
-|   `-- utils/                 # GenericStackHandler, StockingConfigHandler
-|-- quantumcomputer/
-|   |-- cpu/                   # ElapsedTimeTracker, ExecutingCraftingJob, QuantumComputerCluster, VirtualCraftingCPU, VirtualCraftingCPULogic
-|   |-- gui/                   # InfoBar, QuantumComputerMenu, QuantumComputerScreen, QuantumCpuSelectionList
-|   |-- machine/               # QuantumComputerMultiblockMachine
-|   `-- port/                  # QuantumComputerMENetworkPortBlock, QuantumComputerMENetworkPortBlockEntity
-|-- block/                     # QuantumComputerCasingBlock
-|-- item/                      # DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
-|-- multi/                     # PowerSubstationMachine
-`-- pattern/                   # 2: DynamicProcessingPattern, PatternAuthorData
+├─ CESettings.java, CommonProxy.java
+├─ block/           QuantumComputerCasingBlock
+├─ circuit/         CircuitPatternData, CircuitPatternService
+├─ item/            DynamoCardItem, EUCellItem, EUCellStats, IEUCell, MaintainingCardItem
+├─ machine/         ITagFilter, MEPartMachine
+│  ├─ energyhatch/  MEEnergyInputConfigurator, MEEnergyPartMachine, MESubstationHatch
+│  ├─ gui/          AEConfigSlotWidget, AmountSetWidget, AutoPullAmountConfigurator,
+│  │                ConfigWidget, MEDualOutputConfigurator, TagFilterConfigurator
+│  ├─ handler/      MEStorageEUHandler, MEStorageFluidHandler, MEStorageItemHandler
+│  ├─ iohatch/      MEInputMachine, MEOutputMachine, MEStokingInputMachine
+│  ├─ patternbuffer/ MEPatternBuffer
+│  └─ utils/        GenericStackHandler, StockingConfigHandler
+├─ me/              GenericStackEUStorage, MEMachineEUHandler
+│  ├─ cell/         EUCellInventory, EuCellHandler
+│  ├─ key/          EUKey, EUKeyType, VoltageKey, VoltageKeyType
+│  ├─ parts/p2p/    EUP2PTunnelPart
+│  ├─ service/      EnergyDistributeService, IEnergyDistributor
+│  └─ strategy/     EUContainerItemStrategy, context/ (CarriedContextEU, PlayerInvContextEU)
+├─ multi/           PowerSubstationMachine
+├─ pattern/         DynamicProcessingPattern, PatternAuthorData
+├─ quantumcomputer/ cpu/     ElapsedTimeTracker, ExecutingCraftingJob, QuantumComputerCluster,
+│  │                        VirtualCraftingCPU, VirtualCraftingCPULogic
+│  │               gui/     InfoBar, QuantumComputerMenu, QuantumComputerScreen,
+│  │                        QuantumCpuSelectionList
+│  │               machine/ QuantumComputerMultiblockMachine
+│  │               port/    QuantumComputerMENetworkPortBlock, ...BlockEntity
+└─ stats/           CEStats
 ```
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Common proxy | `common/CommonProxy.java` |
-| Settings | `common/CESettings.java` |
-| Circuit pattern | `common/circuit/CircuitPatternService.java` (`apply`/`setCircuit` on `IItemHandlerModifiable`), `common/circuit/CircuitPatternData.java`, `api/ICircuitPattern.java` |
-| AE2/EU keys/cells/P2P | `common/me/key/`, `common/me/cell/`, `common/me/parts/p2p/` |
-| Energy distribution | `common/me/service/` (EnergyDistributeService, IEnergyDistributor) |
-| Container strategy | `common/me/strategy/` (+ `context/`) |
-| Machine EU handler | `common/me/MEMachineEUHandler.java` |
-| Pattern buffer | `common/machine/patternbuffer/MEPatternBuffer.java` |
-| ME part machine circuit | `common/machine/MEPartMachine.java` (`ProgrammableCircuitSlotTrait circuitSlot`) |
-| ME part machine Jade | `common/machine/MEPartMachine.java#writeMachineJadeData` (`exposeAllSides` -> Jade NBT, tooltip `ctnhenergy.mepartmachine.allowconnectionfromallsides.*`) |
-| Energy hatches | `common/machine/energyhatch/` (MEEnergyPartMachine, MESubstationHatch) |
-| I/O hatches | `common/machine/iohatch/` (MEInputMachine, MEOutputMachine, MEStokingInputMachine) |
-| Storage handlers | `common/machine/handler/` (EU/fluid/item) |
-| Machine GUI widgets | `common/machine/gui/` (6 widgets) |
-| Quantum computer | `common/quantumcomputer/` (cpu/, gui/, machine/, port/) |
-| Items | `common/item/` (EUCellItem, EUCellStats, DynamoCardItem, MaintainingCardItem) |
+| 样板署名与编码时间写入 | common/pattern/PatternAuthorData（`addAuthorLore` / `addEncodedTimeLine`） |
+| 动态处理样板 | common/pattern/DynamicProcessingPattern, PatternAuthorData |
+| 电路样板数据与服务 | common/circuit/CircuitPatternData, CircuitPatternService |
+| ME 能源仓配置 | common/machine/energyhatch/MEEnergyInputConfigurator, MESubstationHatch |
+| 机器网络端口 | common/machine/MEPartMachine, iohatch/MEInputMachine, MEOutputMachine |
+| 样板缓冲 | common/machine/patternbuffer/MEPatternBuffer |
+| 仓室 GUI 控件 | common/machine/gui/*Configurator, ConfigWidget, AmountSetWidget |
+| 配置缓存（拉取量等） | common/machine/utils/StockingConfigHandler, GenericStackHandler |
+| EU 存储/键 | common/me/GenericStackEUStorage, me/key/EUKey, VoltageKey |
+| 单元物品 | common/item/EUCellItem, IEUCell, EUCellStats; me/cell/EUCellInventory |
+| 能量分配 | common/me/service/EnergyDistributeService, IEnergyDistributor |
+| 容器/玩家 EU 上下文 | common/me/strategy/EUContainerItemStrategy, strategy/context/ |
+| 量子计算机 | common/quantumcomputer/{machine,cpu,gui,port} |
+| 统计 | common/stats/CEStats |
 
 ## CONVENTIONS
-- `CommonProxy.init()` initializes config, registrate, AE menus, networking, datagen, gatherData listener, creative tabs, and AE key type registration.
-- Common setup registers `EnergyDistributeService`, EU container strategy, EU cell handler/upgrades, pattern-provider upgrade cards, and EU P2P attunement.
-- `CommonProxy.attachCapabilities()` adds `generic_eu_wrapper` through `common/me/MEMachineEUHandler.java`.
-- `MEPartMachine` circuit slot is `ProgrammableCircuitSlotTrait circuitSlot` attached via `attachPersistentTrait("circuit_slot", new ProgrammableCircuitSlotTrait(this)).shouldSearchContent(false)`; null when `circuitSlotEnabled==false`. Ghost-circuit persistence via `MEConfigUtil.writeGhostCircuit/readGhostCircuit(tag, circuitSlot.getStorage())`. `CircuitPatternService.setCircuit(IItemHandlerModifiable, int)` and `apply()` resolve trait via `machine.getTrait(ProgrammableCircuitSlotTrait.class)`.
-- `MEPartMachine` `nodeHost` is trait-hosted via `attachTrait(createNodeHost())`; `onRotated()` updates `exposeAllSides` exposed sides.
-- `MEPartMachine.writeMachineJadeData()` writes `exposeAllSides` boolean; Jade provider renders `Allow connection from all sides: Yes/No` via `@CN`/`@EN` + `Lang` keys `ctnhenergy.mepartmachine.allowconnectionfromallsides.*`. Do not duplicate `@DescSynced` fields into Jade NBT.
-- Do not register EU key/cell behavior only in item code; AE2 key types, storage cell handler, container strategy, upgrades, and P2P attunement are separate CommonProxy hooks.
-- `MaintainingCardItem` implements `api/IMaintainingContext` and provides right-click configuration for stocking amount.
-
-## TRAIT OWNERSHIP
-Energy 侧 trait 落点：`MEStorageEUHandler` / `MEStorageFluidHandler` / `MEStorageItemHandler`（`NotifiableRecipeHandlerTrait<T>`，前者同时实现 `IEnergyContainer`）、`PowerStationEnergyBank extends MachineTrait`。`MEMachineEUHandler` 只实现 `IEnergyContainer`，不是 trait —— 它由 trait 或机器持有，不要当作 trait 挂载。
-
-约束以 `references/_architecture/AGENTS.md` 为准，本域重点：
-
-- EU/AE2 状态一份一个所有者：AE key 类型、存储单元 handler、容器策略、升级与 P2P attunement 是各自独立的 CommonProxy 挂载点，不要在物品代码里重复登记（见本文件 ANTI-PATTERNS）。
-- 能量容器由 tiered machine 的工厂创建；子类特殊容器需要额外参数时用构造时传入的工厂闭包，让父类调用 `createEnergyContainer` 时保留子类参数，禁止延迟绑定绕开构造参数。
-- 量子计算机与 pattern buffer 的 UI 进度属客户端同步状态：`@DescSynced` 已覆盖的字段禁止再写进 Jade NBT。
+- `PatternAuthorData.addAuthorLore(stack, playerName)` 是“改写”而非“追加”：重复调用会把署名与编码时间改成当前调用者，并先移除旧署名行，因此同一玩家重复编码也不会在 Lore 中堆叠多条署名。修改已有样板必须走这条路径。
+- 署名行以组件 JSON 字符串存入 `display.Lore`；判断/去重前需先反序列化为纯文本再比较（见 `plainText`），不要直接比较 JSON 字符串。
+- ME 网络交互统一经 `me/` 下的 handler 与存储类完成，机器类不直接操作 AE2 内部容器。
+- 机器数值配置统一用 `machine/utils/StockingConfigHandler` 与 `machine/gui/*Configurator` 组合，不各自实现配置读写。
 
 ## ANTI-PATTERNS
-- Do not treat quantum computer/menu updates as server-only; UI progress sync is part of the module.
-- Do not reintroduce `NotifiableItemStackHandler circuitInventory` or `IHasCircuitSlot` on `MEPartMachine`; use `ProgrammableCircuitSlotTrait`.
-- Do not write `exposeAllSides` or other trait-persisted fields as unrelated NBT outside `writeMachineJadeData`.
+- 在 Lore 中直接追加署名行而不清理旧行，导致出现多条“由 X 编码”。
+- 在 `common/` 内用物品/方块 ID 字符串反查注册对象，而非 `CEItems.*` / `CEBlocks.*` 等静态对象。
+- 绕过 `PatternAuthorData` 自行写 `AUTHOR` / `ENCODE_TIME` / `LORE` 标签。
+- 在机器类中硬编码 AE2 网络实现细节，而非使用 `common/me/` 的 handler 或 `api/` 契约。
 
 ## SCOPE
-Applies to `src/main/java/tech/luckyblock/mcmod/ctnhenergy/common` and its child packages.
+`modules/CTNH-Energy/src/main/java/tech/luckyblock/mcmod/ctnhenergy/common/` 下全部子包。
 
 ## READ WHEN
-- Implementing AE2/EU behavior, pattern buffer, quantum computer logic, or machine circuit-slot sync.
+- 修改机器 / 仓室 / 总线的行为或 GUI
+- 修改 EU 存储、键类型、单元物品或能量分配
+- 修改样板署名、电路样板、样板提供者逻辑
+- 修改量子计算机 CPU / GUI / 端口
 
 ## SOURCE OF TRUTH
-- `common/CommonProxy.java` and `common/me/` contracts.
-- `common/machine/MEPartMachine.java`, `common/circuit/CircuitPatternService.java` for trait-based circuit handling.
+`modules/CTNH-Energy/src/main/java/tech/luckyblock/mcmod/ctnhenergy/common/`。注册对象定义以 `registry/` 为准，跨域接口以 `api/` 为准。
 
 ## WORKFLOW
-1. Check `CommonProxy.init()` / common setup hook order before adding behavior.
-2. Verify AE key types, container strategy, and P2P attunement wiring.
-3. Run `:modules:CTNH-Energy:build`.
+1. 定位子包 → 改实现；新注册对象回到 `registry/`；跨域契约回到 `api/`。
+2. 样板相关改 `common/pattern/PatternAuthorData`（署名）或 `common/circuit/`（电路样板），不要复制逻辑到 mixin 或客户端。
+3. `:modules:CTNH-Energy:build` 编译；涉及 ME 行为在游戏内验证。
