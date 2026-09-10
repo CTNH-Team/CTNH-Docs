@@ -115,18 +115,49 @@ jobs:
         env:
           # 密钥与 DSH_HOME 只在需要的步骤出现，绝不放到工作流级
           DSH_HOME: ${{ runner.temp }}/dsh-home
+          # 端点直接用 step 级 env，不经 $GITHUB_ENV 中转：
+          # $GITHUB_ENV 只对「后续步骤」生效，中转会让本步的探针校验到与 agent 不同的端点。
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY || secrets.LLM_API_KEY }}
-          DEEPSEEK_BASE_URL_RAW: ${{ secrets.DEEPSEEK_BASE_URL || secrets.BASE_URL }}
+          DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL || secrets.BASE_URL }}
         run: |
           if [ -z "$DEEPSEEK_API_KEY" ]; then
             echo "::error::缺少 DEEPSEEK_API_KEY（或 LLM_API_KEY），dsh headless 无法运行"
             exit 1
           fi
           echo "DEEPSEEK_API_KEY present."
-          if [ -n "$DEEPSEEK_BASE_URL_RAW" ]; then
-            echo "DEEPSEEK_BASE_URL=$DEEPSEEK_BASE_URL_RAW" >> "$GITHUB_ENV"
-            echo "using custom DEEPSEEK_BASE_URL."
+          # 0) 连通性：先确认 runner 能到达端点。否则 dsh 只会抛出
+          #    "TRANSPORT: DeepSeek API request to <url> failed"，看不到真正原因。
+          base="${DEEPSEEK_BASE_URL:-https://api.deepseek.com}"
+          echo "endpoint host: $(printf '%s' "$base" | sed -E 's#^https?://##; s#/.*$##')"
+          set +e
+          http=$(curl -sS -o "$RUNNER_TEMP/relay-body.txt" -w '%{http_code}' --max-time 30 \
+            -H "Authorization: Bearer $DEEPSEEK_API_KEY" -H 'Content-Type: application/json' \
+            -X POST "$base/chat/completions" \
+            -d "{\"model\":\"$DSH_MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}],\"max_tokens\":1}" \
+            2> "$RUNNER_TEMP/relay-curl-err.txt")
+          curl_code=$?
+          set -e
+          if [ "$curl_code" -ne 0 ]; then
+            echo "::error::runner 无法连接到端点（curl exit $curl_code），属网络层失败"
+            cat "$RUNNER_TEMP/relay-curl-err.txt" || true
+            exit 1
           fi
+          echo "endpoint HTTP $http"
+          case "$http" in
+            2*)
+              echo "endpoint reachable." ;;
+            401|403)
+              echo "::error::端点拒绝凭据（HTTP $http）——检查 key 是否匹配该中转"
+              head -c 500 "$RUNNER_TEMP/relay-body.txt" || true
+              exit 1 ;;
+            404)
+              echo "::error::端点路径不存在（HTTP 404）——检查 DEEPSEEK_BASE_URL 是否正确（例如是否缺少 /v1）"
+              head -c 300 "$RUNNER_TEMP/relay-body.txt" || true
+              exit 1 ;;
+            *)
+              echo "::warning::端点返回 HTTP $http，仍继续尝试（可能是限流或临时故障）"
+              head -c 300 "$RUNNER_TEMP/relay-body.txt" || true ;;
+          esac
           # 1) 组合校验：profile 首次使用会自动初始化；overlay 非法会在这里直接失败
           npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
             --patch prompts/headless.ci.patch.yml --dump-config > /dev/null
@@ -153,6 +184,7 @@ jobs:
         env:
           DSH_HOME: ${{ runner.temp }}/dsh-home
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY || secrets.LLM_API_KEY }}
+          DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL || secrets.BASE_URL }}
         run: |
           TASK="$(cat prompts/headless_task.md)"
           set +e
