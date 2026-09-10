@@ -143,7 +143,24 @@ jobs:
           # 0) 连通性：先确认 runner 能到达端点。否则 dsh 只会抛出
           #    "TRANSPORT: DeepSeek API request to <url> failed"，看不到真正原因。
           base="${DEEPSEEK_BASE_URL:-https://api.deepseek.com}"
-          echo "endpoint host: $(printf '%s' "$base" | sed -E 's#^https?://##; s#/.*$##')"
+          # 端点可能来自 secret。GitHub 的日志遮蔽只做「精确匹配整串」，任何从它派生出的
+          # 子串（如主机名）都不会被自动遮蔽；而 ::add-mask:: 那一行本身会把值写进日志
+          # （actions/runner#475，长期未修复）。因此既不复述端点、也不依赖平台遮蔽，
+          # 改为在打印任何可能含端点的文本前先本地脱敏。
+          host=""
+          if [ -n "${DEEPSEEK_BASE_URL:-}" ]; then
+            host="${DEEPSEEK_BASE_URL#*://}"
+            host="${host%%/*}"
+            echo "using custom DEEPSEEK_BASE_URL (value redacted)."
+          else
+            echo "using default endpoint."
+          fi
+          redact() {
+            local text; text="$(cat)"
+            if [ -n "${DEEPSEEK_BASE_URL:-}" ]; then text="${text//"$DEEPSEEK_BASE_URL"/***}"; fi
+            if [ -n "$host" ]; then text="${text//"$host"/***}"; fi
+            printf '%s\n' "$text"
+          }
           set +e
           http=$(curl -sS -o "$RUNNER_TEMP/relay-body.txt" -w '%{http_code}' --max-time 30 \
             -H "Authorization: Bearer $DEEPSEEK_API_KEY" -H 'Content-Type: application/json' \
@@ -154,7 +171,7 @@ jobs:
           set -e
           if [ "$curl_code" -ne 0 ]; then
             echo "::error::runner 无法连接到端点（curl exit $curl_code），属网络层失败"
-            cat "$RUNNER_TEMP/relay-curl-err.txt" || true
+            redact < "$RUNNER_TEMP/relay-curl-err.txt" || true
             exit 1
           fi
           echo "endpoint HTTP $http"
@@ -163,15 +180,15 @@ jobs:
               echo "endpoint reachable." ;;
             401|403)
               echo "::error::端点拒绝凭据（HTTP $http）——检查 key 是否匹配该中转"
-              head -c 500 "$RUNNER_TEMP/relay-body.txt" || true
+              head -c 500 "$RUNNER_TEMP/relay-body.txt" | redact || true
               exit 1 ;;
             404)
               echo "::error::端点路径不存在（HTTP 404）——检查 DEEPSEEK_BASE_URL 是否正确（例如是否缺少 /v1）"
-              head -c 300 "$RUNNER_TEMP/relay-body.txt" || true
+              head -c 300 "$RUNNER_TEMP/relay-body.txt" | redact || true
               exit 1 ;;
             *)
               echo "::warning::端点返回 HTTP $http，仍继续尝试（可能是限流或临时故障）"
-              head -c 300 "$RUNNER_TEMP/relay-body.txt" || true ;;
+              head -c 300 "$RUNNER_TEMP/relay-body.txt" | redact || true ;;
           esac
           # 1) 组合校验：profile 首次使用会自动初始化；overlay 非法会在这里直接失败
           npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
@@ -188,11 +205,12 @@ jobs:
           set -e
           if printf '%s' "$probe" | grep -qE "plugin tree failed to load|failed to apply loader entry"; then
             echo "::error::dsh 插件树装配失败，组合非法（详见下方输出）"
-            printf '%s\n' "$probe"
+            printf '%s\n' "$probe" | redact
             exit 1
           fi
-          printf '%s\n' "$probe" | head -n 5
-          echo "plugin tree loaded."
+          # 探针用假 key，鉴权失败是预期结果，因此成功路径不打印探针输出，
+          # 免得 "AUTH: ..." 被误读成故障；只有装配失败时才打印以便定位。
+          echo "plugin tree loaded (probe key auth failure is expected)."
 
       - name: Run docs sync agent
         if: steps.plan.outputs.has_modules == 'true'
@@ -201,6 +219,18 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY || secrets.LLM_API_KEY }}
           DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL || secrets.BASE_URL }}
         run: |
+          # 日志可能带上端点 URL，先备好本地脱敏（GitHub 只遮蔽完整 secret 串，不含派生子串）
+          host=""
+          if [ -n "${DEEPSEEK_BASE_URL:-}" ]; then
+            host="${DEEPSEEK_BASE_URL#*://}"
+            host="${host%%/*}"
+          fi
+          redact() {
+            local text; text="$(cat)"
+            if [ -n "${DEEPSEEK_BASE_URL:-}" ]; then text="${text//"$DEEPSEEK_BASE_URL"/***}"; fi
+            if [ -n "$host" ]; then text="${text//"$host"/***}"; fi
+            printf '%s\n' "$text"
+          }
           TASK="$(cat prompts/headless_task.md)"
           set +e
           timeout 2700 npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
@@ -209,9 +239,9 @@ jobs:
           code=$?
           set -e
           echo "--- agent stdout (tail) ---"
-          tail -n 60 "$RUNNER_TEMP/dsh-stdout.log" || true
+          tail -n 60 "$RUNNER_TEMP/dsh-stdout.log" | redact || true
           echo "--- agent stderr (tail) ---"
-          tail -n 40 "$RUNNER_TEMP/dsh-stderr.log" || true
+          tail -n 40 "$RUNNER_TEMP/dsh-stderr.log" | redact || true
           echo "agent exit code: $code"
           exit $code
 
