@@ -2,3 +2,7 @@ __pycache__/
 skill/
 *.zip
 scripts/.refcheck/
+
+# CI 临时产物：同步计划与 agent 输出日志（由 prepare_sync.py / 工作流生成，不进入 PR）
+workspace/sync-plan.json
+dsh-*.log

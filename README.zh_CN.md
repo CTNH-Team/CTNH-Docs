@@ -65,15 +65,14 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 ## 自动同步（Auto Sync Docs）
 
-`references/` 指南由 CI 自动更新：把 **init-deep 更新模式**（`prompts/init_deep_update.md`）列入 LLM 提示词，
-让模型对比源码与现有文档并更新 AGENTS.md；改动经 PR（`auto-doc-update`）合入。
+`references/` 指南由 CI 自动更新：CI 运行 **`dsh --profile headless`**（DeepSeek Harness 一次性任务模式），由主代理编排、**每个变更模块派一个后台子代理**并行处理；子代理按 **init-deep 更新模式**（`prompts/init_deep_update.md`）用简体中文改写 AGENTS.md。改完后由确定性闸门 `scripts/verify_docs.py` 判定本轮能否开 PR（`auto-doc-update`）。
 
 | 触发 | 说明 |
 |------|------|
 | `schedule`（每 30 分钟） | 轮询 CTNH-Modules 主仓库与 8 个子模块的新提交（`check_pending.py` 无变化秒退） |
-| `workflow_dispatch` | 手动触发；Sync 可带 `force_latest`，Release 可带 `force` |
+| `workflow_dispatch` | 手动触发；Sync 可带 `force_latest` 与 `dry_run`，Release 可带 `force` |
 
-`scripts/doc_gen.py` 的写入校验限定 `references/<Module>/**AGENTS.md`；`references/_architecture/` 属手工维护，不在自动同步写入范围内。
+流水线：`check_pending.py`（轮询秒退）→ `prepare_sync.py`（写 `workspace/sync-plan.json`）→ dsh agent 运行 → `verify_docs.py`（小节 / 中文 / 路由链接 / 写入范围守卫）→ `advance_state.py`（推进 `scripts/state.json`）→ 仅提交 `ctnh-docs/references/**` 与 `scripts/state.json` 的 PR。写入范围限定 `references/<Module>/**`；`references/_architecture/` 属人工维护，闸门会拒绝任何改动。模型与版本由仓库变量 `DSH_MODEL` / `DSH_VERSION` 控制，凭据为 `DEEPSEEK_API_KEY`。
 
 ## 自动发布（Auto Release Docs）
 

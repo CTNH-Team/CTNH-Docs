@@ -7,7 +7,7 @@
 
 规范条款（边界、字段规则、Jade 最小化、迁移步骤）**立即生效**，适用于所有新代码与所有被触及的旧代码。§9 记录每条机制当前落在哪个类、由哪个提交引入。
 
-本文件不由 `CTNH-Docs` 的自动同步流程生成：`scripts/doc_gen.py` 只写 `ctnh-docs/references/<Module>/**/AGENTS.md`，`_architecture/` 在其写入白名单之外，属手工维护的长期契约。
+本文件不由 `CTNH-Docs` 的自动同步流程生成：CI 的 `scripts/verify_docs.py` 把写入范围限定在 `ctnh-docs/references/<Module>/**/AGENTS.md`，本文件（`_architecture/`）在其白名单之外，出现改动即整轮失败，属手工维护的长期契约。
 
 ## 1. 总体边界
 

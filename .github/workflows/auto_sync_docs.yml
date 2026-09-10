@@ -11,6 +11,11 @@ on:
         required: false
         default: false
         type: boolean
+      dry_run:
+        description: 'Dry run: run agent + gate, but do not advance state or open a PR'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -20,9 +25,22 @@ concurrency:
   group: auto-sync-docs
   cancel-in-progress: false
 
+env:
+  # dsh headless：一次性任务模式，进程自行退出，不打开任何监听端口
+  DSH_HOME: ${{ runner.temp }}/dsh-home
+  # 任何非空值都会关闭 OTel 上报（基座行按该变量禁用遥测）
+  DSH_TELEMETRY_DISABLED: '1'
+  # both = 原生工具 schema + run_code(PTC) 同时可见；ptc = 只暴露 run_code
+  DSH_TOOLS_MODE: ${{ vars.DSH_TOOLS_MODE || 'both' }}
+  DSH_MODEL: ${{ vars.DSH_MODEL || 'deepseek-flash' }}
+  DSH_VERSION: ${{ vars.DSH_VERSION || '0.1.5-rc.2' }}
+  MODULES_ROOT: workspace/modules-src/modules
+
 jobs:
   auto-sync:
     runs-on: ubuntu-latest
+    # agent 一轮要读基线 + 扫源码 + 写文档；超时直接失败，绝不推进水位
+    timeout-minutes: 60
     steps:
       - name: Checkout CTNH-Docs
         uses: actions/checkout@v4
@@ -71,60 +89,105 @@ jobs:
             rm -rf "modules/$m"  # 清掉 checkout 留下的空 gitlink 目录
             git clone --depth=50 --branch dev "https://github.com/CTNH-Team/$m.git" "modules/$m"
           done
-          # GregTech-Modern 是 vendored 依赖，不参与 LLM 扫描，但保持源码树完整。
+          # GregTech-Modern 是 vendored 依赖，不参与文档扫描，但保持源码树完整。
           # 注意：其远程默认分支是 ctnh（.gitmodules 中声明的 dev 已过时）。
           echo "== cloning GregTech-Modern (ctnh) =="
           rm -rf modules/GregTech-Modern
           git clone --depth=50 --branch ctnh "https://github.com/CTNH-Team/GregTech-Modern.git" modules/GregTech-Modern
 
-      - name: Debug Environment Variables
+      - name: Build sync plan
         if: steps.pending.outputs.has_updates == 'true'
-        run: |
-          echo "Checking environment variables (presence only):"
-          [ -n "$GITHUB_TOKEN" ] && echo "GITHUB_TOKEN is set" || echo "GITHUB_TOKEN is NOT set"
-          [ -n "$LLM_API_KEY" ] && echo "LLM_API_KEY is set" || echo "LLM_API_KEY is NOT set"
-          [ -n "$BASE_URL" ] && echo "BASE_URL is set" || echo "BASE_URL is NOT set"
-          [ -n "$MODEL_NAME" ] && echo "MODEL_NAME is set" || echo "MODEL_NAME is NOT set"
-
-      - name: Run sync script
-        if: steps.pending.outputs.has_updates == 'true'
-        id: sync_script
+        id: plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # LLM 凭据：任选一种风格。OpenAI 兼容: LLM_API_KEY + OPENAI_API_BASE + MODEL_NAME;
-          # Gemini 原生: LLM_API_KEY + (可选 BASE_URL=https://generativelanguage.googleapis.com)
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          BASE_URL: ${{ secrets.BASE_URL }}
-          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
-          MODEL_NAME: ${{ secrets.MODEL_NAME }}
-          GEMINI_API_VERSION: ${{ vars.GEMINI_API_VERSION || 'v1beta' }}
-          LLM_API_STYLE: ${{ vars.LLM_API_STYLE || 'auto' }}
-          SYNC_LOOKBACK_HOURS: ${{ vars.SYNC_LOOKBACK_HOURS || '24' }}
-          MODULES_ROOT: workspace/modules-src/modules
-        run: |
-          if [ "${{ inputs.force_latest }}" = "true" ]; then
-            python scripts/main.py --force-latest
-          else
-            python scripts/main.py
-          fi
+          FORCE_LATEST: ${{ inputs.force_latest }}
+        run: python scripts/prepare_sync.py
 
-      - name: Set branch name
-        if: steps.sync_script.outputs.has_updates == 'true'
-        id: vars
-        # 固定分支名：peter-evans/create-pull-request 会更新已有同名 PR，
-        # 配合 SKIP_IF_OPEN_PR 保证同一批提交只产生一个 PR，不堆积重复 PR。
-        run: echo "branch=auto-doc-update" >> $GITHUB_OUTPUT
+      - name: Set up Node
+        if: steps.plan.outputs.has_modules == 'true'
+        uses: actions/setup-node@v4
+        with:
+          # PTC 运行时使用 node:module 的类型剥离能力，官方 CI 亦使用 Node 24
+          node-version: '24'
+
+      - name: Preflight dsh
+        if: steps.plan.outputs.has_modules == 'true'
+        env:
+          # 密钥只在需要的步骤出现，绝不放到 job 级
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY || secrets.LLM_API_KEY }}
+          DEEPSEEK_BASE_URL_RAW: ${{ secrets.DEEPSEEK_BASE_URL || secrets.BASE_URL }}
+        run: |
+          if [ -z "$DEEPSEEK_API_KEY" ]; then
+            echo "::error::缺少 DEEPSEEK_API_KEY（或 LLM_API_KEY），dsh headless 无法运行"
+            exit 1
+          fi
+          echo "DEEPSEEK_API_KEY present."
+          if [ -n "$DEEPSEEK_BASE_URL_RAW" ]; then
+            echo "DEEPSEEK_BASE_URL=$DEEPSEEK_BASE_URL_RAW" >> "$GITHUB_ENV"
+            echo "using custom DEEPSEEK_BASE_URL."
+          fi
+          # 组合校验：profile 首次使用会自动初始化；overlay 非法会在这里直接失败
+          npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
+            --patch prompts/headless.ci.patch.yml --dump-config > /dev/null
+          echo "profile composition OK (dsh $DSH_VERSION, tools=$DSH_TOOLS_MODE)."
+
+      - name: Run docs sync agent
+        if: steps.plan.outputs.has_modules == 'true'
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY || secrets.LLM_API_KEY }}
+        run: |
+          TASK="$(cat prompts/headless_task.md)"
+          set +e
+          timeout 2700 npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
+            --patch prompts/headless.ci.patch.yml "$TASK" \
+            > "$RUNNER_TEMP/dsh-stdout.log" 2> "$RUNNER_TEMP/dsh-stderr.log"
+          code=$?
+          set -e
+          echo "--- agent stdout (tail) ---"
+          tail -n 60 "$RUNNER_TEMP/dsh-stdout.log" || true
+          echo "--- agent stderr (tail) ---"
+          tail -n 40 "$RUNNER_TEMP/dsh-stderr.log" || true
+          echo "agent exit code: $code"
+          exit $code
+
+      - name: Verify docs
+        if: steps.plan.outputs.has_modules == 'true'
+        run: python scripts/verify_docs.py
+
+      - name: Advance sync state
+        id: round
+        # 只检测到主仓库变更时也要推进水位，否则同一批提交会被反复轮询到
+        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
+        run: python scripts/advance_state.py
+
+      - name: Upload agent artifacts
+        if: always() && steps.pending.outputs.has_updates == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-sync-${{ github.run_id }}
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/dsh-stdout.log
+            ${{ runner.temp }}/dsh-stderr.log
+            ${{ runner.temp }}/dsh-home/sessions/**
+            workspace/sync-plan.json
 
       - name: Create Pull Request
-        if: steps.sync_script.outputs.has_updates == 'true'
+        # 无改动时 create-pull-request 自身会跳过，不会产生空 PR
+        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.vars.outputs.branch }}
-          title: ${{ steps.sync_script.outputs.pr_title }}
-          body: ${{ steps.sync_script.outputs.pr_body }}
+          # 固定分支名：peter-evans/create-pull-request 会更新已有同名 PR，
+          # 配合 SKIP_IF_OPEN_PR 保证同一批提交只产生一个 PR，不堆积重复 PR。
+          branch: auto-doc-update
+          title: ${{ steps.round.outputs.pr_title }}
+          body: ${{ steps.round.outputs.pr_body }}
           labels: auto-generated
           commit-message: "docs: automated sync from CTNH-Modules"
           base: ${{ github.ref_name }} # 确保指向当前运行的分支
+          # 只提交文档与水位；agent 的临时产物、workspace/ 检出漂移都不进 PR
+          add-paths: |
+            ctnh-docs/references/**
+            scripts/state.json

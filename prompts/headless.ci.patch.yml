@@ -1,0 +1,19 @@
+# CTNH-Docs CI overlay：叠加在 headless profile 之上（--patch 层最后应用）。
+# 只解决两件事：CI 无人值守的审批姿态，以及模型选择。
+
+- id: approval
+  config:
+    # headless 没有审批应答者，默认 ask 会让所有写入以"不可用"关闭。
+    # 设为 never 后普通工作区写入照常执行；沙箱仍保持 workspace-write。
+    policy: never
+
+- id: agent-default-model
+  config:
+    provider: deepseek-official
+    model: !!js process.env.DSH_MODEL || 'deepseek-flash'
+
+- id: tools
+  config:
+    # both = 原生 schema + run_code（PTC）同时可见；ptc = 只暴露 run_code。
+    mode: !!js process.env.DSH_TOOLS_MODE || 'both'
+    maxParallelSubCalls: 10

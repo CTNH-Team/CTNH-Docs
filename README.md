@@ -65,14 +65,14 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 ## Auto Sync (Auto Sync Docs)
 
-`references/` guides are updated by CI. The **init-deep update mode** (`prompts/init_deep_update.md`) is fed to an LLM so it compares source changes against existing docs and updates the AGENTS.md guides; changes land via PR (`auto-doc-update`).
+`references/` guides are updated by CI running **`dsh --profile headless`** (DeepSeek Harness one-shot mode). The run composes a main agent that delegates one background subagent per changed module; each subagent follows the **init-deep update mode** (`prompts/init_deep_update.md`) and rewrites the AGENTS.md guides in Simplified Chinese. A deterministic gate (`scripts/verify_docs.py`) then decides whether the round may open a PR (`auto-doc-update`).
 
 | Trigger | Description |
 |------|------|
 | `schedule` (every 30 min) | Polls CTNH-Modules + 8 submodules for new commits (`check_pending.py` exits fast when nothing changed) |
-| `workflow_dispatch` | Manual; Sync accepts `force_latest`, Release accepts `force` |
+| `workflow_dispatch` | Manual; Sync accepts `force_latest` and `dry_run`, Release accepts `force` |
 
-`scripts/doc_gen.py` write-validation is limited to `references/<Module>/**AGENTS.md`; `references/_architecture/` is hand-maintained and outside auto-sync writes.
+Pipeline: `check_pending.py` (fast-exit poll) → `prepare_sync.py` (writes `workspace/sync-plan.json`) → the dsh agent run → `verify_docs.py` (sections, Chinese text, routing links, write-scope guard) → `advance_state.py` (advances `scripts/state.json`) → PR limited to `ctnh-docs/references/**` + `scripts/state.json`. Writes are restricted to `references/<Module>/**`; `references/_architecture/` is hand-maintained and the gate rejects any change to it. Model/version come from repo variables `DSH_MODEL` / `DSH_VERSION`; the key is `DEEPSEEK_API_KEY`.
 
 ## Auto Release (Auto Release Docs)
 
