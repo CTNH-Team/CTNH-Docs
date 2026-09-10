@@ -44,7 +44,7 @@ registry/
 - **中文名在注册处声明**（5186b6ec 起，本域最重要的写法）：
   - 纯方块在 `CTNHBlocks` 注册时传入 `cnName`：`createCoilBlock(ICoilType, cnName)`、`createFireboxCasing(BoilerFireboxType, cnName)`、`createTurbineRotorBlock(name, R, G, B, A, cnName)`、`createRotateCasing(name, map, cnName)`（旧二参重载保留、传 `null` 不声明），内部统一 `.cnlang(cnName)`。
   - 普通多方块在 registrate 链上直接 `.cnLangValue("中文名")`（如 `GTNNMultiblocks.CHEMICAL_PLANT` = `"埃克森美孚化工厂"`、`MultiblocksA` 的 `"地暖"`/`"屠宰场"`/`"焦化塔"`、`Mechanical` 的五个机械厂）。
-  - 工厂方法同样要求 `cnName` 形参：`WindPowerArrayRegister.register(name, tier, casing, material, texture, cnName)`、`MultiblocksA.registerPhotovoltaicPowerStation(tier, basicRate, block, cnName)`、`utils/CTNHMachineUtils.registerLargeCombustionEngine(..., cnName)`。
+  - 工厂方法同样要求 `cnName` 形参：`WindPowerArrayRegister.register(name, tier, casing, frame, renderCasing, cnName)`、`MultiblocksA.registerPhotovoltaicPowerStation(tier, basicRate, photovoltaicBlock, cnName)`、`utils/CTNHMachineUtils.registerLargeCombustionEngine(..., cnName)`。
   - 分级机器走 `utils/CTNHMachineUtils.registerTieredMachines(name, cnname, factory, builder, tiers...)`，内部 `.cnLangValue(VNF[tier] + cnname)`。
   - `CTNHMachines` 中 50 个分级机器/仓室仍用 `@Key("block.ctnhcore.*")` + `@CN` + `Lang` 字段（逐级中文名无公式，留待单独处理）；不要以它们为模板新增内容。
   - lang 键名与玩家可见文案保持不变；方块的 `cnlang`/`cnLangValue` 只影响生成的中文 lang 条目。

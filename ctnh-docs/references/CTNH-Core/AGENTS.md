@@ -112,7 +112,7 @@ ctnhcore/
 - **发电机功率读取**：发电机类机器（`common/machine/multiblock/generator/**`）计算并行、输出功率与 GUI 显示时，必须使用 `recipe.getOutputEUt()`（正数发电量）；`RecipeHelper.getRealEUtWithIO()` 返回带符号净 EU（发电配方为负），只适用于耗电机器，不要在发电机中使用（参见 fb74ed5：`ChemicalGeneratorMachine`, `HyperPlasmaTurbineMachine`, `MegaTurbineMachine`, `WaterPowerStationMachine`）。
 - **注册中枢集中**：新注册对象一律落在 `registry/**`，机器实现在 `common/machine/**`、配方数据在 `data/**`，不要跨域散落注册代码。
 - **Mixin 按目标 mod 分组**：新增 Mixin 放到 `mixin/<targetmod>/`，避免堆在 `mixin/mc/`。
-- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（fb74ed5 与 5186b6ec 均修过 `RecipeRemoval` 的此类违规）。
+- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（`RecipeRemoval` 的类体起始空行违规由 fb74ed5 修正；5186b6ec 未改动该文件）。
 
 ## ANTI-PATTERNS
 - 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
