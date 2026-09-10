@@ -18,6 +18,8 @@ Each CTNH module is an independent git submodule. This repo carries only documen
 - Cross-module architecture contract in `references/_architecture/`
 - The LLM-based auto-sync pipeline that keeps guides in step with source changes
 
+Guides are written in Simplified Chinese: section headings, class names, paths, and commands stay English inside backticks.
+
 ## Skill
 
 | Skill | Purpose |

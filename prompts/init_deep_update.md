@@ -12,6 +12,13 @@ ctnh-docs/references/<Module>/<domain>/AGENTS.md     # 域级文档
 - 模块：CTNH-Core, CTNH-Lib, CTNH-Bio, CTNH-Energy, CTNH-Mana, CTNH-Astral, CTPP, Create-Enough-Items
 - 域：模块源码顶层包（api, client, common, data, event, integration, mixin, registry, utils 等，以实际为准）
 
+## 语言与风格（必须遵守）
+
+- 正文一律使用**简体中文**：小节标题（`## OVERVIEW` 等）、表格表头（`| Concern | Location |`）、类名 / 包名 / 路径 / 命令 / 注解保持英文并加反引号，其余叙述、说明、反模式、目录树注释全部中文。
+- telegraphic 风格：名词短语与短句优先，能用表格就表格；删除"本文档介绍……""需要注意的是……"这类填充句。
+- 风格样例：模块主文档参考 `ctnh-docs/references/CTNH-Core/AGENTS.md`，域文档参考 `ctnh-docs/references/CTNH-Energy/common/AGENTS.md`。
+- 模块主文档 OVERVIEW 中的 Java 文件数必须与当次源码扫描结果一致。
+
 ## 工作流（Phase 1-4）
 
 ### Phase 1: Discovery + Analysis

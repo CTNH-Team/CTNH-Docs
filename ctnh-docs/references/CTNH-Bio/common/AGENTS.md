@@ -1,34 +1,37 @@
 # CTNH-BIO COMMON DOMAIN
 
 ## OVERVIEW
-Shared bootstrap and common content for Bio (7 Java files): CommonProxy, recipe conditions, items, recipes, and serums.
+Bio 的公共装配与通用内容（7 个 Java 文件）：`CommonProxy` 注册枢纽、配方条件、通用物品、磨碎配方与血清。
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Common proxy | `common/CommonProxy.java` |
-| Recipe conditions | `common/condition/EffectCondition.java` |
-| Items | `common/item/AssemblyStepItem.java`, `common/item/OrganicVialItem.java` |
-| Mob crushing recipes | `common/recipe/MobCrushingRecipe.java`, `common/recipe/MobCrushingRecipeManager.java` |
-| Serums | `common/serum/PrimordialSerum.java` |
+| 公共代理 | `common/CommonProxy.java` |
+| 配方条件 | `common/condition/EffectCondition.java` |
+| 通用物品 | `common/item/AssemblyStepItem.java`, `common/item/OrganicVialItem.java` |
+| 磨碎配方 | `common/recipe/MobCrushingRecipe.java`, `common/recipe/MobCrushingRecipeManager.java` |
+| 血清 | `common/serum/PrimordialSerum.java` |
 
 ## CONVENTIONS
-- `CommonProxy.java` initializes entities, creative tabs, datagen, registrate, `PropertyOperators`, `EntityProperties`, and Jade `LivingMachineStatusProvider`.
-- `CommonProxy.registerCapabilities()` delegates to `api/capability/forge/CBCapabilities.java`.
-- Mob crushing is a Bio-specific recipe surface (with JEI category and EMI mixins).
+- `CommonProxy()` 构造时调用 `CommonProxy.init()` 并注册自身到 mod 事件总线，同时注册 `CBSerums.SERUMS`。
+- `CommonProxy.init()` 顺序：`CBEntities.init()` → `CBCreativeModeTabs.init()` → `CBDatagen.init()` → `CTNHBio.REGISTRATE.registerRegistrate()` → `PropertyOperators.init()` → `EntityProperties.init()`；依赖属性注册表的代码必须排在其后。
+- `CommonProxy` 通过 `addGenericListener` 接管 GT 注册事件：`MachineDefinition`（`CBMachines.init()` + `CBMultiblocks.init()`）、`GTRecipeType`（`CBRecipeTypes.init()`）、`RecipeConditionType`（`CBRecipeConditions.init()`）、`GTRecipeCategory`（`CBRecipeCategories.init()`）、`SoundEntry`（`CBSoundEntries.init()`）。
+- 材料注册走 `MaterialEvent` → `CBMaterials.init()`；`MaterialRegistryEvent` 创建 `ctnhbio` 材料注册表；`FMLCommonSetupEvent` 中把 Biomancy `DECOMPOSING_RECIPE_TYPE` 挂到 `CBRecipeTypes.DECOMPOSER_RECIPES.getProxyRecipes()`。
+- 磨碎配方是 Bio 自有配方面（配 `integration/jei/MobCrushingCategory` 与 EMI Mixin），数据来自 `src/main/resources/data/ctnhbio/mob_crushing_recipes/`。
 
 ## ANTI-PATTERNS
-- Do not bypass CommonProxy init order for registries that depend on PropertyOperators/EntityProperties.
+- 绕过 `CommonProxy` 的初始化顺序，去用依赖 `PropertyOperators` / `EntityProperties` 的注册表。
+- 在 `common/` 里重复 `registry/` 的注册逻辑。
 
 ## SCOPE
-Applies to `src/main/java/com/moguang/ctnhbio/common` and its child packages.
+`src/main/java/com/moguang/ctnhbio/common` 及其全部子包。
 
 ## READ WHEN
-- Changing CommonProxy wiring, serums, or common recipe logic.
+- 修改 `CommonProxy` 装配顺序、血清或通用配方逻辑。
 
 ## SOURCE OF TRUTH
-- `common/CommonProxy.java` and `event/EventHandler.java`.
+- `common/CommonProxy.java` 与 `event/EventHandler.java`。
 
 ## WORKFLOW
-1. Check `CommonProxy.init()` order before adding hooks.
-2. Run `:modules:CTNH-Bio:build`.
+1. 加钩子前先确认 `CommonProxy.init()` 与 `addGenericListener` 的注册时序。
+2. 跑 `:modules:CTNH-Bio:build`。

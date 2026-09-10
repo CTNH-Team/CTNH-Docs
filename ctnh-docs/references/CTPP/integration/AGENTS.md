@@ -1,12 +1,12 @@
 # CTPP INTEGRATION DOMAIN
 
 ## OVERVIEW
-Jade, JEI, and LDLib integration for CTPP (5 Java files). EMI plugin moved to CTNH-Core; KineticOutputMachineProvider removed.
+CTPP 的 Jade、JEI 与 LDLib 对接（5 个 Java 文件）。EMI 插件已迁至 CTNH-Core；`KineticOutputMachineProvider` 已移除。
 
 ## STRUCTURE
 ```text
 integration/
-|-- jade/                      # CTPPJadePlugin (KineticOutputMachineProvider removed, config `jade.plugin_ctpp.kinetic_output_machine_provider` and `ctpp.kineticoutputmachineprovider.kineticoutput` lang removed)
+|-- jade/                      # CTPPJadePlugin（含内部 PlaceableEmitterProvider）
 |-- jei/                       # CTPPJeiPlugin
 |   `-- category/              # FanAcidWashingCategory, FanBreathingCategory
 `-- ldlib/                     # CTPPLDLibPlugin
@@ -15,30 +15,34 @@ integration/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| JEI plugin | `integration/jei/CTPPJeiPlugin.java` |
-| Fan categories | `integration/jei/category/` (FanAcidWashingCategory, FanBreathingCategory) |
-| Jade provider | `integration/jade/CTPPJadePlugin.java` |
-| LDLib plugin | `integration/ldlib/CTPPLDLibPlugin.java` |
-| EMI (moved) | CTNH-Core `integration/emi/` — do not re-add `integration/emi/CTPPEmiPlugin.java` here |
+| JEI 插件 | `integration/jei/CTPPJeiPlugin.java`（`IModPlugin`；注册 `CTPPRecipeTypeInfo.BREATHING` / `ACIDWASHING` 的配方类别） |
+| 风扇类别 | `integration/jei/category/`（`FanAcidWashingCategory`, `FanBreathingCategory`） |
+| Jade 插件 | `integration/jade/CTPPJadePlugin.java`（`IWailaPlugin` + 内部 `PlaceableEmitterProvider`） |
+| LDLib 插件 | `integration/ldlib/CTPPLDLibPlugin.java`（`@LDLibPlugin`；`onLoad()` 把 `TerminalLinkStateAccessor` 注册进 `TypedPayloadRegistries`，优先级 50） |
+| EMI（已迁出） | CTNH-Core `integration/emi/`——不要在本模块重建 `integration/emi/CTPPEmiPlugin.java` |
 
 ## CONVENTIONS
-- KubeJS recipe keys `SU_IN` / `SU_OUT` are registered from `CTPPGTAddon.registerRecipeKeys()` (not in this domain).
-- Keep integrations isolated and optional.
+- 集成类保持隔离与可选，不得成为 `common/` 的硬依赖。
+- `CTPPLDLibPlugin` 是接线柱链路同步的前提：`api/terminal/TerminalLinkState` 的托管字段依赖这里注册的 payload 访问器。
+- 应力配方提示由 `StressRecipeCapability.appendJadeRecipeTooltip(...)` 直接产出，Jade 插件不重复序列化配方信息。
 
 ## ANTI-PATTERNS
-- Do not make integration classes hard dependencies of common code.
-- Do not reintroduce `CTPPEmiPlugin` in CTPP; it lives in Core.
-- Do not re-add `KineticOutputMachineProvider`; use `CTPPJadePlugin` only.
+- 让集成类成为 common 代码的硬依赖。
+- 在 CTPP 中重新引入 `CTPPEmiPlugin`（它在 Core）。
+- 重新加回 `KineticOutputMachineProvider`；Jade 侧只用 `CTPPJadePlugin`。
+- 在 Jade provider 中重复序列化客户端已能推导的数据（如 `lastRecipe`）。
 
 ## SCOPE
-Applies to `src/main/java/com/mo_guang/ctpp/integration` and its child packages.
+适用于 `src/main/java/com/mo_guang/ctpp/integration` 及其子包。
 
 ## READ WHEN
-- Changing CTPP JEI/Jade integration.
+- 改动 CTPP 的 JEI 配方类别或 Jade 提示。
+- 改动接线柱链路的 LDLib payload 注册。
 
 ## SOURCE OF TRUTH
-- `integration/` classes and `CTPPGTAddon.registerRecipeKeys()`.
+- `integration/` 各类与其注册站点。
+- `integration/ldlib/CTPPLDLibPlugin.java` 的 payload 注册。
 
 ## WORKFLOW
-1. Confirm the target mod version before changing hooks.
-2. Run `:modules:CTPP:build`; validate at runtime with the target mod present.
+1. 改挂钩前确认目标 mod 版本与对应 API。
+2. 跑 `:modules:CTPP:build`；带目标 mod 进游戏验证。

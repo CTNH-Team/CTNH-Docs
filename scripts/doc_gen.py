@@ -177,7 +177,7 @@ class DocGenerator:
    - 保持现有文档风格：OVERVIEW / STRUCTURE / WHERE TO LOOK / DOMAIN GUIDE ROUTING / CONVENTIONS / ANTI-PATTERNS / COMMANDS / SCOPE / READ WHEN / SOURCE OF TRUTH / WORKFLOW
    - 保留既定声明（GTM 动态包、注册对象优先）——见规范
    - 只描述 diff/源码中可佐证的内容，禁止编造类名/路径
-   - 中文或英文均可，与现有文档一致
+   - 正文统一简体中文（小节标题 / 表头 / 类名 / 路径保持英文），telegraphic 风格，见规范「语言与风格」
 
 # 输出格式（严格 JSON）
 {{"updates": [

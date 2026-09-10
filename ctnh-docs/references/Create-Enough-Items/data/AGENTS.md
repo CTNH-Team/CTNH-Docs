@@ -1,29 +1,30 @@
 # CREATE-ENOUGH-ITEMS DATA DOMAIN
 
 ## OVERVIEW
-Datagen hook for CEI: currently only adds the lang processor.
+`data/` 是 CEI 的数据生成钩子（1 个 Java 文件）：目前只挂 lang processor。
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Datagen hook | `data/CEIDatagen.java` |
+| Datagen 钩子 | `data/CEIDatagen.java` |
+| 语言资源 | `src/main/resources/assets/cei/lang/`（`en_us.json`、`zh_cn.json`） |
 
 ## CONVENTIONS
-- `CEIDatagen.init()` currently only adds the lang processor; no generated resource tree was present in the current snapshot.
-- Lang/resources live under `src/main/resources/assets/cei/lang/`.
+- `CEIDatagen.init()` 仅调用 `REGISTRATE.addLangProcessor()`；模块内不存在 `src/generated` 目录。
+- 语言与资源文件直接放在 `src/main/resources/assets/cei/lang/`。
 
 ## ANTI-PATTERNS
-- Do not hand-edit `src/generated/resources` if one appears later; regenerate via `runData`.
+- 日后若出现 `src/generated/resources`，手改它；应经 `runData` 重新生成。
 
 ## SCOPE
-Applies to `src/main/java/com/ctnh/cei/data`.
+适用于 `src/main/java/com/ctnh/cei/data`。
 
 ## READ WHEN
-- Adding CEI datagen output.
+- 新增 CEI datagen 输出。
 
 ## SOURCE OF TRUTH
-- `data/CEIDatagen.java` and `common/CommonProxy.init()` wiring.
+- `data/CEIDatagen.java` 与 `common/CommonProxy.init()` 的接线。
 
 ## WORKFLOW
-1. Edit `CEIDatagen`, then run `:modules:Create-Enough-Items:runData`.
-2. Inspect generated-resource diffs.
+1. 改 `CEIDatagen` 后跑 `:modules:Create-Enough-Items:runData`。
+2. 核对 lang 输出差异。

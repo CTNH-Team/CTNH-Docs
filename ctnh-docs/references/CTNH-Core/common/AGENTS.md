@@ -1,36 +1,36 @@
 # CTNH-CORE COMMON DOMAIN
 
 ## OVERVIEW
-Shared (client+server) implementation for Core: CommonProxy, blocks, block entities, capabilities, enchantments, entities, GUIs, items, machines, recipes, and world handling. This is the largest domain (125 Java files), dominated by the multiblock machine hierarchy.
+Core 的（客户端 + 服务端）共享实现：CommonProxy、方块、方块实体、capability、附魔、实体、GUI、物品、机器、配方与世界处理。这是最大的域（124 个 Java 文件），以多方块机器层级为主。
 
 ## STRUCTURE
 ```text
 common/
-|-- CommonProxy.java              # registration hub
-|-- block/                        # CoilType, PhotovoltaicBlock, TurbineRotorBlock, CTNHFusionCasingType, SpaceStructuralFramework, MaterialTurbineRotorBlock
-|   `-- blockdata/                # IPBData, ISSFData, PlanetMinerData (block data attachments)
+|-- CommonProxy.java              # 注册中枢
+|-- block/                        # CoilType, CTNHFusionCasingType, MaterialTurbineRotorBlock, PhotovoltaicBlock, SpaceStructuralFramework, TurbineRotorBlock
+|   `-- blockdata/                # IPBData, ISSFData, PlanetMinerData（方块数据附加）
 |-- blockentity/                  # TurbineRotorBE
-|-- capability/                   # EIOCapacitorProvider (EIO capacitor capabilities, namespace/remap helpers)
+|-- capability/                   # EIOCapacitorProvider（EIO 电容 capability 与命名空间/remap 辅助）
 |-- enchantment/                  # TemperatureEnchantment
 |-- entity/monster/               # astralslime/AstralSlime, sightseerspitter/SightSeerSpitter
-|-- gui/                          # WPAAcceleratorGui, MachineModeFancyConfiguratorTest (legacy leftover), SimpleNumberInputWidget
+|-- gui/                          # WPAAcceleratorGui, MachineModeFancyConfiguratorTest（遗留）, SimpleNumberInputWidget
 |   |-- terminal/                 # TerminalInputWidget
 |   `-- widget/                   # SimpleNumberInputWidget
-|-- item/                         # ArkOfHomoItem, AstronomyCircuitItem, MEAdvancedTerminalItem, SnowCitySwordItem, ThrowableSummoner, TurbineRotorItem, ConnectTerminalItem, ProgramItem, MultiblockHelper, SingleItemHandler, TagPrefixBehavior, CatalystBehavior, IThrowableItem, IDroneItem, IDataItem, MaterialTurbineRotorItem, TestingTerminalBehavior
+|-- item/                         # ArkOfHomoItem, AstronomyCircuitItem, MEAdvancedTerminalItem/Behavior, SnowCitySwordItem, ThrowableSummoner, TurbineRotorItem, MaterialTurbineRotorItem, ConnectTerminalItem, ProgramItem, MultiblockHelper, SingleItemHandler, TagPrefixBehavior, CatalystBehavior, IThrowableItem, IDroneItem, IDataItem, TestingTerminalBehavior
 |   `-- debug/                    # ReloadItem
 |-- machine/
 |   |-- cover/                    # CreativeEnergyCover
-|   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine (now MultiblockFluidRendererTrait), MultiblockComputationMachine (attachTrait NetworkedComputationContainer), SlaughterHouseMachine/FactoryMachine (attachTrait storage)
-|   |   |-- electric/             # 29 top-level machines (34 incl. multithread/ and rareearth/): WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, BlazeBlastFurnaceMachine (CoilMachineTrait), FermentingTankMachine (CoilMachineTrait), ...
+|   |-- multiblock/               # KineticElectricMultiblockMachine, LargeBottleMachine（MultiblockFluidRendererTrait）, MultiblockComputationMachine（attachTrait NetworkedComputationContainer）, SlaughterHouseMachine/FactoryMachine（attachTrait storage）, UnderfloorHeatingMachine
+|   |   |-- electric/             # 29 个顶层机器（含 multithread/ 与 rareearth/ 共 34 个 Java 文件）: WideParticleAccelerator, NeutronActivatorMachine, PlanetMiner, LargeDigitalMinerMachine, BlazeBlastFurnaceMachine（CoilMachineTrait）, FermentingTankMachine（CoilMachineTrait）...
 |   |   |   |-- multithread/      # CNCAlloySmelter
 |   |   |   `-- rareearth/        # ProcessControlMachine, ProcessControlProfile, ProcessControlledCoilMultiblockMachine, ProcessControlledElectricMultiblockMachine
-|   |   |-- generator/            # 12 machines: Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine, LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator, NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine, WaterPowerStationMachine, WindPowerArrayMachine
-|   |   |-- kinetic/              # 5: IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine, MeadowMachine, NoEnergyMachine
-|   |   |-- part/                 # 12 parts: CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine, CreativeEnergyHatchPartMachine, CreativeInputBusPartMachine, CreativeInputHatchPartMachine, CreativeLaserHatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock, NeutronAcceleratorMachine, NeutronSensorMachine
+|   |   |-- generator/            # 12 台：Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine, LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator, NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine, WaterPowerStationMachine, WindPowerArrayMachine
+|   |   |-- kinetic/              # 5 台：IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine, MeadowMachine, NoEnergyMachine
+|   |   |-- part/                 # 12 个部件：CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine, CreativeEnergyHatchPartMachine, CreativeInputBusPartMachine, CreativeInputHatchPartMachine, CreativeLaserHatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock, NeutronAcceleratorMachine, NeutronSensorMachine
 |   |   `-- quantum/              # quantum_core
 |   |-- simple/                   # DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine
 |   `-- trait/                    # ScalableReservoirComputingLogic, SimpleComputationContainer
-|       `-- providable_net/       # IProviableNetHandlerMachine, ProvidableNetHandler, ProvidableNetInfo, ProviderInfo
+|       `-- providable_net/       # ProvidableNetInfo, ProvidableNetTrait, ProviderInfo
 |-- recipe/                       # KeepIngredientShapedRecipe, NeutronActivatorCondition, PlantCasingCondition, TierCasingCondition
 |   `-- builder/                  # CTNHRecipeBuilder
 `-- world/                        # CTNHChunkLoading
@@ -39,42 +39,43 @@ common/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Common proxy | `common/CommonProxy.java` |
-| Blocks/block data | `common/block/`, `common/block/blockdata/` |
-| Block entities | `common/blockentity/` |
-| Capabilities | `common/capability/` |
-| Enchantments | `common/enchantment/` |
-| Entities | `common/entity/monster/` |
-| GUIs | `common/gui/`, `common/gui/terminal/`, `common/gui/widget/` |
-| Items | `common/item/`, `common/item/debug/` |
-| Electric multiblocks | `common/machine/multiblock/electric/` (29 + multithread + rareearth) — coil via `CoilMachineTrait` |
-| Generator multiblocks | `common/machine/multiblock/generator/` (12) |
-| Kinetic multiblocks | `common/machine/multiblock/kinetic/` (5) |
-| Machine parts | `common/machine/multiblock/part/` (12) |
-| Simple machines | `common/machine/simple/` (4) |
-| Machine traits | `common/machine/trait/`, `common/machine/trait/providable_net/` |
-| Computation machine | `common/machine/multiblock/MultiblockComputationMachine.java` (`attachTrait(new NetworkedComputationContainer(...))`) |
-| Fluid bottle machine | `common/machine/multiblock/LargeBottleMachine.java` (`attachTrait(new MultiblockFluidRendererTrait(this, this::saveOffsets))`, `saveOffsets()` returns `Set<BlockPos>`) |
-| Storage trait migration | `common/machine/multiblock/SlaughterHouseMachine.java`, `FactoryMachine.java` (`attachTrait(createMachineStorage(...))`, subscription via `getRecipeLogic().getTraitSubscriptions()`) |
-| Recipe builders | `common/recipe/`, `common/recipe/builder/` |
-| World | `common/world/CTNHChunkLoading.java` |
+| Common 代理 | `common/CommonProxy.java` |
+| 方块/方块数据 | `common/block/`, `common/block/blockdata/` |
+| 方块实体 | `common/blockentity/` |
+| Capability | `common/capability/EIOCapacitorProvider.java` |
+| 附魔 | `common/enchantment/TemperatureEnchantment.java` |
+| 实体 | `common/entity/monster/` |
+| GUI | `common/gui/`, `common/gui/terminal/`, `common/gui/widget/` |
+| 物品 | `common/item/`, `common/item/debug/` |
+| 电力多方块 | `common/machine/multiblock/electric/`（29 个顶层 + multithread + rareearth）—— 线圈走 `CoilMachineTrait` |
+| 发电机多方块 | `common/machine/multiblock/generator/`（12） |
+| 动力多方块 | `common/machine/multiblock/kinetic/`（5） |
+| 机器部件 | `common/machine/multiblock/part/`（12） |
+| 单方块机器 | `common/machine/simple/`（4） |
+| 机器 trait | `common/machine/trait/`, `common/machine/trait/providable_net/` |
+| 算力机器 | `common/machine/multiblock/MultiblockComputationMachine.java`（`attachTrait(new NetworkedComputationContainer(...))`） |
+| 流体瓶机器 | `common/machine/multiblock/LargeBottleMachine.java`（`attachTrait(new MultiblockFluidRendererTrait(this, this::saveOffsets))`，`saveOffsets()` 返回 `Set<BlockPos>`） |
+| 存储 trait 迁移 | `common/machine/multiblock/SlaughterHouseMachine.java`, `electric/FactoryMachine.java`（`attachTrait(createMachineStorage(...))`，订阅经 `getRecipeLogic().getTraitSubscriptions()`） |
+| 配方构建器 | `common/recipe/`, `common/recipe/builder/` |
+| 世界 | `common/world/CTNHChunkLoading.java` |
 
 ## CONVENTIONS
-- `CommonProxy.java` registers config, registrate, recipe conditions, machines, recipe types, datagen, creative tabs, and client/server setup listeners.
-- Machine implementations live here; their registrate entries live in `registry/machines/` and `registry/CTNHMachines.java`.
-- Electric multiblocks follow `*Machine` naming (some legacy files use `*_old` or snake_case); parts implement `CTNHPartAbility`.
-- The `rareearth/` subpackage under electric machines contains process-control machine abstractions and their profiles; treat it as part of the electric multiblock hierarchy.
-- GT/GMT recipes are runtime dynamic-pack data (`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`); `runData` produces no JSON for them.
-- When referencing items/blocks/fluids, MUST use direct registration objects — never `ResourceLocation` string parsing with `ForgeRegistries` lookups except where no registration object exists.
-- Trait ownership migrated: `NetworkedComputationContainer`, `NotifiableItemStackHandler`, `MultiblockFluidRendererTrait`, `CoilMachineTrait` are now attached via `attachTrait()` in construction; do not duplicate state as machine fields. `BlazeBlastFurnaceMachine`/`FermentingTankMachine` query coil via `getTraitOrThrow(CoilMachineTrait.class)`.
+- `CommonProxy.java` 注册 config、registrate、配方条件、机器、配方类型、datagen、创造栏，以及客户端/服务端 setup 监听器。
+- 机器实现放在本域；其 registrate 条目在 `registry/machines/` 与 `registry/CTNHMachines.java`。
+- 电力多方块遵循 `*Machine` 命名（少数遗留文件用 `*_old` 或 snake_case）；部件实现 `CTNHPartAbility`。
+- electric 下的 `rareearth/` 子包是过程控制机器抽象与其 profile，属于电力多方块层级的一部分。
+- GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。
+- 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
+- Trait 所有权已迁移：`NetworkedComputationContainer`、`NotifiableItemStackHandler`、`MultiblockFluidRendererTrait`、`CoilMachineTrait` 现在都在构造阶段经 `attachTrait()` 挂载；不要再把同一份状态复制成机器字段。`BlazeBlastFurnaceMachine`/`FermentingTankMachine` 经 `getTraitOrThrow(CoilMachineTrait.class)` 查询线圈。
+- 机器中文名在注册处声明（`.cnLangValue(...)` / 工厂 `cnName` 形参），不在 `common/` 里写 `@Key` + `Lang` 字段。见 registry 域文档。
 
 ## TRAIT OWNERSHIP
 所有权与字段规则以 `references/_architecture/AGENTS.md` 为准（§1 边界、§2 字段、§4 capability 分层）。Core 侧落点：
 
-- `common/machine/trait/`：`ScalableReservoirComputingLogic`（`RecipeLogic` 子类）、`SimpleComputationContainer`（`NetworkedComputationContainer` 子类）、`providable_net/`（`ProvidableNetHandler`、`ProvidableNetInfo`、`ProviderInfo`、`IProviableNetHandlerMachine`）。
+- `common/machine/trait/`：`ScalableReservoirComputingLogic`（`RecipeLogic` 子类）、`SimpleComputationContainer`（`NetworkedComputationContainer` 子类）、`providable_net/`（`ProvidableNetTrait`、`ProvidableNetInfo`、`ProviderInfo`）。
 - 机器内联 `RecipeLogic` 子类：`INFFluidDrillLogic`、`VoidMinerRecipeLogic`、`NeutronActivatorLogic`、`DigestingTankLogic`、`ProcessControlRecipeLogic`。
 - 部件侧 `Notifiable*` 子类：`CircuitItemHandler`、`InfinityEnergyContainer`、`InfinityItemStackHandler`、`InfinityFluidTank`、`DroneHolderHandler`。
-- 新迁移：`MultiblockComputationMachine.computationContainer`、`SlaughterHouseMachine.machineStorage`、`FactoryMachine.machineStorage`、`LargeBottleMachine` fluid offsets、`BlazeBlastFurnaceMachine`/`FermentingTankMachine` coil — 均改为 trait 单一所有者。
+- 新迁移：`MultiblockComputationMachine.computationContainer`、`SlaughterHouseMachine.machineStorage`、`FactoryMachine.machineStorage`、`NanoscaleTriboelectricGenerator.machineStorage`、`LargeBottleMachine` 流体偏移、`BlazeBlastFurnaceMachine`/`FermentingTankMachine` 线圈 —— 均改为 trait 单一所有者。
 
 硬约束：
 
@@ -84,22 +85,23 @@ common/
 - 新增 trait 不要在机器基类堆类型特判；让 trait 自己实现能力与生命周期。
 
 ## ANTI-PATTERNS
-- Do not bypass `CommonProxy` registration order; registry dependencies are deliberate.
-- Do not put client-only rendering in common machine classes.
-- Do not treat `WPA_old.java` or `MachineModeFancyConfiguratorTest` as current implementation; both are legacy leftovers.
-- Do not reintroduce machine-owned `@DescSynced fluidBlockOffsets` or `ICoilMachine`; use `MultiblockFluidRendererTrait` and `CoilMachineTrait`.
+- 绕过 `CommonProxy` 的注册顺序；注册表依赖是刻意安排的。
+- 在 common 机器类里放仅客户端渲染。
+- 把 `WPA_old.java` 或 `MachineModeFancyConfiguratorTest` 当成现行实现；两者都是遗留物。
+- 重新引入机器自有的 `@DescSynced fluidBlockOffsets` 或 `ICoilMachine`；应使用 `MultiblockFluidRendererTrait` 与 `CoilMachineTrait`。
+- 在本域给方块/机器补 `@Key("block.ctnhcore.*")` + `Lang` 字段伪造翻译（新写法见 registry 域文档）。
 
 ## SCOPE
-Applies to `src/main/java/io/github/cpearl0/ctnhcore/common` and its child packages.
+适用于 `src/main/java/io/github/cpearl0/ctnhcore/common` 及其子包。
 
 ## READ WHEN
-- Implementing blocks, machines, items, capabilities, or entities in Core.
-- Changing CommonProxy registration or Forge event wiring.
+- 在 Core 中实现方块、机器、物品、capability 或实体。
+- 改动 CommonProxy 注册或 Forge 事件接线。
 
 ## SOURCE OF TRUTH
-- `common/CommonProxy.java` (registration), `registry/` (entries), `event/ForgeEventHandler.java` (runtime hooks).
+- `common/CommonProxy.java`（注册）、`registry/`（条目）、`event/ForgeEventHandler.java`（运行时钩子）。
 
 ## WORKFLOW
-1. Confirm the behavior belongs in Core rather than a feature module.
-2. Check `CommonProxy` registration and any GT addon hooks that reference the new content.
-3. Run the narrowest Gradle task; regenerate data when datagen inputs changed.
+1. 先确认行为属于 Core 而非某个 feature 模块。
+2. 检查 `CommonProxy` 注册与引用该内容的 GT addon 钩子。
+3. 跑最窄的 Gradle 任务；datagen 输入变化时重新生成数据。

@@ -1,7 +1,7 @@
 # CTNH-CORE MODULE
 
 ## OVERVIEW
-CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，约 430 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
+CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，432 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/`（括号内为该域 Java 文件数）
@@ -9,23 +9,23 @@ CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore
 ```
 ctnhcore/
 ├── CTNHCore / CTNHCoreGTAddon / CTNHConfig      # mod 入口、GT addon、配置
-├── api/        (~17) CTNHMultiblockBuilder；Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}；
+├── api/        (17) CTNHMultiblockBuilder；Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}；
 │                     data/material/{CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty}；
-│                     gui/CTNHGuiTextures；jade/{MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider}；
+│                     gui/CTNHGuiTextures；jade/{MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider}（整体注释停用）；
 │                     machine/feature/{IDigitalMiner, IDynamicCasing}；machine/multiblock/UnlimitedItemStackTransfer；recipe/DigitalMinerLogic
-├── client/     (~22) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
+├── client/     (22) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
 │                     ponder/{CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags,
 │                             Electric/{GregTechMultiblocks, NeutronActivator}, Kinetic/{Meadow, MechanicalExporter}}；
 │                     renderer/{ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender,
 │                               MartialMoralityEyeRender, TurbineRotorRender, utils/RenderUtils}；util/SnowOverlayQuadOffset
-├── common/     (~124) 代理与机器/方块/物品实现
+├── common/     (124) 代理与机器/方块/物品实现
 │   ├── block/ (CTNHFusionCasingType, CoilType, MaterialTurbineRotorBlock, PhotovoltaicBlock, SpaceStructuralFramework,
 │   │           TurbineRotorBlock, blockdata/{IPBData, ISSFData, PlanetMinerData})
 │   ├── blockentity/TurbineRotorBE；capability/EIOCapacitorProvider；enchantment/TemperatureEnchantment
 │   ├── entity/monster/{astralslime/AstralSlime, sightseerspitter/SightSeerSpitter}
 │   ├── gui/ (MachineModeFancyConfiguratorTest, SimpleNumberInputWidget, WPAAcceleratorGui,
 │   │         terminal/TerminalInputWidget, widget/SimpleNumberInputWidget)
-│   ├── item/ (~18) ArkOfHomoItem, AstronomyCircuitItem, CatalystBehavior, ConnectTerminalItem, IDataItem, IDroneItem,
+│   ├── item/ (18) ArkOfHomoItem, AstronomyCircuitItem, CatalystBehavior, ConnectTerminalItem, IDataItem, IDroneItem,
 │   │              IThrowableItem, MEAdvancedTerminalItem/Behavior, MultiblockHelper, ProgramItem,
 │   │              TurbineRotorItem/MaterialTurbineRotorItem, TagPrefixBehavior, ThrowableSummoner, debug/ReloadItem ...
 │   ├── machine/ cover/CreativeEnergyCover；multiblock/{KineticElectricMultiblockMachine, LargeBottleMachine,
@@ -49,26 +49,26 @@ ctnhcore/
 │   ├── recipe/ (KeepIngredientShapedRecipe, NeutronActivatorCondition, PlantCasingCondition, TierCasingCondition,
 │   │            builder/CTNHRecipeBuilder)
 │   └── world/CTNHChunkLoading
-├── data/       (~149) CTNHCoreDatagen, CTNHMaterialFlags, CreateRecipeTypes；item/CrystalItems；machines/GTNNMachines；
+├── data/       (149) CTNHCoreDatagen, CTNHMaterialFlags, CreateRecipeTypes；item/CrystalItems；machines/GTNNMachines；
 │                     materials/ (26 个材料集，如 RareEarthMaterials, NaquadahMaterials, WetWareLineMaterials ...)；
 │                     recipe/ (34 顶层 + age/10 + chain/30 + multiblock/11 + create/6 + migrated/4 + mana/3 + wood/3 +
 │                              utils/3 + cogniassembly/1 + immersiveaircraft/1 + modmodify/1 + generated/1)；
 │                     tags/ (8) CTNH*TagsProvider, ItemTags, StoneTags, TagClearHelper；worldgen/CTNHBiomeModifiers
-├── event/      (~5)  BuildTaskManager, DimensionFlightHandler, ForgeClientEventHandler, ForgeEventHandler,
+├── event/      (5)   BuildTaskManager, DimensionFlightHandler, ForgeClientEventHandler, ForgeEventHandler,
 │                     ProvidableNetEventHandler
-├── integration/(~7)  creatediesel/{DistillationCategoryLayout, GTBedrockOilBridge}；
+├── integration/(7)   creatediesel/{DistillationCategoryLayout, GTBedrockOilBridge}；
 │                     emi/{CTNHCoreEmiPlugin, CTNHExtraEmiPlugin}；ftbessentials/AsyncRtpManager；
 │                     legendary/{ArmorModifier, UnderfloorHeatingSystemTempModifier}
-├── mixin/      (~47) 按目标 mod 分组：aecs, apotheosis, ars_nouveau, avaritia, create, creatediesel, dategen,
+├── mixin/      (47)  按目标 mod 分组：aecs, apotheosis, ars_nouveau, avaritia, create, creatediesel, dategen,
 │                     eclipticseasons, eio, emi, ftbchunks, ftbessentials, gtceu(+orevein), javd, legendarysurvival,
 │                     mc, tmrv, vintageimprovements；顶层 ChunkMixin, ChunkSerializerMixin, TagLoaderMixin
-├── registry/   (~50) 注册中枢：CTNHRegistration/CTNHRegistrate, CTNHItems, CTNHBlocks, CTNHBlockEntities,
+├── registry/   (50) 注册中枢：CTNHRegistration/CTNHRegistrate, CTNHItems, CTNHBlocks, CTNHBlockEntities,
 │                     CTNHMultiblockMachines, CTNHRecipeTypes/Categories/Recipes/Conditions/Modifiers,
 │                     machines/{CTNHMachines, GTMachineModify, multiblock/*}, material/{CTNHMaterials, CTNHMaterialFlags,
-│                     CTNHMaterialBlocks, GTMaterialAddon}, ores/* (7), adventure/CTNHEnchantments, jade/CTNHJadePlugin,
+│                     CTNHMaterialBlocks, GTMaterialAddon}, ores/* (7), adventure/CTNHEnchantments, jade/CTNHJadePlugin（停用），
 │                     sound/CTNHSoundEvents ...
-└── utils/      (~8)  CTNHCommonTooltips, CTNHMachineUtils, CTNHRecipeHelper, CoilTierHelper, LayeredBiMap,
-                      MathUtils, OrientedItem, StructureUtils
+└── utils/      (8)  CTNHCommonTooltips, CTNHMachineUtils, CTNHRecipeHelper, CoilTierHelper, LayeredBiMap,
+                     MathUtils, OrientedItem, StructureUtils
 ```
 
 ## WHERE TO LOOK
@@ -86,7 +86,7 @@ ctnhcore/
 | 机器 GUI / widget | `common/gui/**`（含 `WPAAcceleratorGui`, `terminal/TerminalInputWidget`）, `api/gui/CTNHGuiTextures` |
 | 客户端渲染 / 模型 / Ponder | `client/renderer/**`, `client/model/*`, `client/ponder/**` |
 | 配方实现 | `data/recipe/**`（顶层 34；`age/`, `chain/`, `create/`, `multiblock/`, `migrated/`, `mana/`, `wood/`, `utils/`）, `data/recipe/CTNHCoreRecipeAddition` |
-| 配方移除 | `data/recipe/RecipeRemoval`（配合 `mixin/tmrv/RecipeManagerMixin` 统一处理） |
+| 配方移除 | `data/recipe/RecipeRemoval`（只登记过滤规则；通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper` 提供） |
 | 数据生成 | `data/CTNHCoreDatagen`, `data/tags/**`, `data/worldgen/CTNHBiomeModifiers` |
 | 跨 mod 集成 | `integration/**`（creatediesel, emi, ftbessentials, legendary） |
 | Mixin 补丁 | `mixin/**`（按目标 mod 分组）；GT/GTCEu 相关在 `mixin/gtceu/**` |
@@ -108,14 +108,17 @@ ctnhcore/
 ## CONVENTIONS
 - **GTM 动态包**：GT/GMT 配方经 `CTNHCoreGTAddon.addRecipes()` 注册为运行时动态数据包（`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其**不产出 JSON**；静态 `src/generated/resources` 只含 tags/lang/models/worldgen/非 GT 配方。验证方式为游戏内或 `ConfigHolder.dev.dumpRecipes`。
 - **注册对象优先**：引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `CTNHItems.*`, `TagPrefix.ingot`, `AEItems.X`, `CBBlocks.X`, `CEItems.X`, `CMItems.X`, `CABlocks.X`, `CTPPBlocks.X`），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找；字符串 ID 仅限无注册对象的场景（上游 mod 专属 ID、配方 ID、tag key、维度 ID）。
+- **翻译在注册处声明**（5186b6ec 起）：方块中文名不再用 `@Key("block.ctnhcore.*")` + `Lang` 字段伪造，改为注册时声明。纯方块走 `registry/CTNHBlocks` 的 `createCoilBlock(ICoilType, cnName)` / `createFireboxCasing(BoilerFireboxType, cnName)` / `createTurbineRotorBlock(name, R, G, B, A, cnName)` / `createRotateCasing(name, map, cnName)` → `.cnlang(cnName)`；多方块在 registrate 链上直接 `.cnLangValue("…")`；分级机器走 `utils/CTNHMachineUtils` 的 `registerTieredMachines(name, cnname, …)`（内部 `.cnLangValue(VNF[tier] + cnname)`）与 `registerLargeCombustionEngine(…, cnName)`。玩家可见文案与 lang 键名保持稳定，新增内容一律用新写法。
 - **发电机功率读取**：发电机类机器（`common/machine/multiblock/generator/**`）计算并行、输出功率与 GUI 显示时，必须使用 `recipe.getOutputEUt()`（正数发电量）；`RecipeHelper.getRealEUtWithIO()` 返回带符号净 EU（发电配方为负），只适用于耗电机器，不要在发电机中使用（参见 fb74ed5：`ChemicalGeneratorMachine`, `HyperPlasmaTurbineMachine`, `MegaTurbineMachine`, `WaterPowerStationMachine`）。
 - **注册中枢集中**：新注册对象一律落在 `registry/**`，机器实现在 `common/machine/**`、配方数据在 `data/**`，不要跨域散落注册代码。
 - **Mixin 按目标 mod 分组**：新增 Mixin 放到 `mixin/<targetmod>/`，避免堆在 `mixin/mc/`。
-- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（fb74ed5 修复了 `RecipeRemoval` 的此类违规）。
+- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（fb74ed5 与 5186b6ec 均修过 `RecipeRemoval` 的此类违规）。
 
 ## ANTI-PATTERNS
 - 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
 - 用字符串 ID + `ForgeRegistries` 查找代替已存在的静态注册对象。
+- 对已有注册处中文名声明能力的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段（5186b6ec 已删除 87 处此类伪造；`CTNHMachines` 中 50 个分级机器/仓室仍为遗留写法，新增内容不要跟随）。
+- 删除注册对象后遗留悬空 lang 条目（如已无任何注册、仅剩伪造翻译键的 `mechanical_extractor`）。
 - 在 `common/machine/**` 内直接调用注册 API 注册物品/方块/配方类型（应走 `registry/**`）。
 - 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
 - 在通用工具类里复制 `utils/**` 已有能力（`CTNHRecipeHelper`, `CoilTierHelper` 等）。

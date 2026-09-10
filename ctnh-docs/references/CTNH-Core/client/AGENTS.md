@@ -1,12 +1,12 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-Client-side bootstrap, models, renderers, and Core-owned Create Ponder scenes, tags, and plugin (22 Java files).
+客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（22 个 Java 文件）。
 
 ## STRUCTURE
 ```text
 client/
-|-- ClientProxy.java           # client bootstrap (extends CommonProxy)
+|-- ClientProxy.java           # 客户端引导（extends CommonProxy）
 |-- ClientUtil.java
 |-- model/                     # ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel
 |-- ponder/                    # CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags
@@ -16,42 +16,42 @@ client/
 |-- renderer/utils/            # RenderUtils
 `-- util/                      # SnowOverlayQuadOffset
 ```
-Deleted: `client/renderer/LargeBottleRender.java` — fluid rendering now via server trait `MultiblockFluidRendererTrait` attached in `LargeBottleMachine`; no custom `DynamicRender` subclass needed.
+已删除：`client/renderer/LargeBottleRender.java` —— 流体渲染改由服务端 trait `MultiblockFluidRendererTrait` 承担（在 `LargeBottleMachine` 中 attach），不再需要自定义 `DynamicRender` 子类。
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Client bootstrap | `client/ClientProxy.java`, `client/ClientUtil.java` |
-| Ponder plugin/scenes/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
-| Core Ponder scenes | `client/ponder/Kinetic/` (Meadow, MechanicalExporter), `client/ponder/Electric/` (GregTechMultiblocks, NeutronActivator) |
-| Ponder adapter builder | `client/ponder/CTNHCorePonderSceneBuilder.java` |
-| Models | `client/model/` (ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel) |
-| Renderers | `client/renderer/` (ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, AstralPlanetSpecialEffects) |
-| Client utility | `client/util/SnowOverlayQuadOffset.java` |
+| 客户端引导 | `client/ClientProxy.java`, `client/ClientUtil.java` |
+| Ponder 插件/场景/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
+| Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（GregTechMultiblocks, NeutronActivator） |
+| Ponder 适配构建器 | `client/ponder/CTNHCorePonderSceneBuilder.java` |
+| 模型 | `client/model/`（ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel） |
+| 渲染器 | `client/renderer/`（ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, AstralPlanetSpecialEffects） |
+| 客户端工具 | `client/util/SnowOverlayQuadOffset.java` |
 
 ## CONVENTIONS
-- Ponder scenes use `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` with text embedded directly in scene files.
-- `CTNHCorePonderSceneBuilder` is only a Core adapter around Lib's shared builder; keep reusable builder/text behavior in CTNH-Lib.
-- Ponder registration happens from `ClientProxy.onClientSetupEvent()`; client datagen lang extraction happens in `CommonProxy.gatherData()` via `CTNHPonderLang.init(new CTNHCorePonderPlugin())`.
-- When referencing items/blocks/fluids, MUST use direct registration objects — never `ResourceLocation` string parsing with `ForgeRegistries` lookups except where no registration object exists.
+- Ponder 场景用 `scene.title(key, en, cn)` / `scene.showText(tick, en, cn)`，文案直接内嵌在场景文件里。
+- `CTNHCorePonderSceneBuilder` 只是 Lib 共享构建器之上的 Core 适配层；可复用的构建器/文本行为留在 CTNH-Lib。
+- Ponder 注册发生在 `ClientProxy.onClientSetupEvent()`；客户端 datagen 的语言提取在 `CommonProxy.gatherData()` 中经 `CTNHPonderLang.init(new CTNHCorePonderPlugin())` 完成。
+- 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
 
 ## ANTI-PATTERNS
-- Do not move Core Ponder scenes/tags/plugin into CTNH-Lib; only the shared builder belongs there.
-- Do not make client-only classes reachable from common construction paths.
-- Do not reintroduce `LargeBottleRender`; use `MultiblockFluidRendererTrait`.
+- 把 Core 的 Ponder 场景/tags/插件搬进 CTNH-Lib；只有共享构建器属于 Lib。
+- 让仅客户端类从 common 构造路径可达。
+- 重新引入 `LargeBottleRender`；应使用 `MultiblockFluidRendererTrait`。
 
 ## SCOPE
-Applies to `src/main/java/io/github/cpearl0/ctnhcore/client` and its child packages.
+适用于 `src/main/java/io/github/cpearl0/ctnhcore/client` 及其子包。
 
 ## READ WHEN
-- Adding or changing Core Ponder scenes, tags, or the client render pipeline.
-- Changing Core model/layer registrations.
+- 新增或修改 Core Ponder 场景、tags 或客户端渲染管线。
+- 改动 Core 模型/图层注册。
 
 ## SOURCE OF TRUTH
-- `client/ClientProxy.java` (bootstrap), `client/ponder/CTNHCorePonderPlugin.java` (scene/tag registration).
-- Ponder lang extraction: CTNH-Lib `CTNHPonderLang` wired from `common/CommonProxy.gatherData()`.
+- `client/ClientProxy.java`（引导）、`client/ponder/CTNHCorePonderPlugin.java`（场景/tag 注册）。
+- Ponder 语言提取：CTNH-Lib `CTNHPonderLang`，由 `common/CommonProxy.gatherData()` 接线。
 
 ## WORKFLOW
-1. Read the shared Ponder builder guide in `references/CTNH-Lib/client/AGENTS.md` before writing scenes.
-2. Add scene/tag registrations in the plugin; keep reusable text helpers in Lib.
-3. Run `:modules:CTNH-Core:runData` after Ponder text changes, then `spotlessCheck`.
+1. 写场景前先读 `references/CTNH-Lib/client/AGENTS.md` 的共享 Ponder 构建器指南。
+2. 在插件里加场景/tag 注册；可复用文本辅助留在 Lib。
+3. Ponder 文案改动后跑 `:modules:CTNH-Core:runData`，再跑 `spotlessCheck`。

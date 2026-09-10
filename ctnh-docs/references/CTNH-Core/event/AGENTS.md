@@ -1,38 +1,38 @@
 # CTNH-CORE EVENT DOMAIN
 
 ## OVERVIEW
-Forge event handlers and background task managers for Core runtime behavior (5 Java files).
+Core 运行时行为的 Forge 事件处理器与后台任务管理器（5 个 Java 文件）。
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Main event handler | `event/ForgeEventHandler.java` |
-| Client events | `event/ForgeClientEventHandler.java` |
-| Dimension flight | `event/DimensionFlightHandler.java` |
-| Build tasks | `event/BuildTaskManager.java` |
-| Network events | `event/ProvidableNetEventHandler.java` |
+| 主事件处理器 | `event/ForgeEventHandler.java` |
+| 客户端事件 | `event/ForgeClientEventHandler.java` |
+| 维度飞行 | `event/DimensionFlightHandler.java` |
+| 构建任务 | `event/BuildTaskManager.java` |
+| 网络事件 | `event/ProvidableNetEventHandler.java` |
 
 ## CONVENTIONS
-- Event subscribers and registry callbacks are lifecycle entry points; trace them through annotations, not ordinary Java callers.
-- Capability attach hooks (EIO capacitor capabilities, namespace/remap helpers) are wired through `common/capability/` from here.
-- `ProvidableNetEventHandler` works with `common/machine/trait/providable_net/` machines.
-- `ForgeEventHandler` also hosts the soul torch easter egg (`onSoulTorchEasterEgg`), which spawns a firework and plays the `easter_egg_clown` sound event.
+- 事件订阅者与注册表回调是生命周期入口；顺着注解追踪，不要按普通 Java 调用方找。
+- Capability 挂载钩子（EIO 电容 capability、命名空间/remap 辅助）经由 `common/capability/` 从这里接线。
+- `ProvidableNetEventHandler` 与 `common/machine/trait/providable_net/` 的机器配合。
+- `ForgeEventHandler` 还承载灵魂火把彩蛋（`onSoulTorchEasterEgg`），会生成烟花并播放 `easter_egg_clown` 音效事件。
 
 ## ANTI-PATTERNS
-- Do not move event logic into registry classes; keep lifecycle wiring in `event/`.
-- Do not make client-only event subscribers reachable from common paths.
+- 把事件逻辑搬进注册类；生命周期接线留在 `event/`。
+- 让仅客户端事件订阅者从 common 路径可达。
 
 ## SCOPE
-Applies to `src/main/java/io/github/cpearl0/ctnhcore/event`.
+适用于 `src/main/java/io/github/cpearl0/ctnhcore/event`。
 
 ## READ WHEN
-- Adding Forge lifecycle, capability, or network event handling in Core.
-- Tracing runtime hooks that have few ordinary Java callers.
+- 在 Core 中新增 Forge 生命周期、capability 或网络事件处理。
+- 排查几乎没有普通 Java 调用方的运行时钩子。
 
 ## SOURCE OF TRUTH
-- `event/ForgeEventHandler.java`, `event/ForgeClientEventHandler.java`, and the mod event bus wiring in `common/CommonProxy.java`.
+- `event/ForgeEventHandler.java`、`event/ForgeClientEventHandler.java`，以及 `common/CommonProxy.java` 中的 mod 事件总线接线。
 
 ## WORKFLOW
-1. Identify the Forge event and its registration site.
-2. Check both common and client event handler classes.
-3. Run `:modules:CTNH-Core:build` and validate the runtime surface if available.
+1. 确定 Forge 事件与它的注册位置。
+2. 同时检查 common 与 client 两个事件处理器类。
+3. 跑 `:modules:CTNH-Core:build`，可用时在运行时验证该面。
