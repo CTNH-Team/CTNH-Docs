@@ -48,7 +48,7 @@ api/
 - 在 API 类里加玩法逻辑；实现应留在 `common/` 或 `registry/`。
 - 从共享 API 面引用模块专属类。
 - 重新引入 `ICoilMachine`；应使用 `CoilMachineTrait`。
-- 把已注释停用的 `api/jade/` provider 重新接线，或重建 CTNH-Lib 的 `JadePriorityManager` / `GTProvidersRegistrar`（现行入口是 GTCEu `MachineJadeProvider`）。
+- 把已注释停用的 `api/jade/` provider 重新接线，或另建集中优先级注册器（现行入口是 GTCEu `MachineJadeProvider`）。
 
 ## SCOPE
 适用于 `src/main/java/io/github/cpearl0/ctnhcore/api` 及其子包。

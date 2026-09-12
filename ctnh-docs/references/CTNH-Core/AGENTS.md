@@ -118,7 +118,7 @@ ctnhcore/
 ## ANTI-PATTERNS
 - 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
 - 用字符串 ID + `ForgeRegistries` 查找代替已存在的静态注册对象。
-- 对已有注册处中文名声明能力的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段（`CTNHMachines` 中 52 个分级机器/仓室用这种写法，新增内容不要跟随）。
+- 对已有注册处中文名声明能力的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段（`CTNHMachines` 中 50 个分级机器/仓室用这种写法，新增内容不要跟随）。
 - 删除注册对象后留下悬空 lang 条目。
 - 在 `common/machine/**` 内直接调用注册 API 注册物品/方块/配方类型（应走 `registry/**`）。
 - 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
