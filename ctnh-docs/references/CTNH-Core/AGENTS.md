@@ -113,7 +113,7 @@ ctnhcore/
 - **注册中枢集中**：新注册对象一律落在 `registry/**`，机器实现在 `common/machine/**`、配方数据在 `data/**`，不要跨域散落注册代码。
 - **配方驱动多方块基类**：需要配方类型/机器模式页签的电力多方块，注册 factory 的类必须是 `RecipeElectricMultiblockMachine` 或其子类（无自定义行为时用 `RecipeElectricMultiblockMachine::new`，否则用自定义子类）—— 它经 `RecipeMultiblockMachine` 实现 `IRecipeLogicMachine`；`WorkableElectricMultiblockMachine` 不实现该接口，用它注册会导致模式页签不显示、配方类型不生效。线圈机用 `CoilWorkableElectricMultiblockMachine::new`。`registry/CTNHRecipeModifiers.java#ebfOverclock()` 的类型判断同样指向 `RecipeElectricMultiblockMachine`。细节与 ece38be 迁移清单见 `registry/AGENTS.md`。
 - **Mixin 按目标 mod 分组**：新增 Mixin 放到 `mixin/<targetmod>/`，避免堆在 `mixin/mc/`。
-- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（`RecipeRemoval` 的类体起始空行违规由 fb74ed5 修正；5186b6ec 未改动该文件）。
+- **格式化**：类体与方法体起始不留空行，`spotlessCheck` 必须通过（`RecipeRemoval` 方法体起始空行由 fb74ed5 修正；5186b6ec 未改动该文件；6eb50b5d 再次清空该文件 `init()` 与 `gtceuRemovals()` 的方法体起始空行）。
 
 ## ANTI-PATTERNS
 - 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
