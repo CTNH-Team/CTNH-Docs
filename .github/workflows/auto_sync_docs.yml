@@ -232,9 +232,16 @@ jobs:
             printf '%s\n' "$text"
           }
           TASK="$(cat prompts/headless_task.md)"
+          # 看门狗：由宿主在 agent 启动前盖下起始时刻，15/30 分钟各催促一次。
+          # 催促经 prompts/watchdog.ci.patch.yml 挂载的 PostToolUse 钩子在 agent 进程内注入，
+          # 只做进度自检——不阻塞、不终止、不降低产出要求。
+          export WATCHDOG_STATE="$RUNNER_TEMP/ctnh-docs-watchdog.state"
+          rm -f "$WATCHDOG_STATE" "$WATCHDOG_STATE".fired.*
+          date +%s > "$WATCHDOG_STATE"
           set +e
           timeout 2700 npx --yes @deepseek-ai/dsh@"$DSH_VERSION" --profile headless \
-            --patch prompts/headless.ci.patch.yml "$TASK" \
+            --patch prompts/headless.ci.patch.yml \
+            --patch prompts/watchdog.ci.patch.yml "$TASK" \
             > "$RUNNER_TEMP/dsh-stdout.log" 2> "$RUNNER_TEMP/dsh-stderr.log"
           code=$?
           set -e

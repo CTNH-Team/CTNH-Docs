@@ -1,0 +1,16 @@
+# CTNH-Docs CI overlay：看门狗催促（叠加在 headless profile 之上）。
+#
+# 用途：同步 agent 可能跑很久而没人催它。dsh 没有「从进程外注入消息」的入口，
+# 唯一受支持的运行中注入路径是 hooks 桥接——它在 agent 进程内的工具边界执行命令钩子，
+# 并把 hookSpecificOutput.additionalContext 作为模型上下文交回去。
+#
+# 语义边界（不要改）：催促是提高效率的手段，不是截止时间。
+#   - 钩子绝不阻塞、绝不终止、绝不要求提前收尾或减少产出。
+#   - 催促的方向是「少做无用检索、把已有证据落到文档」，不是「少写内容」。
+#   - 耗时是否可接受由人评审 PR 时判断，不由宿主强制中断。
+
+- insert:
+    - id: watchdog-hooks
+      name: '@deepseek-ai/dsh-hooks-claude-code'
+      config:
+        configPath: prompts/watchdog.hooks.json
