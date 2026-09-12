@@ -69,16 +69,16 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 | 触发 | 说明 |
 |------|------|
-| `schedule`（每 30 分钟） | 轮询 CTNH-Modules 主仓库与 8 个子模块的新提交（`check_pending.py` 无变化秒退） |
+| `schedule`（每 12 小时） | 轮询 CTNH-Modules 主仓库与 8 个子模块的新提交（`check_pending.py` 无变化秒退） |
 | `workflow_dispatch` | 手动触发；Sync 可带 `force_latest` 与 `dry_run`，Release 可带 `force` |
 
 流水线：`check_pending.py`（轮询秒退）→ `prepare_sync.py`（写 `workspace/sync-plan.json`）→ dsh agent 运行 → `verify_docs.py`（小节 / 中文 / 路由链接 / 写入范围守卫）→ `advance_state.py`（推进 `scripts/state.json`）→ 仅提交 `ctnh-docs/references/**` 与 `scripts/state.json` 的 PR。写入范围限定 `references/<Module>/**`；`references/_architecture/` 属人工维护，闸门会拒绝任何改动。模型与版本由仓库变量 `DSH_MODEL` / `DSH_VERSION` 控制，凭据为 `DEEPSEEK_API_KEY`。
 
 ## 自动发布（Auto Release Docs）
 
-以**日期**为版本号发布 GitHub Release（tag 形如 `2026-08-07`），附件为整个 skill 目录打包的 `ctnh-docs-skill-<日期>.zip`（含 `SKILL.md` + `references/`）。
+按 CTNH-Docs 提交逐次发布 GitHub Release，tag 与附件同名：`ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`（含 `SKILL.md` + `references/`）。
 
-- 同一天已发布则跳过（手动触发可带 `force` 覆盖）
+- 每 4 小时轮询；仅当**当前提交**已有 release 时跳过（手动 `force` 可覆盖）——同一天发布多次是正常情况
 - 下载：https://github.com/CTNH-Team/CTNH-Docs/releases/latest
 
 ## 维护

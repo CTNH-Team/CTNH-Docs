@@ -69,16 +69,16 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 | Trigger | Description |
 |------|------|
-| `schedule` (every 30 min) | Polls CTNH-Modules + 8 submodules for new commits (`check_pending.py` exits fast when nothing changed) |
+| `schedule` (every 12 h) | Polls CTNH-Modules + 8 submodules for new commits (`check_pending.py` exits fast when nothing changed) |
 | `workflow_dispatch` | Manual; Sync accepts `force_latest` and `dry_run`, Release accepts `force` |
 
 Pipeline: `check_pending.py` (fast-exit poll) → `prepare_sync.py` (writes `workspace/sync-plan.json`) → the dsh agent run → `verify_docs.py` (sections, Chinese text, routing links, write-scope guard) → `advance_state.py` (advances `scripts/state.json`) → PR limited to `ctnh-docs/references/**` + `scripts/state.json`. Writes are restricted to `references/<Module>/**`; `references/_architecture/` is hand-maintained and the gate rejects any change to it. Model/version come from repo variables `DSH_MODEL` / `DSH_VERSION`; the key is `DEEPSEEK_API_KEY`.
 
 ## Auto Release (Auto Release Docs)
 
-Publishes a dated GitHub Release (tag like `2026-08-07`) containing the whole skill directory as `ctnh-docs-skill-<date>.zip` (`SKILL.md` + `references/`).
+Publishes a GitHub Release per CTNH-Docs commit, named `ctnh-docs-skill-<YYYY-MM-DD>-<short-sha>.zip` (tag and asset share that name; `SKILL.md` + `references/`).
 
-- Skips if already released the same day (manual `force` overrides)
+- Polls every 4 h; skips only when the current commit already has a release (manual `force` overrides) — several releases per day are expected
 - Download: https://github.com/CTNH-Team/CTNH-Docs/releases/latest
 
 ## Maintenance

@@ -3,7 +3,7 @@ name: Auto Sync Docs
 on:
   schedule:
     # 轮询检测 CTNH-Modules 主仓库与子模块的新提交；无变化时秒退（见 check_pending 步骤）
-    - cron: '*/30 * * * *'
+    - cron: '0 */12 * * *'
   workflow_dispatch: # 手动触发
     inputs:
       force_latest:
