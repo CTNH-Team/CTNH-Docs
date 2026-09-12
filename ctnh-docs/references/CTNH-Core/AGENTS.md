@@ -52,7 +52,7 @@ ctnhcore/
 ├── data/       (149) CTNHCoreDatagen, CTNHMaterialFlags, CreateRecipeTypes；item/CrystalItems；machines/GTNNMachines；
 │                     materials/ (26 个材料集，如 RareEarthMaterials, NaquadahMaterials, WetWareLineMaterials ...)；
 │                     recipe/ (34 顶层 + age/10 + chain/30 + multiblock/11 + create/6 + migrated/4 + mana/3 + wood/3 +
-│                              utils/3 + cogniassembly/1 + immersiveaircraft/1 + modmodify/1 + generated/1)；
+│                              utils/3 + cogniassembly/1 + immersiveaircraft/1 + modmodify/2 + generated/1)；
 │                     tags/ (8) CTNH*TagsProvider, ItemTags, StoneTags, TagClearHelper；worldgen/CTNHBiomeModifiers
 ├── event/      (5)   BuildTaskManager, DimensionFlightHandler, ForgeClientEventHandler, ForgeEventHandler,
 │                     ProvidableNetEventHandler

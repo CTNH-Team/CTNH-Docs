@@ -63,7 +63,7 @@ data/
 - 配方删除：`data/recipe/RecipeRemoval.java` 只登记过滤规则（`id`/`idRegex`/`mod`/`type`/`not`/`or`），通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper`（`mixin/RecipeManagerApplyMixin`）提供，Core 侧不重复实现。动态配方刻意不过滤。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。见模块主文档 CONVENTIONS。
 - `CreateRecipeTypes` 的 mechanicalTier 换算为 `Math.min(GTUtil.getTierByVoltage(EUt), 5)`，适用于 MECHANICAL_PRESSOR/MIXER/CENTRIFUGE/SIFTER/LATHE；`*2` 已被移除。
-- 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`（原 Aluminium Hydroxide）、`PURE_SODIUM_ALUMINATE_SOLUTION` `Al(OH)3+NaOH+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution` 取代了 `aluminium_hydroxide_solution`。
+- 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`（原 Aluminium Hydroxide）、`PURE_SODIUM_ALUMINATE_SOLUTION` `NaAl(OH)4+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution` 取代了 `aluminium_hydroxide_solution`。
 - AlumiumChain 调参：绿蓝宝石/蓝宝石/红宝石离心改 `VA[HV]`，硅/镁 `VA[MV]`，Ti 产量略升、Al 产量略降，HCl 用量下降。
 
 ## ANTI-PATTERNS
