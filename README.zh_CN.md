@@ -76,9 +76,9 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 ## 自动发布（Auto Release Docs）
 
-按 CTNH-Docs 提交逐次发布 GitHub Release，tag 与附件同名：`ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`（含 `SKILL.md` + `references/`）。
+为同步分支 `auto-doc-update` 的每个提交发布 GitHub Release，tag 与附件同名：`ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`（内容取自同一 ref，含 `SKILL.md` + `references/`）。
 
-- 每 4 小时轮询；仅当**当前提交**已有 release 时跳过（手动 `force` 可覆盖）——同一天发布多次是正常情况
+- 每 4 小时轮询；仅当**该同步分支提交**已有 release 时跳过（手动 `force` 可覆盖）——同一天发布多次是正常情况。`auto-doc-update` 不存在时回落到默认分支 head
 - 下载：https://github.com/CTNH-Team/CTNH-Docs/releases/latest
 
 ## 维护

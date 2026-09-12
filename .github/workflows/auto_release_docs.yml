@@ -2,12 +2,12 @@ name: Auto Release Docs
 
 on:
   schedule:
-    # 每 4 小时轮询；只要当前提交有变化就发一次带提交 hash 的新 release（不再限制每天一次）
+    # 每 4 小时轮询；auto-doc-update 分支 head 前进就发一次（不再限制每天一次）
     - cron: '0 */4 * * *'
-  workflow_dispatch: # 手动构建（同一天可多次发布，按提交 hash 去重）
+  workflow_dispatch: # 手动构建（同一天可多次发布，按同步分支提交 hash 去重）
     inputs:
       force:
-        description: 'Force publish even if this commit already has a release'
+        description: 'Force publish even if the sync-branch commit already has a release'
         required: false
         default: false
         type: boolean
@@ -23,6 +23,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # 工作树留在默认分支：跑的是本分支的 scripts/；发布内容另行从同步分支取（见下）
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -37,13 +38,32 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # 不再以 CTNH-Modules 有无新提交作为闸门：release 与当前提交绑定，
-      # 由 check_release.py 按 tag 是否已存在去重（同一天可发多次，同一提交只发一次）。
+      # 发布源：同步分支 auto-doc-update 的 head（同步 PR 未合并时也要能发）；
+      # 该分支不存在时回落到默认分支 head。这里只解析 sha，**不切换工作树**——
+      # 工作树必须留在默认分支，否则 workflow 自己的 scripts/ 会变成该分支上的旧版本。
+      # 打包由 check_release.py 用 `git archive <sha> ctnh-docs` 从该 ref 取内容，tag 与内容同源。
+      - name: Resolve release source
+        id: source
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin auto-doc-update >/dev/null 2>&1; then
+            ref=auto-doc-update
+          else
+            ref="${{ github.event.repository.default_branch }}"
+          fi
+          git fetch --no-tags --quiet origin "$ref"
+          sha=$(git rev-parse "origin/$ref")
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "release source: origin/$ref @ ${sha:0:8}"
+
       - name: Build skill package and check release status
         id: check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FORCE_RELEASE: ${{ inputs.force }}
+          RELEASE_SHA: ${{ steps.source.outputs.sha }}
+          RELEASE_REF: ${{ steps.source.outputs.ref }}
         run: |
           python scripts/check_release.py
           echo "Decision:"

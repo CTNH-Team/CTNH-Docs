@@ -1,12 +1,15 @@
 """打包 skill 目录并决定本轮是否发布 GitHub Release。
 
+发布源：**同步分支 `auto-doc-update` 的 head**（workflow 的 Resolve release source
+步骤解析后通过 RELEASE_SHA 传入）；该分支不存在时由 workflow 回落到默认分支 head，
+因此脚本只认 RELEASE_SHA，不自己挑分支。
+
 命名：tag 与附件同名，形如 `ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`。
-去重：同一天可以发多次——只要当前提交的 tag 还不存在就发；tag 已存在说明这次提交
+去重：同一天可以发多次——只要该提交的 tag 还不存在就发；tag 已存在说明这次提交
 已经发过，跳过即可。因此不再有"每天只能发布一次"的限制。
 """
 import json
 import os
-import re
 import subprocess
 import sys
 import zipfile
@@ -52,22 +55,22 @@ def _today_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
-def _short_sha() -> str:
-    """当前提交的前 8 位。
+def _resolve_sha() -> str:
+    """发布源提交：workflow 传入的 RELEASE_SHA（auto-doc-update 的 head）。
 
-    CI 里用 GITHUB_SHA（触发本轮 workflow 的提交）；本地或缺失时回落到 git。
+    缺失时回落到本地 HEAD，便于本地演练；取不到就报错，不要发出命名错误的 release。
     """
-    sha = os.getenv("GITHUB_SHA", "").strip()
-    if not sha:
-        try:
-            sha = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                capture_output=True, text=True, check=True,
-            ).stdout.strip()
-        except Exception as e:  # noqa: BLE001 - 取不到就报错，不要发出命名错误的 release
-            print(f"无法确定当前提交 hash: {e}", file=sys.stderr)
-            raise SystemExit(3)
-    return sha[:SHORT_SHA_LEN]
+    sha = os.getenv("RELEASE_SHA", "").strip()
+    if sha:
+        return sha
+    try:
+        return subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+    except Exception as e:  # noqa: BLE001
+        print(f"无法确定发布源提交: {e}", file=sys.stderr)
+        raise SystemExit(3)
 
 
 def _release_tags(repo: str, token: str) -> Set[str]:
@@ -82,22 +85,26 @@ def _release_tags(repo: str, token: str) -> Set[str]:
     return {r.get("tag_name", "") for r in (releases or [])}
 
 
-def _zip_skill_dir(skill_dir: str = SKILL_DIR, asset_name: str = "") -> str:
-    """把仓库内已跟踪的 ctnh-docs/ skill 目录（SKILL.md + agents + references）打成 zip。
+def _archive_skill(ref: str, asset_name: str) -> str:
+    """用 `git archive` 从指定 ref 取 ctnh-docs/ 打成 zip。
 
-    zip 内路径以 ctnh-docs/ 为根，解压后即得到完整 skill 目录。
+    不用工作树打包：workflow 的工作树留在默认分支（否则 scripts/ 会变成该分支的旧版本），
+    而发布内容必须来自 auto-doc-update 的 head —— git archive 正好按 ref 取内容，
+    zip 内路径仍是 `ctnh-docs/...`，与工作树打包结果一致。
     """
-    if not os.path.isdir(skill_dir):
-        raise SystemExit(f"skill 目录缺失: {skill_dir}")
-    if not asset_name:
-        asset_name = f"{TAG_PREFIX}-{_today_utc()}-{_short_sha()}.zip"
-    with zipfile.ZipFile(asset_name, "w", zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(skill_dir):
-            for fn in files:
-                full = os.path.join(root, fn)
-                arc = os.path.relpath(full, os.path.dirname(skill_dir))  # ctnh-docs/...
-                zf.write(full, arc)
-    print(f"已生成: {asset_name}")
+    try:
+        subprocess.run(
+            ["git", "archive", "--format=zip", f"--output={asset_name}", ref, SKILL_DIR],
+            check=True, capture_output=True, text=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"git archive 失败（{ref}）: {e.stderr.strip()}", file=sys.stderr)
+        raise SystemExit(4)
+    with zipfile.ZipFile(asset_name) as zf:
+        names = zf.namelist()
+    if f"{SKILL_DIR}/SKILL.md" not in names:
+        raise SystemExit(f"打包结果缺少 {SKILL_DIR}/SKILL.md，ref={ref}")
+    print(f"已生成: {asset_name}（来自 {ref}，{len(names)} 个条目）")
     return asset_name
 
 
@@ -105,16 +112,19 @@ def main() -> int:
     repo = os.getenv("GITHUB_REPOSITORY", "").strip()
     token = os.getenv("GITHUB_TOKEN", "").strip()
     force = os.getenv("FORCE_RELEASE", "false").strip() == "true"
+    release_ref = os.getenv("RELEASE_REF", "").strip()
     if not repo:
         print("GITHUB_REPOSITORY is required.", file=sys.stderr)
         return 2
 
     today = _today_utc()
-    sha = _short_sha()
-    tag = f"{TAG_PREFIX}-{today}-{sha}"
+    sha = _resolve_sha()
+    short_sha = sha[:SHORT_SHA_LEN]
+    tag = f"{TAG_PREFIX}-{today}-{short_sha}"
 
-    # 直接打包仓库内已跟踪的 ctnh-docs/ skill 目录；附件与 tag 同名
-    asset_name = _zip_skill_dir(asset_name=f"{tag}.zip")
+    # 打包源：优先用解析出的 sha（保证与 tag 同源），否则退回 ref 名。
+    source_ref = sha or release_ref
+    asset_name = _archive_skill(source_ref, f"{tag}.zip")
 
     # 去重只看 tag 是否已存在：同一天可以发多次，但同一提交只发一次。
     existing = _release_tags(repo, token)
@@ -122,13 +132,14 @@ def main() -> int:
     should_release = force or not already
     reason = (
         "force release" if force
-        else f"commit {sha} not yet released" if not already
+        else f"commit {short_sha} not yet released" if not already
         else f"already released ({tag})"
     )
 
-    release_title = f"CTNH-Docs Skill {today} ({sha})"
+    release_title = f"CTNH-Docs Skill {today} ({short_sha})"
     release_body = (
-        f"CTNH-Docs 层级知识库（skill 格式）{today} 版本，提交 `{sha}`。\n\n"
+        f"CTNH-Docs 层级知识库（skill 格式）{today} 版本，来自同步分支 "
+        f"`{release_ref or 'auto-doc-update'}` 的提交 `{short_sha}`。\n\n"
         f"附件为 skill 包（`ctnh-docs/` 目录），解压到 skills 目录后即可作为 "
         f"`ctnh-docs` skill 使用，包含：\n"
         f"- `SKILL.md`：skill 入口与路由表\n"
