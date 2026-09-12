@@ -1,6 +1,6 @@
 """确定性校验闸门：dsh agent 改写完成后运行，任何一条不过都以非零退出。
 
-覆盖五项：小节齐全、中文正文、反引号/围栏闭合、路由链接可解析、写入范围守卫。
+覆盖六项：小节齐全、中文正文、反引号/围栏闭合、路由链接可解析、变更播报用语、写入范围守卫。
 agent 的输出是非确定性的，这一层是「能不能开 PR」的唯一客观依据。
 """
 
@@ -57,6 +57,34 @@ def repo_root() -> Path:
     env = (os.getenv("GITHUB_WORKSPACE") or "").strip()
     return Path(env) if env else Path.cwd()
 
+# 「变更播报」禁用模式：文档只描述当前源码状态，不写本轮 diff 说明或溯源。
+# 只匹配高置信度形态，避免误伤"当前/目前"这类合法的现状陈述。
+BAN_PATTERNS = [
+    (re.compile(r"本次|本轮|what changes|update inform"), "变更播报用语"),
+    # 至少含一个数字，避免把 defaced / acceded 之类的英文单词当成 hash
+    (re.compile(r"(?<![0-9a-zA-Z_])(?=[0-9a-f]*[0-9])[0-9a-f]{7,40}(?![0-9a-zA-Z_])"), "疑似提交号"),
+    (re.compile(r"20\d{2}-\d{2}-\d{2}"), "日期溯源"),
+    (re.compile(r"\bPR\s*#?\d+|pull request\s*#?\d+"), "PR 溯源"),
+    (re.compile(r"已(?:迁移|移除|删除|停用|废弃|收敛|改名|清除)"), "移除/迁移播报"),
+    (re.compile(r"改为|改由|已改用|改用为"), "新旧对照"),
+    (re.compile(r"取代|替代了|不再是|不再(?:用|注册|调整|依赖|需要)"), "新旧对照"),
+    (re.compile(r"旧(?:的|版|写法|二参|文件|模型|入口|结构|静态)"), "旧/新标签"),
+]
+
+
+def check_changelog_tone(text: str) -> List[str]:
+    """文档正文不得出现变更播报/溯源用语；返回命中的行（截断）。"""
+    hits: List[str] = []
+    for line in text.split("\n"):
+        stripped = line.strip()
+        # 跳过围栏代码块与纯示例行
+        if not stripped or stripped.startswith(FENCE):
+            continue
+        for regex, reason in BAN_PATTERNS:
+            if regex.search(stripped):
+                hits.append(f"{reason}: {stripped[:110]}")
+                break
+    return hits
 
 def iter_docs(root: Path) -> List[Path]:
     return sorted((root / config.DOCS_ROOT).rglob("AGENTS.md"))
@@ -192,6 +220,10 @@ def main() -> int:
 
         for broken in check_routes(root, text):
             failures.append(f"{rel}: 路由链接指向不存在的文件 {broken}")
+
+        if kind != "architecture":
+            for hit in check_changelog_tone(text):
+                failures.append(f"{rel}: 变更播报残留 → {hit}")
 
         warnings.extend(warn_identifiers(root, path, text))
 
