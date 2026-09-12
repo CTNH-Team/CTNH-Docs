@@ -36,7 +36,7 @@ mixin/
 ## CONVENTIONS
 - 目标覆盖 EMI、Create JEI、TMRV 与 GTCEu 的 EMI 类；改注入点前先核对上游目标方法/字段名。多数文件为 `remap = false`。
 - `EmiScreenManagerMixin` 目标是 `EmiScreenManager`：`Redirect` `give` 中的 `EmiStack.getItemStack()`，流体堆栈时经 `GTItems.FLUID_CELL` 填 1000mB 后返回（结果存 `@Share("realStack")`）；`Inject` 到 `mouseReleased` 的 `deleteCursor` 调用处以填充光标容器；`ModifyExpressionValue` 把 `EmiConfig.centerSearchBar` 强制为 `false`。
-- `EmiScreenManagerMixin` 填充后除创造模式物品栏且 `instabuild` 外，都经 `CreateItemC2SPacket` 同步服务端；被处理的界面经 `EmiApi.getHandledScreen()` 获取，不再 `@Shadow` `Minecraft client`。
+- `EmiScreenManagerMixin` 填充后除创造模式物品栏且 `instabuild` 外，都经 `CreateItemC2SPacket` 同步服务端；被处理的界面经 `EmiApi.getHandledScreen()` 获取，不 `@Shadow` `Minecraft client`。
 - `EmiScreenManagerInputMixin` 在 `renderWidgets` 尾部绘制 4 组配方页按钮与拖拽高亮，G 按钮位于 `search.getX() - TOGGLE_BUTTON_SIZE(16) - TOGGLE_BUTTON_GAP(4)`，Y 取 `search.getY()`。
 - `EmiScreenManagerInputMixin` 在 `mouseClicked` 头部依次处理精选（56×16）、关联搜索（56×16）、重复（56×16）、电压（最小/最大 32×16、重置 56×16）按钮；随后左键 G 按钮 `toggleAll(false)`（智能：存在折叠组则展开全部）、右键 `toggleAll(true)`（强制折叠），Alt+左键 `toggleGroup` 单个分组；`mouseScrolled` 在电压最小/最大按钮上调节区间。
 - `EmiScreenManagerInputMixin` 用 `Redirect` 改写 `renderCurrentTooltip` 中的 `EmiIngredient.getTooltip()`，为分组成员追加 `cei.emi.collapsible.group.count` 与 `cei.emi.collapsible.group.toggle` 两行；`getSearchSource` 返回时按需重建分组，`toggleVisibility` 头部标记 dirty。
@@ -48,7 +48,7 @@ mixin/
 - `EmiScreenManagerScreenSpaceMixin` 只作用于 `EmiScreenManager.ScreenSpace` 的 `search && getType() == SidebarType.INDEX`：`getStacks` 返回时替换为折叠投影，折叠代表项跳过 EMI 原图标，`StackBatcher.draw()` 之后补画背景/边框/双层图标（GTNH NEI 风格：折叠背景 `0x335555EE`、边框 `0x995555EE`、后层偏移 `(1,-1)`、前层偏移 `(-2,2)`；展开成员背景 `0x44113377`、边框 `0xCC3344AA`，相邻同组格子省略共享边）。
 - `EmiSearchMixin`：`Redirect` `bake` 中的 `EmiStack.getTooltipText()` 返回 `null`，`bake` 尾部标记折叠组 dirty 并重建 `TooltipBakeQueue`；`@Overwrite` `search(String)` 走快速路径（只接受单堆栈且已烘焙命中的 ingredient）。
 - `EmiApiTagExpandMixin`：`displayRecipes`/`displayUses` 头部记录关联搜索上下文；启用时把 Forge 前缀关系组（`ingots`/`nuggets`/`hot_ingots`、`dusts`/`small_dusts`/`tiny_dusts`）展开成额外堆栈，并补 `forge:<suffix>` 与 `forge:molten_<suffix>` 流体条目，结果缓存于 `cei$tagCache`。
-- `EmiRecipesMixin` `@Overwrite` `EmiRecipes.bake()`，改用 `FastRecipeManager` 建索引并记录耗时。
+- `EmiRecipesMixin` `@Overwrite` `EmiRecipes.bake()`，用 `FastRecipeManager` 建索引并记录耗时。
 - `EmiTagsMixin` 在 `EmiTags.getIngredient` 中拦截“含 NBT 的流体被错误压成 tag”的情况，直接返回 `ListEmiIngredient`。
 - `CreateJEIMixin` `@Overwrite` 掉 `registerExtraIngredients`；内部类 `CategoryBuilderMixin` 对 `MILLING`/`SMELTING` 强制全量注册、对 `BLASTING` 跳过，并重写 `removeRecipes` 按首槽物品排除。
 - `RecipeManagerMixin` 修补 TMRV `RecipeManager.addRecipe` 的忽略判定（对应 TooManyRecipeViewers issue #24：鼓风机只显示非原版配方）。
@@ -59,7 +59,7 @@ mixin/
 - 绕过 `mouseReleased` 填充路径中的创造模式 `instabuild` 跳过，直接发 `CreateItemC2SPacket`。
 - 在 `EmiScreenManagerMixin` 里重新引入 `@Shadow Minecraft client`；应使用 `EmiApi.getHandledScreen()`。
 - 把折叠组 G 按钮挪回搜索框右侧；当前行为是紧邻搜索框左侧。
-- 重新引入 `RecipeScreenMixin` 旧的过滤刷新归零（`tabPage = 0; tab = 0; page = 0`）；必须保留聚焦分类与页码。
+- 让 `RecipeScreenMixin` 的过滤刷新把 `tabPage`/`tab`/`page` 归零；必须保留聚焦分类与页码。
 - 把电压重置按钮放到最小/最大值按钮上方或与之重叠；它画在其下方（`cei$getVoltageMinButtonY() + 18`）。
 
 ## SCOPE

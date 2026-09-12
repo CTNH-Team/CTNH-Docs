@@ -1,7 +1,7 @@
 # CTPP INTEGRATION DOMAIN
 
 ## OVERVIEW
-CTPP 的 Jade、JEI 与 LDLib 对接（5 个 Java 文件）。EMI 插件已迁至 CTNH-Core；`KineticOutputMachineProvider` 已移除。
+CTPP 的 Jade、JEI 与 LDLib 对接（5 个 Java 文件）；EMI 对接在 CTNH-Core。
 
 ## STRUCTURE
 ```text

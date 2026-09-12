@@ -27,7 +27,7 @@ tech/vixhentx/mcmod/ctnhlib/ (48)
 src/main/resources/ctnhlib.mixins.json
 ```
 
-`jade/` 域已于 f9951f9「移除gt jade相关」删除（当前 0 个 Java 文件），不要在 Lib 内重建 Jade provider 排序。
+本模块没有 `jade/` 域（0 个 Java 文件），不要在 Lib 内重建 Jade provider 排序。
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -74,7 +74,7 @@ src/main/resources/ctnhlib.mixins.json
 - 在模块内重复实现 `RecipeRemovalHelper` / `DataFilterPack` 的移除逻辑。
 - 在 Lib 内加模块专属命令、数据包、构建器或 Ponder 场景。
 - 新增 mixin `.java` 却不登记 `ctnhlib.mixins.json`。
-- 把已删除的 `jade/GTProvidersRegistrar` / `jade/JadePriorityManager` 重新加回 Lib。
+- 在 Lib 内重建 `jade/GTProvidersRegistrar` / `jade/JadePriorityManager`（Lib 无 `jade/` 包）。
 
 ## COMMANDS
 ```bash

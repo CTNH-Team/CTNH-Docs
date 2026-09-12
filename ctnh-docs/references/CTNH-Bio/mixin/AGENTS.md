@@ -40,7 +40,7 @@ mixin/
 
 ## ANTI-PATTERNS
 - 加补丁不改 `ctnhbio.mixins.json`，或把客户端专用注入放进 `mixins` 数组（会导致服务端加载失败）。
-- 重新加回 `mixin/ali/EmiCompatibilityMixin`（已移除：源码与 `ctnhbio.mixins.json` 均无此条）：despoil 战利品催化剂展示已由 Core 接管（`CTNH-Core` 的 `CTNHExtraEmiPlugin` 处理 `ctnhbio:despoil_loot` 类别）。
+- despoil 战利品催化剂展示由 `CTNH-Core` 的 `CTNHExtraEmiPlugin` 处理（`ctnhbio:despoil_loot` 类别）；本模块不实现 `mixin/ali/EmiCompatibilityMixin`。
 - 不复核上游成员签名就改注入点。
 - 用 Mixin 实现本该由 `api/` / `registry/` 提供的功能。
 

@@ -16,7 +16,7 @@ client/
 |-- renderer/utils/            # RenderUtils
 `-- util/                      # SnowOverlayQuadOffset
 ```
-已删除：`client/renderer/LargeBottleRender.java` —— 流体渲染改由服务端 trait `MultiblockFluidRendererTrait` 承担（在 `LargeBottleMachine` 中 attach），不再需要自定义 `DynamicRender` 子类。
+- 流体渲染由服务端 trait `MultiblockFluidRendererTrait` 承担（在 `LargeBottleMachine` 中 attach）；本域不放 `LargeBottleRender` 这类自定义 `DynamicRender` 子类。
 
 ## WHERE TO LOOK
 | Concern | Location |

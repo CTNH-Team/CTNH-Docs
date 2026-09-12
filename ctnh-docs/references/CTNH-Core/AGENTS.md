@@ -108,18 +108,18 @@ ctnhcore/
 ## CONVENTIONS
 - **GTM 动态包**：GT/GMT 配方经 `CTNHCoreGTAddon.addRecipes()` 注册为运行时动态数据包（`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其**不产出 JSON**；静态 `src/generated/resources` 只含 tags/lang/models/worldgen/非 GT 配方。验证方式为游戏内或 `ConfigHolder.dev.dumpRecipes`。
 - **注册对象优先**：引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `CTNHItems.*`, `TagPrefix.ingot`, `AEItems.X`, `CBBlocks.X`, `CEItems.X`, `CMItems.X`, `CABlocks.X`, `CTPPBlocks.X`），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找；字符串 ID 仅限无注册对象的场景（上游 mod 专属 ID、配方 ID、tag key、维度 ID）。
-- **翻译在注册处声明**（5186b6ec 起）：方块中文名不再用 `@Key("block.ctnhcore.*")` + `Lang` 字段伪造，改为注册时声明。纯方块走 `registry/CTNHBlocks` 的 `createCoilBlock(ICoilType, cnName)` / `createFireboxCasing(BoilerFireboxType, cnName)` / `createTurbineRotorBlock(name, R, G, B, A, cnName)` / `createRotateCasing(name, map, cnName)` → `.cnlang(cnName)`；多方块在 registrate 链上直接 `.cnLangValue("…")`；分级机器走 `utils/CTNHMachineUtils` 的 `registerTieredMachines(name, cnname, …)`（内部 `.cnLangValue(VNF[tier] + cnname)`）与 `registerLargeCombustionEngine(…, cnName)`。玩家可见文案与 lang 键名保持稳定，新增内容一律用新写法。
-- **发电机功率读取**：发电机类机器（`common/machine/multiblock/generator/**`）计算并行、输出功率与 GUI 显示时，必须使用 `recipe.getOutputEUt()`（正数发电量）；`RecipeHelper.getRealEUtWithIO()` 返回带符号净 EU（发电配方为负），只适用于耗电机器，不要在发电机中使用（参见 fb74ed5：`ChemicalGeneratorMachine`, `HyperPlasmaTurbineMachine`, `MegaTurbineMachine`, `WaterPowerStationMachine`）。
+- **翻译在注册处声明**：方块中文名不用 `@Key("block.ctnhcore.*")` + `Lang` 字段，一律在注册时声明。纯方块走 `registry/CTNHBlocks` 的 `createCoilBlock(ICoilType, cnName)` / `createFireboxCasing(BoilerFireboxType, cnName)` / `createTurbineRotorBlock(name, R, G, B, A, cnName)` / `createRotateCasing(name, map, cnName)` → `.cnlang(cnName)`；多方块在 registrate 链上直接 `.cnLangValue("…")`；分级机器走 `utils/CTNHMachineUtils` 的 `registerTieredMachines(name, cnname, …)`（内部 `.cnLangValue(VNF[tier] + cnname)`）与 `registerLargeCombustionEngine(…, cnName)`。玩家可见文案与 lang 键名保持稳定，新增内容一律用此写法。
+- **发电机功率读取**：发电机类机器（`common/machine/multiblock/generator/**`）计算并行、输出功率与 GUI 显示时，必须使用 `recipe.getOutputEUt()`（正数发电量）；`RecipeHelper.getRealEUtWithIO()` 返回带符号净 EU（发电配方为负），只适用于耗电机器，不要在发电机中使用。
 - **注册中枢集中**：新注册对象一律落在 `registry/**`，机器实现在 `common/machine/**`、配方数据在 `data/**`，不要跨域散落注册代码。
-- **配方驱动多方块基类**：需要配方类型/机器模式页签的电力多方块，注册 factory 的类必须是 `RecipeElectricMultiblockMachine` 或其子类（无自定义行为时用 `RecipeElectricMultiblockMachine::new`，否则用自定义子类）—— 它经 `RecipeMultiblockMachine` 实现 `IRecipeLogicMachine`；`WorkableElectricMultiblockMachine` 不实现该接口，用它注册会导致模式页签不显示、配方类型不生效。线圈机用 `CoilWorkableElectricMultiblockMachine::new`。`registry/CTNHRecipeModifiers.java#ebfOverclock()` 的类型判断同样指向 `RecipeElectricMultiblockMachine`。细节与 ece38be 迁移清单见 `registry/AGENTS.md`。
+- **配方驱动多方块基类**：需要配方类型/机器模式页签的电力多方块，注册 factory 的类必须是 `RecipeElectricMultiblockMachine` 或其子类（无自定义行为时用 `RecipeElectricMultiblockMachine::new`，否则用自定义子类）—— 它经 `RecipeMultiblockMachine` 实现 `IRecipeLogicMachine`；`WorkableElectricMultiblockMachine` 不实现该接口，用它注册会导致模式页签不显示、配方类型不生效。线圈机用 `CoilWorkableElectricMultiblockMachine::new`。`registry/CTNHRecipeModifiers.java#ebfOverclock()` 的类型判断同样指向 `RecipeElectricMultiblockMachine`。细节见 `registry/AGENTS.md`。
 - **Mixin 按目标 mod 分组**：新增 Mixin 放到 `mixin/<targetmod>/`，避免堆在 `mixin/mc/`。
-- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过（`RecipeRemoval` 的类体起始空行违规由 fb74ed5 修正；5186b6ec 未改动该文件）。
+- **格式化**：类体起始不留空行，`spotlessCheck` 必须通过。
 
 ## ANTI-PATTERNS
 - 在发电机/涡轮机中读取 `RecipeHelper.getRealEUtWithIO()` 作为发电量或输出功率（会得到负数，导致并行与 GUI 数值错误甚至配方判定失败）。
 - 用字符串 ID + `ForgeRegistries` 查找代替已存在的静态注册对象。
-- 对已有注册处中文名声明能力的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段（5186b6ec 已删除 87 处此类伪造；`CTNHMachines` 中 50 个分级机器/仓室仍为遗留写法，新增内容不要跟随）。
-- 删除注册对象后遗留悬空 lang 条目（如已无任何注册、仅剩伪造翻译键的 `mechanical_extractor`）。
+- 对已有注册处中文名声明能力的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段（`CTNHMachines` 中 52 个分级机器/仓室用这种写法，新增内容不要跟随）。
+- 删除注册对象后留下悬空 lang 条目。
 - 在 `common/machine/**` 内直接调用注册 API 注册物品/方块/配方类型（应走 `registry/**`）。
 - 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
 - 在通用工具类里复制 `utils/**` 已有能力（`CTNHRecipeHelper`, `CoilTierHelper` 等）。

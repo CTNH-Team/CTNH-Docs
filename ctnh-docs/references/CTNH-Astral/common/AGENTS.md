@@ -1,7 +1,7 @@
 # CTNH-ASTRAL COMMON DOMAIN
 
 ## OVERVIEW
-Astral 的共享启动与实现核心（20 个 Java 文件）：`CommonProxy` 与 `CAFluidInteractions`、世界生成方块、真空密封附魔、火箭实体与跨维度转移、火箭组装/发射多方块、供氧机，以及 `oxygen/` 氧气与大气环境系统。常压环境判定已从机器控制器解耦，火箭转移不再依赖组装平台。
+Astral 的共享启动与实现核心（20 个 Java 文件）：`CommonProxy` 与 `CAFluidInteractions`、世界生成方块、真空密封附魔、火箭实体与跨维度转移、火箭组装/发射多方块、供氧机，以及 `oxygen/` 氧气与大气环境系统。常压环境判定独立于机器控制器，火箭转移不经组装平台。
 
 ## STRUCTURE
 ```text
@@ -64,7 +64,7 @@ common/
 ## ANTI-PATTERNS
 - 绕过 `CommonProxy` 的注册顺序自建初始化路径。
 - 在 `RocketDimensionTravelHandler` 里重新引入基于组装平台控制器的传送逻辑；转移只用 `RocketState` 捕获/回填。
-- 把火箭转移状态写回遗留的 `CTNHAstralRocket` 持久化数据键；实体 NBT 字段才是权威来源。
+- 把火箭转移状态写回 `CTNHAstralRocket` 持久化数据键；实体 NBT 字段才是权威来源。
 - 对 `RocketAssemblyPlatformMachine` 的 `@Persisted` 火箭字段调用 `markDirty()`。
 - 在 `common/` 内用物品/方块 ID 字符串反查注册对象，而非 `CABlocks.*` / `CAItems.*` / `CAMaterials.*` 等静态对象。
 - 新增氧气源时绕过 `OxygenAreaSource` 契约，或在机器与 service 之间重复缓存密闭区块集合。

@@ -69,7 +69,7 @@ ctnhbio/
 - 把生物 recipe capability 合并进 Core；活体机器抽象归本模块所有。
 - 假定所有配方 JSON 都是生成的；先确认文件在 `src/main/resources` 还是 `src/generated/resources`。
 - 新增实体/模型配方匹配时绕过 `PropertyOperators` / `EntityProperties`；这两个注册表在 `CommonProxy.init()` 中显式初始化。
-- `mixin/ali/EmiCompatibilityMixin` 已移除（源码与 `ctnhbio.mixins.json` 均无），不要加回；despoil 战利品催化剂展示已由 Core 接管。
+- despoil 战利品催化剂展示由 CTNH-Core 的 `CTNHExtraEmiPlugin` 处理（`ctnhbio:despoil_loot`）；本模块不加 `mixin/ali/EmiCompatibilityMixin`。
 - 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
 
 ## COMMANDS

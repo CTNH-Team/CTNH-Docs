@@ -1,7 +1,7 @@
 # CTPP UTIL DOMAIN
 
 ## OVERVIEW
-CTPP 的共享工具（6 个 Java 文件）。`CTPPValues`（MT 等级表）已移除——机械等级改用 `GTValues.VNF`。
+CTPP 的共享工具（6 个 Java 文件）：通用 tooltip、槽位接口、物品朝向构建与数学工具。机械等级经 `GTValues.VNF` 计算。
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -12,7 +12,7 @@ CTPP 的共享工具（6 个 Java 文件）。`CTPPValues`（MT 等级表）已�
 | 数学工具 | `util/MathUtil.java`（如 `rotateByVec`，被 `KineticGeneratorMachine` 用于旋转 contraption 的转速方向） |
 
 ## CONVENTIONS
-- 机械等级相关文案统一用 `GTValues.VNF[tier]`；`CTPPValues.MT` 与其 lang key（`ctpp.ctppvalues.mt.*`、旧的 `ctpp.commontooltips.mechanical_tier`）已不存在，不要引用。
+- 机械等级相关文案统一用 `GTValues.VNF[tier]`；不引入 `CTPPValues` 相关的 lang key。
 - tooltip 常量以 `@CN` / `@EN` 注解的 `Lang` 字段声明，随 datagen 产出 lang；不要在代码里写死可翻译字符串。
 - 工具类保持无注册依赖；需要注册对象的逻辑放回对应域。
 

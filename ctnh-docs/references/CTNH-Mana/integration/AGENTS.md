@@ -19,7 +19,7 @@ integration/
 
 ## CONVENTIONS
 - 集成类保持隔离与可选：不成为 `common/` 的硬依赖。
-- Jade 注册集中在 `CTNHManaJadePlugin`；`CommonProxy` 不再注册任何 Jade provider，新增 provider 只在插件里注册，且必须同时给出服务端 data 与客户端 component 两侧目标类型。
+- Jade 注册集中在 `CTNHManaJadePlugin`；`CommonProxy` 不注册任何 Jade provider，新增 provider 只在插件里注册，且必须同时给出服务端 data 与客户端 component 两侧目标类型。
 - 魔法集成面横跨配方 builder、mixin、集成与客户端包四处，改动前四处同查。
 - GT/GMT 配方是运行时动态包数据，集成层不得假定存在静态 JSON。
 - 物品/方块/流体引用使用静态注册对象（`CMItems.X` 等），不用字符串查找。

@@ -11,7 +11,7 @@
 
 ## CONVENTIONS
 - `CommonProxy(FMLJavaModLoadingContext)` 在构造中：注册到 mod 事件总线 → `MinecraftForge.EVENT_BUS.register(CommonProxy.class)`（`RegisterCommandsEvent` 这类 Forge 总线事件必须挂全局总线）→ `init()`；随后经 GTCEu `GTRegistration.REGISTRATE` 注册物品 `mutiblock_helper`（id 拼写照源码保留）。
-- `CommonProxy.init()` 是空实现；`GTProvidersRegistrar.init()` 与 Jade 初始化已在 f9951f9「移除gt jade相关」删除。
+- `CommonProxy.init()` 是空实现；Lib 内不做 `GTProvidersRegistrar` / Jade 初始化。
 - `commonSetup(FMLCommonSetupEvent)` 中 `event.enqueueWork(CTNHLibNetworking::init)` 完成网络通道注册。
 - `registerPackFinders(AddPackFindersEvent)` 仅在 `PackType.SERVER_DATA` 下以 `GTPackSource("ctnhlib:filter_data", ..., Pack.Position.TOP, DataFilterPack::new)` 挂载静态过滤包。
 - `registerCommands(RegisterCommandsEvent)` 转调 `CTNHCommands.register(dispatcher, buildContext)`。

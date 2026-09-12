@@ -44,7 +44,7 @@ data/                                     # 共 43 个 Java 文件
 ## CONVENTIONS
 - **世界生成集中**：世界生成类一律放 `data/worldgen`；维度类直接在 `worldgen` 根，没有 `dimension/` 子包。
 - **材料集**：10 个材料在 `data/CAMaterials` 中声明；`StarsteelIcon`（`new MaterialIconSet("starsteel", METALLIC)`）对应静态模型资源 `assets/gtceu/models/item/materials_sets/starsteel/**`。
-- **月球海水**：`CAMaterials.Seawater` 是 Astral 的海水流体（替代 `GTMaterials.SaltWater`）；`GTMateralAdjust` 不再调整 SaltWater 的方块与贴图，`CANoiseSetting.MOON` 用它作为默认流体。
+- **月球海水**：`CAMaterials.Seawater` 是 Astral 的海水流体（`GTMaterials.SaltWater` 只作上游保留）；`GTMateralAdjust` 不调整 SaltWater 的方块与贴图，`CANoiseSetting.MOON` 用它作为默认流体。
 - **矿脉 tag prefix 条件化**：只有 `oreAstralStone` 在类初始化时创建；其余 5 个在 `CATagPrefixes.init()` 中当 `LDLib.isModLoaded("ad_astra")` 时创建，随后统一 `addSecondaryMaterial(...)` 追加对应石粉。`oreAstralStone` 依赖 `AstralBlocks.ASTRAL_STONE`，因此必须在 `CABlocks.init()` 之后才调用。
 - **GT 配方**：`CARecipes.init(provider)` 经 `CTNHAstralGTAddon.addRecipes()` 调用，产出 MV/HV/EV 三档供氧机装配配方、`oxygen_enricher` 富集配方与 `rocket_assemble` 火箭组装配方——这些都是运行时动态数据包，`runData` 不产 JSON。
 - **数据生成**：`CommonProxy.gatherData()` 的 `RegistrySetBuilder` 引导 10 个注册表（carver / biome / configured_feature / placed_feature / dimension_type / level_stem / noise_settings / structure / structure_set / density_function），输出到 `src/generated/resources`；静态 `src/main/resources/data/ctnhastral/` 另有手写的 `biome/`、`planets/`、`recipes/`（nasa_workbench 火箭配方、space_station 空间站配方）、`tags/`。
@@ -69,4 +69,4 @@ data/                                     # 共 43 个 Java 文件
 
 ## WORKFLOW
 1. 改动世界生成前先把关联注册表当成一组通读。
-2. 影响数据生成时跑 `:modules:CTNH-Astral:runData`；GT 配方改动改用游戏内或 `ConfigHolder.dev.dumpRecipes` 验证。
+2. 影响数据生成时跑 `:modules:CTNH-Astral:runData`；GT 配方用游戏内或 `ConfigHolder.dev.dumpRecipes` 验证。

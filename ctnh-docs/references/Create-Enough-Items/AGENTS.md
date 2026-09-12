@@ -75,7 +75,7 @@ cei/
 - 改运行时 `config/cei/*.json` 来改默认值；应改 `src/main/resources/assets/cei/emi/` 下的静态规则文件。
 - 把电压过滤当通用 EMI 过滤；它只处理 GTCEu `GTEmiRecipe` 路径。
 - 不改 `cei.mixins.json` 与上游 EMI/GTCEu 目标成员就直接改 mixin accessor 签名。
-- 重新引入 `RecipeScreenMixin` 旧的“过滤刷新回到 tab 0 / page 0”行为；CEI 保留聚焦的配方页。
+- 让 `RecipeScreenMixin` 在过滤刷新时把 `tab`/`page` 归零；CEI 保留聚焦的配方页。
 - 用字符串 ID + `ForgeRegistries` 查找代替已存在的静态注册对象。
 
 ## COMMANDS

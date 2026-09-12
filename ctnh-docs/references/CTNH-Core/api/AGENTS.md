@@ -11,7 +11,7 @@ api/
 |-- data/material/             # CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty
 |-- gui/                       # CTNHGuiTextures
 |-- jade/                      # MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider
-|-- machine/feature/           # IDigitalMiner, IDynamicCasing（ICoilMachine 已删除 → 改用 GTCEu CoilMachineTrait）
+|-- machine/feature/           # IDigitalMiner, IDynamicCasing
 |-- machine/multiblock/        # UnlimitedItemStackTransfer
 `-- recipe/                    # DigitalMinerLogic
 ```
@@ -21,34 +21,34 @@ api/
 |---------|----------|
 | 多方块构建器 | `api/CTNHMultiblockBuilder.java`, `api/machine/multiblock/` |
 | 机器 feature | `api/machine/feature/`（`IDigitalMiner`, `IDynamicCasing`） |
-| 线圈处理（已迁移） | GTCEu `com.gregtechceu.gtceu.common.machine.trait.multiblock.CoilMachineTrait`，经 `getTraitOrThrow()` 获取 —— 原 `api/machine/feature/ICoilMachine` 已删除 |
+| 线圈处理 | GTCEu `com.gregtechceu.gtceu.common.machine.trait.multiblock.CoilMachineTrait`，经 `getTraitOrThrow()` 获取（本模块无 `ICoilMachine`） |
 | 图案辅助 | `api/Pattern/`（`AsynBlockPattern`, `CTNHBlockMaps`, `CTNHPredicates`） |
 | AE 图案 NPE 修复 | `api/Pattern/AsynBlockPattern.java` —— `extractInventory` / `searchAEStorage` 在 `AEItemKey.of` 前先判 `context.foundItemStack != null && !isEmpty()` |
 | 材料数据 | `api/data/material/`（icon set/type、property key、catalyst property） |
 | GUI 贴图 | `api/gui/CTNHGuiTextures.java` |
-| Jade provider（已停用） | `api/jade/`（多线程配方/输出/线程状态，三份文件整体注释；见下节） |
+| Jade provider | `api/jade/`（多线程配方/输出/线程状态，三份文件整体注释；见下节） |
 | 配方 API | `api/recipe/`（`DigitalMinerLogic`） |
 
 ## CONVENTIONS
 - API 类不得把仅客户端类泄漏进 common 构造路径。
 - 对外暴露机器时优先给接口面（`IDigitalMiner`, `IDynamicCasing`），而非具体实现。
-- `api/jade/` 的 provider 接口与 `registry/jade/CTNHJadePlugin` 目前均为停用状态（见下节）；不要再按「接口 + 插件注册」的旧模型扩展它们。
+- `api/jade/` 的 provider 接口与 `registry/jade/CTNHJadePlugin` 均为停用状态（见下节）；不要按「接口 + 插件注册」的模型扩展它们。
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。详见模块主文档 CONVENTIONS。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
-- 线圈迁移：本模块已删除 `ICoilMachine`；调用方改为在机器上查询 `CoilMachineTrait`（示例：`BlazeBlastFurnaceMachine`, `FermentingTankMachine`）。
+- 线圈处理：线圈经 GTCEu `CoilMachineTrait` 查询（`getTraitOrThrow(CoilMachineTrait.class)`，示例：`BlazeBlastFurnaceMachine`, `FermentingTankMachine`）；本模块无 `ICoilMachine`。
 
 ## JADE PROVIDERS
-`api/jade/` 的 `MultithreadRecipeLogicProvider`、`MultithreadRecipeOutputProvider`、`ThreadStatusProvider` 是 GTCEu `RecipeLogicProvider` / `RecipeOutputProvider` 的多线程变体，**当前全部处于停用状态**：三个文件整体被注释（`ThreadStatusProvider` 79 行、`MultithreadRecipeLogicProvider` 200 行、`MultithreadRecipeOutputProvider` 319 行均为注释行），`registry/jade/CTNHJadePlugin` 的 `init()` 方法体也整体注释，没有任何注册调用生效。
+`api/jade/` 的 `MultithreadRecipeLogicProvider`、`MultithreadRecipeOutputProvider`、`ThreadStatusProvider` 是 GTCEu `RecipeLogicProvider` / `RecipeOutputProvider` 的多线程变体，整体被注释；`registry/jade/CTNHJadePlugin` 的 `init()` 方法体同样整体注释，没有任何注册调用生效。
 
-- 它们不再是现行注册路径：GTCEu 上游已收敛为单一机器入口 `com.gregtechceu.gtceu.integration.jade.provider.MachineJadeProvider`（由 GTCEu `integration/jade/GTJadePlugin` 注册，`integration/jade/provider/` 现仅 6 个 provider）。CTNH-Lib 的 `jade/GTProvidersRegistrar`、`jade/JadePriorityManager` 连同整个 `jade/` 包已在 f9951f9「移除gt jade相关」中删除，Lib 侧对应指南也已一并移除，不要在 Lib 重建 provider 排序。
-- 迁移方向与条款以 `references/_architecture/AGENTS.md` §6/§8/§9 为准；改动这三个类或 `CTNHJadePlugin` 前先读架构契约，不要把它们当成生效中的 provider 去接线。
+- 现行注册路径是 GTCEu 的单一机器入口 `com.gregtechceu.gtceu.integration.jade.provider.MachineJadeProvider`（由 GTCEu `integration/jade/GTJadePlugin` 注册，`integration/jade/provider/` 现仅 6 个 provider）；CTNH-Lib 侧没有 `jade/` 包，不要在那里重建 provider 排序。
+- 改动这三个类或 `CTNHJadePlugin` 前先读 `references/_architecture/AGENTS.md` §6/§8/§9；它们不是生效中的 provider，不要接线。
 - Jade 服务端数据只写客户端推导不出的信息：`lastRecipe` 已由 `@DescSynced` 同步，禁止在 Jade 中重复序列化；能耗、并行、线程状态能推导则不写 NBT。
 
 ## ANTI-PATTERNS
 - 在 API 类里加玩法逻辑；实现应留在 `common/` 或 `registry/`。
 - 从共享 API 面引用模块专属类。
 - 重新引入 `ICoilMachine`；应使用 `CoilMachineTrait`。
-- 把已注释停用的 `api/jade/` provider 重新接线，或重建 CTNH-Lib 已删除的 `JadePriorityManager` / `GTProvidersRegistrar`（上游已收敛为 GTCEu `MachineJadeProvider`）。
+- 把已注释停用的 `api/jade/` provider 重新接线，或重建 CTNH-Lib 的 `JadePriorityManager` / `GTProvidersRegistrar`（现行入口是 GTCEu `MachineJadeProvider`）。
 
 ## SCOPE
 适用于 `src/main/java/io/github/cpearl0/ctnhcore/api` 及其子包。

@@ -58,7 +58,7 @@ com.magicbee.ctnhmana/                        # 333 个 Java 文件
 ## CONVENTIONS
 - **GTM 动态包**：GT/GMT 配方经 `CTNHManaGTAddon.addRecipes()` 注册为运行时动态数据包（`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其**不产出 JSON**；静态 `src/generated/resources` 只含 tags/lang/models/worldgen/非 GT 配方。验证方式为游戏内或 `ConfigHolder.dev.dumpRecipes`。
 - **注册对象优先**：引用物品/方块/流体**必须**用静态注册对象（`CMItems.X`, `CMBlocks.X`, `CMMaterials.X`, `GTMaterials.*`, `TagPrefix.ingot`, `AEItems.X`, `CBBlocks.X`, `CEItems.X`, `CABlocks.X`, `CTPPBlocks.X`），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找；字符串 ID 仅限无注册对象的场景（上游 mod 专属 ID、配方 ID、tag key、维度 ID）。
-- **命名空间**：包名固定 `com.magicbee.ctnhmana`（历史 `com.moguang.ctnhmana` 已废弃），注册对象统一 `CM` 前缀。
+- **命名空间**：包名固定 `com.magicbee.ctnhmana`（不是 `com.moguang.ctnhmana`），注册对象统一 `CM` 前缀。
 - **配方移除走 CTNH-Lib**：`ManaRecipeRemoval.init()` 用 `RecipeRemovalHelper.remove(new RemoveFilter().id(...))` 批量删除精确 ID；类型/正则删除写在 `CTNHManaGTAddon.removeRecipes(Consumer<ResourceLocation>)` 内；本模块不得自建 `Consumer<ResourceLocation>` 删除循环或 `DataFilterPack`。
 - **重注册改命名空间**：被删除配方即使重新注册也会被过滤，需经 `CTNHManaGTAddon.changeId(...)` 把 ID 改到 `ctnhmana` 命名空间。
 - **双语文本**：所有文案走 CTNH-Lib lang provider（`com.ctnhlang.CN` / `com.ctnhlang.EN` 注解或 `Lang#translate()`），不得硬编码中文文案。

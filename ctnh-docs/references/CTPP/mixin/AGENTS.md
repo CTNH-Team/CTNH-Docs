@@ -33,7 +33,7 @@ mixin/
 - Mixin 配置与包结构必须同步：新增类要同时加进 `ctpp.mixins.json` 的 `mixins` 或 `client` 段，并按目标 mod 分组放置。
 - Create 动能行为由 Mixin 与 `dynamicPart/` 的 contraption 类共同打补丁；改旋转或移动方块行为需同时看两处。
 - 客户端专用补丁（Ponder、工具箱客户端、选取方块）必须登记在 `client` 段。
-- 转子支架（rotor holder）相关 Mixin 已移除，相关修复由 GTM 原生处理。
+- 转子支架（rotor holder）行为由 GTM 原生处理，本模块不加相关 Mixin。
 
 ## ANTI-PATTERNS
 - 改注入点却不核对上游目标成员（Create / GT / MC 版本）。

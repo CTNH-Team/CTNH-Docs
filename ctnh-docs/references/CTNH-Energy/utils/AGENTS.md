@@ -17,7 +17,7 @@ utils/
 |---------|----------|
 | 能量 / 网络查询 | `utils/CEUtil`（`getUpgradeable(BlockEntity, Direction)`, `isInSameGrid`, `getSides`, `getGridTier(IGrid/IGridNode)`, `clampToLong(BigInteger)`, `ingredientFromGenericStacks`, `isCrafting(...)`） |
 | 机器配置读写 | `utils/MEConfigUtil`（`writeGhostCircuit/readGhostCircuit`, `writeDistinctBuses/readDistinctBuses`, `writeConfigHandler/readConfigHandler`, `writeAutoPull/readAutoPull`, `writeMinStackSize/readMinStackSize`, `writeMaxStackSize/readMaxStackSize`） |
-| 样板提供者目标 | `utils/CEPatternProviderTarget`（继承 AE2 `PatternProviderTarget`，声明 `onlyHasPatternInput(IPatternDetails, boolean)` 与 `getStorage()`；文件内旧的静态包装实现为注释状态） |
+| 样板提供者目标 | `utils/CEPatternProviderTarget`（继承 AE2 `PatternProviderTarget`，声明 `onlyHasPatternInput(IPatternDetails, boolean)` 与 `getStorage()`） |
 | 提供者记录 | `utils/ProviderRecord`（record，字段 `ICraftingProvider provider, Boolean block`） |
 | 固定长度伪列表 | `utils/FakeSizedIntList`（继承 fastutil `AbstractIntList`，`ofSize(int)`，元素固定 -1） |
 | 临时染色行为 | `utils/TempColorSprayBehaviour`（继承 AE2 `ColorSprayBehaviour`，重写 `useItemDurability`） |

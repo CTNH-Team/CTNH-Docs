@@ -24,7 +24,7 @@ registry/                                 # 共 18 个 Java 文件
 | 月球方块 | `registry/worldgen/MoonBlocks.java`（含 `BUDDING_SILICON_CRYSTAL` 与三档硅晶芽） |
 | 火星方块 | `registry/worldgen/MarsBlocks.java`（含星门框架/柱/核心/折光棱镜、遗迹机器） |
 | 额外泥土与草方块 | `registry/CTNHBlockInfo.java`（`ASTRAL_DIRT`, `ASTRAL_GRASS_BLOCK`，掉落走 `api/loot/LootBuilder`） |
-| 物品 | `registry/CAItems.java`（当前仅占位辅助方法，无已注册物品） |
+| 物品 | `registry/CAItems.java`（辅助方法；`init()` 未注册任何物品，注册内容全为注释） |
 | 单方块机器 | `registry/CAMachines.java`（`OXYGEN_ENRICHER`，MV/HV/EV 三档） |
 | 多方块 | `registry/CAMultiblocks.java`（`ROCKET_ASSEMBLY_PLATFORM`，9×7×11 图案，外壳 `AllBlocks.ANDESITE_CASING`，框架不锈钢） |
 | 火箭部件 | `registry/CARocketBlocks.java`（`BASIC_ROCKET_THRUSTER` 推力 1200、`HV_ROCKET_FUEL_TANK` 容量 16000；`RocketPartStats` 映射供组装平台累加） |

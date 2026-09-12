@@ -41,9 +41,9 @@ data/
 | 配方分发根 | `data/recipe/CTNHCoreRecipeAddition.java` |
 | 铝土矿链 | `data/materials/BauxiteProcessingMaterials.java`（IMPURE/PURE_SODIUM_ALUMINATE_SOLUTION, RED_MUD, TITANYL_SULFATE）, `data/recipe/chain/AlumiumChain.java` |
 | 硼链 | `data/materials/BoronChainMaterials.java`, `data/recipe/chain/BoronChain.java` |
-| 金链改名 | `data/materials/GoldChainMaterials.java`（原 CrudeGoldRefiningMaterials） |
+| 金链材料 | `data/materials/GoldChainMaterials.java` |
 | 晶圆/精密电路 | `data/recipe/WaferRecipes.java` |
-| Create 动力换算 | `data/CreateRecipeTypes.java`（tier 换算修正） |
+| Create 动力换算 | `data/CreateRecipeTypes.java`（tier 换算） |
 | 按 age 的配方 | `data/recipe/age/`（LV..ZPM, PrimitiveKinetic） |
 | 加工链 | `data/recipe/chain/`（30 条链） |
 | Create/联动配方 | `data/recipe/create/`, `data/recipe/immersiveaircraft/`, `data/recipe/multiblock/` |
@@ -62,9 +62,9 @@ data/
 - 配方生成器按 age、chain、Create/联动、迁移脚本、mod 修改、mana 桥接、多方块与木材域拆分。
 - 配方删除：`data/recipe/RecipeRemoval.java` 只登记过滤规则（`id`/`idRegex`/`mod`/`type`/`not`/`or`），通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper`（`mixin/RecipeManagerApplyMixin`）提供，Core 侧不重复实现。动态配方刻意不过滤。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。见模块主文档 CONVENTIONS。
-- `CreateRecipeTypes` 的 mechanicalTier 换算为 `Math.min(GTUtil.getTierByVoltage(EUt), 5)`，适用于 MECHANICAL_PRESSOR/MIXER/CENTRIFUGE/SIFTER/LATHE；`*2` 已被移除。
-- 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`（原 Aluminium Hydroxide）、`PURE_SODIUM_ALUMINATE_SOLUTION` `NaAl(OH)4+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution` 取代了 `aluminium_hydroxide_solution`。
-- AlumiumChain 调参：绿蓝宝石/蓝宝石/红宝石离心改 `VA[HV]`，硅/镁 `VA[MV]`，Ti 产量略升、Al 产量略降，HCl 用量下降。
+- `CreateRecipeTypes` 的 mechanicalTier 换算为 `Math.min(GTUtil.getTierByVoltage(EUt), 5)`，适用于 MECHANICAL_PRESSOR/MIXER/CENTRIFUGE/SIFTER/LATHE。
+- 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`、`PURE_SODIUM_ALUMINATE_SOLUTION` `NaAl(OH)4+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution`。
+- AlumiumChain 离心电压：绿蓝宝石/蓝宝石/红宝石 `VA[HV]`，硅/镁 `VA[MV]`。
 
 ## ANTI-PATTERNS
 - 手工编辑 `src/generated/resources`；应改 datagen Java 后跑 `runData`。

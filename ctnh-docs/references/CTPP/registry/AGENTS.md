@@ -25,7 +25,7 @@ CTPP 的 Registrate 注册面（12 个 Java 文件）：物品、方块、方块
 - `CTPP.java` 构造函数经 `DistExecutor.unsafeRunForDist` 分流 `ClientProxy` / `CommonProxy`，随后调用 `CTPPEntityTypes.init()`。
 - `CTPPRegistration.REGISTRATE.registerRegistrate()` 在 `common/CommonProxy.init()` 中调用；机器、配方类型、配方条件分别经 `GTCEuAPI.RegisterEvent` 泛型监听器（`registerMachines` / `registerRecipeTypes` / `registerRecipeConditions`）注册。
 - `CTPPGTAddon.initializeAddon()` 初始化 `CTPPBlocks`、`CTPPBlockEntities`、`CTPPBlockMaps`，并注册 `MagnetPlacementHelper` 放置助手。
-- `CTPPRecipeTypes.init()` 目前只启用 `MACERATOR_RECIPES` → `SMASHING_FACTORY_RECIPES` 的自动转换；`MIXER_RECIPES` → `KINETIC_MIXER_RECIPES` 的挂钩已注释掉。
+- `CTPPRecipeTypes.init()` 只启用 `MACERATOR_RECIPES` → `SMASHING_FACTORY_RECIPES` 的自动转换；`MIXER_RECIPES` → `KINETIC_MIXER_RECIPES` 的挂钩被注释掉，不要依赖。
 - `CTPPRecipeModifiers` 的两个修饰符只作用于 `KineticWorkableMultiblockMachine`，其他机器返回 `null`。
 - 材料走两条事件：`MaterialRegistryEvent` 创建 `ctpp` 材料注册表，`MaterialEvent` 调用 `CreateMaterials.init()`。
 

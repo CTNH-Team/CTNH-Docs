@@ -1,7 +1,7 @@
 # CTNH-CORE MIXIN DOMAIN
 
 ## OVERVIEW
-跨 mod Mixin 补丁（47 个 Java 文件，其中 47 个类带 `@Mixin`）：AECs、Apotheosis、Ars Nouveau、Avaritia、Create、Create Diesel、EIO、EMI、Ecliptic Seasons、FTB Chunks、FTB Essentials、GTCEu、JAVD、Legendary Survival、Minecraft（区块/刷怪/服务器）、TMRV、Vintage Improvements。
+跨 mod Mixin 补丁（47 个 Java 文件，全部为 `@Mixin` 类）：AECs、Apotheosis、Ars Nouveau、Avaritia、Create、Create Diesel、EIO、EMI、Ecliptic Seasons、FTB Chunks、FTB Essentials、GTCEu、JAVD、Legendary Survival、Minecraft（区块/刷怪/服务器）、TMRV、Vintage Improvements。
 
 ## STRUCTURE
 ```text

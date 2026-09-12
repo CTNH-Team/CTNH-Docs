@@ -34,7 +34,7 @@ ctpp/
                               ItemAxisBuilder, MathUtil
 ```
 
-已移除项：`CTPPValues`（机械等级改用 `GTValues.VNF`）、`integration/emi`（迁至 CTNH-Core）、`KineticOutputMachineProvider`、转子支架（rotor holder）Mixin、`OreProcessingRecipes`。
+本模块没有 `CTPPValues`（机械等级经 `GTValues.VNF`）与 `integration/emi`（EMI 对接归 CTNH-Core）；转子支架与 `OreProcessingRecipes` 在 CTNH-Core `data/recipe` 侧，本模块不含。
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -110,7 +110,7 @@ CTPP 定义两族配方类型：动能/电动机器用 GT 风格 `GTRecipeType`�
 **Vintage Improvements（8 个）**——继承 `AbstractVintageRecipeBuilder`，经 `VintageRecipes` 枚举取类型；`builder/vintage/` 共 10 个文件（8 个 builder + 抽象基类 + `VintageRecipeResult`）：`CentrifugationRecipeBuilder`（`CENTRIFUGATION`）、`CoilingRecipeBuilder`（`COILING`）、`CurvingRecipeBuilder`（`CURVING`）、`HammeringRecipeBuilder`（`HAMMERING`）、`PressurizingRecipeBuilder`（`PRESSURIZING`）、`TurningRecipeBuilder`（`TURNING`）、`VacuumizingRecipeBuilder`（`VACUUMIZING`）、`VibratingRecipeBuilder`（`VIBRATING`）；均支持物品/流体 I/O + RPM + 热量。
 
 ### 自定义配方基础设施
-- **Capability** `StressRecipeCapability`（key `"su"`，Float）——GT 配方的动能应力 I/O，驱动 `KineticWorkableMultiblockMachine` / `KineticOutputMachine` 的并行计算；注册入口 `CTPPRecipeCapabilities.init()`（由 `CTPPGTAddon.registerRecipeCapabilities()` 调用）。Lang key 为 `ctpp.stressrecipecapability.{capabilityname,stressconsumption,stressproduction,stressinput,stressoutput}`（旧 `recipe.capability.su.name`、`ctpp.top.*` 已移除）。
+- **Capability** `StressRecipeCapability`（key `"su"`，Float）——GT 配方的动能应力 I/O，驱动 `KineticWorkableMultiblockMachine` / `KineticOutputMachine` 的并行计算；注册入口 `CTPPRecipeCapabilities.init()`（由 `CTPPGTAddon.registerRecipeCapabilities()` 调用）。Lang key 为 `ctpp.stressrecipecapability.{capabilityname,stressconsumption,stressproduction,stressinput,stressoutput}`。
 - **Conditions** `RPMCondition`（`"rpm"`）与 `MechanicalTierCondition`（`"mechanical_tier"`）——动能配方的转速/等级要求；`MechanicalTierCondition` 用 `GTValues.VNF[tier]` 显示。
 - **Modifiers** `KINETIC_PARALLEL`（应力倍数 + 精确并行）与 `KINETIC_PERFECT_PARALLEL`（完美并行变体）——两者都只作用于 `KineticWorkableMultiblockMachine`。
 - **Recipe builder** `CTPPRecipeBuilder` 扩展 `GTRecipeBuilder`，提供 `.rpm(float)`、`.rpm(float, boolean)`、`.mechanicalTier(int)`、`.inputStress(float)`、`.outputStress(float)`、`.noEUt()`。

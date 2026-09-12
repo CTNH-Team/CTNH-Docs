@@ -31,7 +31,7 @@ api/
 | Mixin 契约 | `api/mixin/IBloodAltarLogic.java`（`CM$resetCapacity(int)`, `CM$setCapacityMultiplier(float)`, `CM$BroadcastPos(BlockPos)`, `CM$ConsumeLPIfEnough(int)`） |
 
 ## CONVENTIONS
-- `BTManaContainerTrait extends MachineTrait implements ManaReceiver`：持久化 `@Persisted maxBTMana`（仅 `@Getter`）与 `@Persisted BTMana`（`@Getter @Setter`）；`setMaxBTMana(int)` 以 `Math.max(0, ...)` 夹紧并同步压低 `BTMana`；默认容量 `10_000`。它是 BTMana 的唯一归属者，取代旧版 `ManaMachineBlockEntity` 上的字段。
+- `BTManaContainerTrait extends MachineTrait implements ManaReceiver`：持久化 `@Persisted maxBTMana`（仅 `@Getter`）与 `@Persisted BTMana`（`@Getter @Setter`）；`setMaxBTMana(int)` 以 `Math.max(0, ...)` 夹紧并同步压低 `BTMana`；默认容量 `10_000`。它是 BTMana 的唯一归属者。
 - `MysticSpireManaTrait extends MachineTrait implements ManaReceiver`：`@Persisted` 存 `int maxBTMana/BTMana` 与 `String trueMana/trueManaCapacity`；BigInteger 经 `SpireBigMath.parsePersisted` / `toPersistString` / `nonNegative` 转换；暴露 `getTrueManaBig` / `getTrueManaCapBig` / `getTrueManaRoomBig` / `setTrueManaCapacityBig` / `setMaxMana` / `syncManaCache` / `mysticOutboundTickCap(int)` / `mysticInboundTickBudget(int)` / `mysticDrainMana(int)` / `sendMana(long)` / `receiveMana(int)`。
 - `ExtendedControlBusCircuitTrait`（`final`）：`@Persisted CustomItemStackHandler storage`，构造 `(MetaMachine, int laneCount)`，`setFilter(IntCircuitBehaviour::isIntegratedCircuit)`，内容变更回调 `onChanged`。
 - `api/recipe/customlogic/` 的 6 个类实现 `GTRecipeType.ICustomRecipeLogic`，负责自定义配方匹配，**不是** `RecipeLogic` 子类。
