@@ -1,7 +1,7 @@
 # CTNH-CORE REGISTRY DOMAIN
 
 ## OVERVIEW
-Core 的 Registrate 注册面（50 个根 + 子包类）：物品、方块、方块实体、创造栏、tags、模型、配方类型/修饰符/条件、GTCEu 机器与多方块、材料、矿石、流体矿脉、世界生成层与音效。精准装配线改写落在 `GTMachineModify`。
+Core 的 Registrate 注册面（50 个 Java 文件：根包 27 + 子包 23）：物品、方块、方块实体、创造栏、tags、模型、配方类型/修饰符/条件、GTCEu 机器与多方块、材料、矿石、流体矿脉、世界生成层与音效。精准装配线改写落在 `GTMachineModify`。
 
 ## STRUCTURE
 ```
@@ -47,7 +47,7 @@ registry/
   - 普通多方块在 registrate 链上直接 `.cnLangValue("中文名")`（如 `GTNNMultiblocks.CHEMICAL_PLANT` = `"埃克森美孚化工厂"`、`MultiblocksA` 的 `"地暖"`/`"屠宰场"`/`"焦化塔"`、`Mechanical` 的五个机械厂）。
   - 工厂方法同样要求 `cnName` 形参：`WindPowerArrayRegister.register(name, tier, casing, frame, renderCasing, cnName)`、`MultiblocksA.registerPhotovoltaicPowerStation(tier, basicRate, photovoltaicBlock, cnName)`、`utils/CTNHMachineUtils.registerLargeCombustionEngine(..., cnName)`。
   - 分级机器走 `utils/CTNHMachineUtils.registerTieredMachines(name, cnname, factory, builder, tiers...)`，内部 `.cnLangValue(VNF[tier] + cnname)`。
-  - `CTNHMachines` 中 52 个分级机器/仓室用 `@Key("block.ctnhcore.*")` + `@CN` + `Lang` 字段逐级声明中文名（无公式）；不要以它们为模板新增内容。
+  - `CTNHMachines` 中 50 个分级机器/仓室用 `@Key("block.ctnhcore.*")` + `@CN` + `Lang` 字段逐级声明中文名（无公式）；不要以它们为模板新增内容。
   - lang 键名与玩家可见文案保持不变；方块的 `cnlang`/`cnLangValue` 只影响生成的中文 lang 条目。
 - 大型多方块注册文件使用 `spotless:off/on`；保留该局部格式化边界。
 - `CTNHCoreGTAddon.initializeAddon()` 初始化物品、方块、方块实体与方块映射；后续 hook 注册 tag prefix、元素、矿石/流体矿脉、世界生成层、配方与配方删除。

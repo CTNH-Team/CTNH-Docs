@@ -11,7 +11,7 @@ data/
 |-- CreateRecipeTypes.java        # mechanicalTier 用 Math.min(tier, 5)，不是 *2
 |-- item/                         # CrystalItems
 |-- machines/                     # GTNNMachines
-|-- materials/                    # 26 个材料集：BauxiteProcessingMaterials、BoronChainMaterials、GoldChainMaterials、NaquadahMaterials、PlatinumLineMaterials、RareEarthMaterials、RareearthBastnasiteChain 相关、WetWareLineMaterials、ZrHfSeparationMaterials ...
+|-- materials/                    # 26 个材料集：BauxiteProcessingMaterials、BoronChainMaterials、GoldChainMaterials、NaquadahMaterials、PlatinumLineMaterials、RareEarthMaterials、SecondMaterials、SpecialMaterials、WetWareLineMaterials、ZrHfSeparationMaterials ...
 |-- tags/                         # CTNHBiomeTagsProvider, CTNHEntityTypeTagsProvider, CTNHExtraBlockTagsProvider, CTNHExtraFluidTagsProvider, CTNHExtraItemTagsProvider, ItemTags, StoneTags, TagClearHelper
 |-- worldgen/                     # CTNHBiomeModifiers
 `-- recipe/

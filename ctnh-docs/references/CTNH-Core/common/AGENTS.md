@@ -62,7 +62,7 @@ common/
 ## CONVENTIONS
 - `CommonProxy.java` 注册 config、registrate、配方条件、机器、配方类型、datagen、创造栏，以及客户端/服务端 setup 监听器。
 - 机器实现放在本域；其 registrate 条目在 `registry/machines/` 与 `registry/CTNHMachines.java`。
-- 电力多方块遵循 `*Machine` 命名；现存 `WPA_old.java` 等少数文件不符合该命名，勿作为模板；部件实现 `CTNHPartAbility`。
+- 电力多方块遵循 `*Machine` 命名；`WPA_old.java` 整文件注释、不提供可用实现，勿作为模板；部件实现 `CTNHPartAbility`。
 - electric 下的 `rareearth/` 子包是过程控制机器抽象与其 profile，属于电力多方块层级的一部分。
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。
 - 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
@@ -87,7 +87,7 @@ common/
 ## ANTI-PATTERNS
 - 绕过 `CommonProxy` 的注册顺序；注册表依赖是刻意安排的。
 - 在 common 机器类里放仅客户端渲染。
-- 把 `WPA_old.java` 或 `MachineModeFancyConfiguratorTest` 当成现行实现；两者都是遗留物。
+- 把整文件注释的 `WPA_old.java` 当成现行实现。`MachineModeFancyConfiguratorTest` 是 `CryotheumFreezer` 专用的侧栏子页签实现，不要照抄为通用模板（通用模式页签走 GTCEu `MachineModeFancyConfigurator`）。
 - 重新引入机器自有的 `@DescSynced fluidBlockOffsets` 或 `ICoilMachine`；应使用 `MultiblockFluidRendererTrait` 与 `CoilMachineTrait`。
 - 在本域给方块/机器补 `@Key("block.ctnhcore.*")` + `Lang` 字段伪造翻译（正确写法见 registry 域文档）。
 
