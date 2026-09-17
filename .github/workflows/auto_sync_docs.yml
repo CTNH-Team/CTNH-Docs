@@ -256,8 +256,10 @@ jobs:
         if: steps.plan.outputs.has_modules == 'true'
         run: python scripts/verify_docs.py
       - name: Ensure base branch is current
-        # 放在推进水位之前：无法产出 PR 的轮次不应该动 state
-        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
+        # 放在推进水位之前：无法产出 PR 的轮次不应该动 state。
+        # 显式 success() 同 Advance：失败轮次本就跳过，这里只把意图写明，
+        # 避免失败时再拿“基点前进”报第二个错、掩盖真正的失败原因。
+        if: success() && steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
         env:
           BASE_REF: ${{ github.ref_name }}
         run: |
@@ -277,10 +279,15 @@ jobs:
           fi
           echo "base $BASE_REF is current at ${local_sha:0:8}."
 
+      # 显式写出 success() 只为把意图写在纸面上：GitHub 对不含状态检查函数的 if 本来
+      # 就会隐式附加 success()，所以 agent/闸门失败时这一步一直是跳过的。
+      # 真正会「推进了水位却没有文档」的原因是脚本层面：旧 advance_state 会把计划里
+      # 每个模块的水位都推一遍，哪怕该模块一个文档都没写（agent 退出 0 但空产出同样
+      # 能过 verify_docs）。现在改为按模块核对实际文档改动，见 scripts/advance_state.py。
       - name: Advance sync state
         id: round
         # 只检测到主仓库变更时也要推进水位，否则同一批提交会被反复轮询到
-        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
+        if: success() && steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
         run: python scripts/advance_state.py
 
       - name: Upload agent artifacts
@@ -298,7 +305,7 @@ jobs:
 
       - name: Create Pull Request
         # 无改动时 create-pull-request 自身会跳过，不会产生空 PR
-        if: steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
+        if: success() && steps.pending.outputs.has_updates == 'true' && inputs.dry_run != true
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

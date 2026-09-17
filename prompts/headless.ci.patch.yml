@@ -19,3 +19,24 @@
     # both = 原生 schema + run_code（PTC）同时可见；ptc = 只暴露 run_code。
     mode: !!js process.env.DSH_TOOLS_MODE || 'both'
     maxParallelSubCalls: 10
+# 瞬时模型请求失败的重试：dsh 自带 dsh-llm-retry 执行器，但提供方默认策略只对
+# EMPTY_RESPONSE / RATE_LIMIT / SERVER / TIMEOUT / TRANSPORT 重试（默认 5 次）。
+# 实测 CI 会撞上 "dsh: STREAM_CLOSED: SSE stream ended without [DONE]" —— 该 code
+# 不在默认集合里，于是整轮直接失败、文档一个都没写。这里把它加进可重试集合并把
+# 上限提到 10 次，让这类瞬时断流在同一个轮次内自愈，而不是让整轮作废。
+- id: llm-deepseek
+  config:
+    retryPolicy:
+      mode: normal
+      maxRetries: 10
+      retryableCodes:
+        - STREAM_CLOSED
+        - EMPTY_RESPONSE
+        - RATE_LIMIT
+        - SERVER
+        - TIMEOUT
+        - TRANSPORT
+      backoff:
+        initialDelayMs: 1000
+        maxDelayMs: 30000
+        jitterRatio: 0.2
