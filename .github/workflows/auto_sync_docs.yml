@@ -187,6 +187,18 @@ jobs:
               head -c 300 "$RUNNER_TEMP/relay-body.txt" | redact || true
               exit 1 ;;
             *)
+              # 未知模型 id 会返回 503（不是 404），若只当「临时故障」放行，就要等到
+              # agent 阶段才以 STREAM_CLOSED / 空响应之类的怪错误暴露，极难定位。
+              # 实测把 DSH_MODEL 设成中转不支持的 id 就是这个症状，因此这里硬失败。
+              if grep -qiE 'not supported|model_not_found|unknown model|invalid model|no such model' "$RUNNER_TEMP/relay-body.txt"; then
+                echo "::error::模型 \"$DSH_MODEL\" 不被该中转支持（HTTP $http）——请把仓库变量 DSH_MODEL 改成中转支持的 id"
+                head -c 300 "$RUNNER_TEMP/relay-body.txt" | redact || true
+                set +e
+                curl -sS --max-time 20 -H "Authorization: Bearer $DEEPSEEK_API_KEY" "$base/models" 2>/dev/null \
+                  | grep -oE '"id"[[:space:]]*:[[:space:]]*"[^"]+"' | head -n 20 || true
+                set -e
+                exit 1
+              fi
               echo "::warning::端点返回 HTTP $http，仍继续尝试（可能是限流或临时故障）"
               head -c 300 "$RUNNER_TEMP/relay-body.txt" | redact || true ;;
           esac
