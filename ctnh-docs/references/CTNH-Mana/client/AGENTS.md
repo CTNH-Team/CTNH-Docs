@@ -1,7 +1,7 @@
 # CTNH-MANA CLIENT DOMAIN
 
 ## OVERVIEW
-`client/` 是 CTNH-Mana 的客户端面（41 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
+`client/` 是 CTNH-Mana 的客户端面（43 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
 
 ## STRUCTURE
 ```text
@@ -11,7 +11,7 @@ client/
 ├── model/                     # 8: CMModels, GiantBeeModel, MagicCubeModel, ModelBase, ModelDefinition, RoyalServantBeeModel, StarCakeBlockModel, StarCakeItemModel
 ├── ponder/                    # CTNHManaPonderPlugin, CTNHManaPonderSceneBuilder, CTNHManaPonderScenes, CTNHManaPonderTags
 │   └── mana/                  # MagicRituals, MysticSpire, PonderParticleUtil
-├── render/                    # 17: AntagonismRender, BeeNukeProjectileRenderer, DeltaSparkRenderer, DemonWillRender, EternalGardenRender, GiantBeeRenderer, MaliciousThermalilyProjectileRenderer, ManaCondenserRender, ManaReactorRender, OmegaSparkRenderer, RoyalServantBeeRenderer, ShroudGazingRender, StarCakeItemRender, StarCakeMachineBERProvider, StarCakeRender, WitherAconiteProjectileRenderer, ZenithMatrixRender
+├── render/                    # 19: AntagonismRender, BeeNukeProjectileRenderer, DeltaSparkRenderer, DemonWillRender, EternalGardenRender, GiantBeeRenderer, MaliciousThermalilyProjectileRenderer, ManaCondenserRender, ManaReactorRender, OmegaSparkRenderer, RoyalServantBeeRenderer, ShroudGazingRender, StarCakeItemRender, StarCakeMachineBERProvider, StarCakeRender, UltraManaMistModel, UltraManaMistRenderType, WitherAconiteProjectileRenderer, ZenithMatrixRender
 │   └── particle/              # IconParticle
 └── utils/                     # RenderUtils
 ```
@@ -23,6 +23,7 @@ client/
 | 动态渲染注册 | `ClientProxy.init()`：`DynamicRenderManager.register` 注册 `zenith_laser`, `eternal_garden`, `mana_condenser`, `mana_reactor`, `demon_will_generator` 五个渲染类型 |
 | shader | `ClientProxy.registerShaders()`：`zenith` 与 `zenith_beam`，经静态 getter 暴露 |
 | 物品属性谓词 | `ClientProxy.onClientSetup()`：`CMItems.SABER_WAND` 的 `wand_status`（由 `SaberWandItem.getBindMode` 决定）、`CMItems.CADUCEUS` 的 `tool_type`（读 NBT `caduceus_type_index`，除以 12） |
+| 究极魔力锭迷雾模型 | `ClientProxy.onModifyBakingResult()` 按物品 id 把烘焙结果替换为 `UltraManaMistModel`（`render/UltraManaMistRenderType` 提供加法混合的迷雾渲染层） |
 | 粒子 / 模型层 | `ClientProxy.onRegisterParticleProviders()`（`CMParticleTypes.INDEX_TARGET` → `IconParticle.Provider`）、`onRegisterLayerDefinitions()`（`CMModelLayers.init()`） |
 | Caduceus 轮盘 | `client/gui/radial/`（4 类）；按键触发在 `event/ForgeEventHandler.keyEvent` |
 | Ponder 插件 | `client/ponder/CTNHManaPonderPlugin.java`（`getModId` → `CTNHMana.MODID`；注册 `CTNHManaPonderScenes` 与 `CTNHManaPonderTags`） |
@@ -30,7 +31,7 @@ client/
 | 尖塔 / 仪式场景 | `client/ponder/mana/`（`MagicRituals`, `MysticSpire`, `PonderParticleUtil`） |
 | Ponder 构建器适配 | `client/ponder/CTNHManaPonderSceneBuilder.java` |
 | 模型 | `client/model/`（8） |
-| 渲染器 | `client/render/`（17）+ `render/particle/IconParticle` |
+| 渲染器 | `client/render/`（19）+ `render/particle/IconParticle` |
 | 虚境客户端镜像 | `client/ZenithInvadeClient.java`, `client/ZenithMatrixEffect.java` |
 
 ## CONVENTIONS
@@ -39,6 +40,7 @@ client/
 - Ponder 插件由 `ClientProxy.onClientSetup()` 经 `PonderIndex.addPlugin(new CTNHManaPonderPlugin())` 挂载；插件本身不含注册逻辑。
 - 动态渲染类型必须在 `ClientProxy.init()` 注册，渲染类本身只提供 `TYPE`。
 - Caduceus / Saber 的客户端行为由「网络包 + 物品属性谓词」两处共同决定，改动需成对检查。
+- 究极魔力锭的迷雾是纯附加 pass：`UltraManaMistModel` 只额外产出一组每帧重算的加法混合 quad（`UltraManaMistRenderType.mist()`），物品本体仍委托被包装的底层烘焙模型；`ClientProxy.onModifyBakingResult()` 必须按 `CTNHMana.id("ultra_mana_ingot")` 的 `inventory` 模型定位替换，不要往 GTCEu 动态资源包里的父模型挂自定义 loader。
 
 ## ANTI-PATTERNS
 - 把 Mana 的 Ponder 场景/标签/插件搬到 CTNH-Core 或 CTNH-Lib（共享 builder 才归 Lib）。
