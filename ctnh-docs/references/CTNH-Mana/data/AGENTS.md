@@ -23,7 +23,7 @@ data/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| 配方移除清单 | `data/recipe/ManaRecipeRemoval.java`（`final`，`REMOVED_RECIPE_IDS: List<String>` 共 32 条精确 ID，`init()` 无参，逐条 `RecipeRemovalHelper.remove(new RemoveFilter().id(recipeId))`） |
+| 配方移除清单 | `data/recipe/ManaRecipeRemoval.java`（`final`，`REMOVED_RECIPE_IDS: List<String>` 共 36 条精确 ID，`init()` 无参，逐条 `RecipeRemovalHelper.remove(new RemoveFilter().id(recipeId))`） |
 | GTAddon 移除入口 | `CTNHManaGTAddon.removeRecipes(Consumer<ResourceLocation> ignoredConsumer)`：先 `ManaRecipeRemoval.init()`，再用 `RemoveFilter` 删除 `bloodmagic:altar`、`botania:petal_apothecary`、`botania:runic_altar`、`botania:terra_plate`、`extrabotany:petal_apothecary`（`.type(...)`）与 `mythicbotany:.*_runic_altar`（`.idRegex(...)`）、`bloodmagic:soulforge`（`.type(...)`） |
 | 配方重注册 | `CTNHManaGTAddon.changeId(Consumer<FinishedRecipe>)`：把被删配方的 ID 改写到 `ctnhmana` 命名空间后重新注册 |
 | GT/机器配方 | `data/recipe/` 顶层 33 个 `*Recipes` 类 |

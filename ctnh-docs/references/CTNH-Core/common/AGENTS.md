@@ -68,6 +68,7 @@ common/
 - 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
 - Trait 所有权：`NetworkedComputationContainer`、`NotifiableItemStackHandler`、`MultiblockFluidRendererTrait`、`CoilMachineTrait` 都在构造阶段经 `attachTrait()` 挂载，同一份状态不得再复制成机器字段。`BlazeBlastFurnaceMachine`/`FermentingTankMachine` 经 `getTraitOrThrow(CoilMachineTrait.class)` 查询线圈。
 - 机器中文名在注册处声明（`.cnLangValue(...)` / 工厂 `cnName` 形参），不在 `common/` 里写 `@Key` + `Lang` 字段。见 registry 域文档。
+- **配方失败原因**：机器在 `recipeModifier(...)` / `beforeWorking(...)` 返回 `Component` 时，玩家可见文案用 `@CN/@EN` 注解的 `Lang` 静态字段声明并调用 `.translate()`（如 `KineticElectricMultiblockMachine.insufficientKineticSpeed`、`Arc_Generator.arcIntensityInsufficient`、`PlasmaAlloyBlast.missingPlasma`、`WideParticleAccelerator.nuSpeedInsufficient`、`Superconducting_Penning_Trap.insufficientPower`）；发电机/涡轮在无正数 `recipe.getOutputEUt()` 或输出上限不足时返回 `null`，由后续配方匹配给出实际失败原因。机器类型不匹配经 `RecipeModifier.nullWrongType(...)` 返回 `DEFAULT_FAILURE` 并记录开发期错误日志。
 
 ## TRAIT OWNERSHIP
 所有权与字段规则以 `references/_architecture/AGENTS.md` 为准（§1 边界、§2 字段、§4 capability 分层）。Core 侧落点：
