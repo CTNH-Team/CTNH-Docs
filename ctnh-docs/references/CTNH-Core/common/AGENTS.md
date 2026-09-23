@@ -67,6 +67,7 @@ common/
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。
 - 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
 - Trait 所有权：`NetworkedComputationContainer`、`NotifiableItemStackHandler`、`MultiblockFluidRendererTrait`、`CoilMachineTrait` 都在构造阶段经 `attachTrait()` 挂载，同一份状态不得再复制成机器字段。`BlazeBlastFurnaceMachine`/`FermentingTankMachine` 经 `getTraitOrThrow(CoilMachineTrait.class)` 查询线圈。
+- **配方修饰符签名**：机器配方修饰符为 `public static Component recipeModifier(MetaMachine machine, RecipeHandlerGroup group, GTRecipe recipe)`——返回 `null` 表示成功，返回 `Component` 表示失败原因（如 `SinopeChemical`, `WideParticleAccelerator`, `MegaTurbineMachine`, `PhotoVoltaicDroneStation`, `PlasmaAlloyBlast`）。机器类型不匹配经 `RecipeModifier.nullWrongType(<MachineClass>.class, machine)` 返回：它同时 `GTCEu.LOGGER.error` 记录开发期类型错误并返回 `RecipeModifier.DEFAULT_FAILURE`（`gtceu.recipe_modifier.default_fail`），是开发期类型错误的信号，不冒充玩家可见的真实失败原因；真实失败原因由 GTCEu `RecipeHelper.matchContents` 给出。发电机类机器读取 `recipe.getOutputEUt()`（见模块主文档）。
 - 机器中文名在注册处声明（`.cnLangValue(...)` / 工厂 `cnName` 形参），不在 `common/` 里写 `@Key` + `Lang` 字段。见 registry 域文档。
 
 ## TRAIT OWNERSHIP

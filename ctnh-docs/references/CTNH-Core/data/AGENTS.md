@@ -65,6 +65,8 @@ data/
 - `CreateRecipeTypes` 的 mechanicalTier 换算为 `Math.min(GTUtil.getTierByVoltage(EUt), 5)`，适用于 MECHANICAL_PRESSOR/MIXER/CENTRIFUGE/SIFTER/LATHE。
 - 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`、`PURE_SODIUM_ALUMINATE_SOLUTION` `NaAl(OH)4+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution`。
 - AlumiumChain 离心电压：绿蓝宝石/蓝宝石/红宝石 `VA[HV]`，硅/镁 `VA[MV]`。
+- 硼链材料：`LEACHED_BORAX_SOLUTION`（`2NaCl+4H3BO3+nH2O`，酸浸硼砂溶液）、`BORON_TRIOXIDE`、`LEACHED_OLIVINE_SOLUTION`（`MgCl2+FeCl3+nH2O`，酸浸橄榄石溶液）、`MAGNESIUM_HYDROXIDE`（`Mg(OH)2`）、`IRON_HYDROXIDE`（`Fe(OH)3`）。
+- 硼链配方：硼砂酸浸与蒸馏走 `LEACHED_BORAX_SOLUTION`；`BoronChain` 同时产出镁线——菱镁矿煅烧、盐酸浸取菱镁矿/氧化镁、橄榄石酸浸与碱沉、氢氧化镁/氢氧化铁转氯化物与煅烧、氯化镁与氧化镁电解。
 
 ## ANTI-PATTERNS
 - 手工编辑 `src/generated/resources`；应改 datagen Java 后跑 `runData`。

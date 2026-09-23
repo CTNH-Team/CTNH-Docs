@@ -62,6 +62,8 @@ common/
 - 加载完成钩子：`CommonProxy.onFMLoadComplete()` 用 `BloodMagicAPI.INSTANCE.registerAltarComponent(CMBlocks.CASING_BLOODLOGIC.getDefaultState(), "CRYSTAL")`。
 - GT/GMT 配方是运行时动态包数据（`CTNHManaGTAddon.addRecipes()`），`runData` 对其不产出 JSON。物品/方块/流体引用必须用 `CMItems.X`/`CMBlocks.X` 等静态对象，不得字符串查找。
 - 多方块定义（图案、中文名、tooltip、配方类型接线）写在 `registry/multiblock/*`，`common/multiblock/` 只放实现。
+- **跨并行批次预算**：`CrossParallelManaMultiBlockMachine implements ICrossParallelRecipeLogicMachine`，`createRecipeLogic()` 返回 `CrossParallelRecipeLogic`。GT 视野（`upgrade.type == "GT"`）总并行预算为 `GTUpgradeItemT2` 时 1024、否则 512，已并入并行从 `CrossParallelRecipeLogic.mergedRecipe.parallels` 实时读取，预算耗尽返回 `RecipeModifier.DEFAULT_FAILURE`；非 GT 视野先扣除已并入并行与已占用 `RecipeHelper.getRealEUt`，再取剩余并行与输入容量额度。
+- 升级件并行增益：`BTUpgradeItemT1.calculateNormalUpgrade` 为 `min(8, BTMana/50000) + min(8, maxBTMana/200000)`（两项各上限 8）。
 
 ## ANTI-PATTERNS
 - 在 BlockEntity 上重新引入魔力字段，或复制 trait 已持有的状态。
