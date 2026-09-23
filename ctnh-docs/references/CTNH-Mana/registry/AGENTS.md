@@ -21,7 +21,7 @@ registry/
 | Registrate 根 | `registry/CMRegistrate.java`（`CTNHMana.REGISTRATE = CMRegistrate.create()`，由 `CommonProxy.init()` 调 `registerRegistrate()`） |
 | 物品 | `registry/CMItems.java`, `registry/items/CMFuelItems.java` |
 | 方块 / BE / 实体 | `registry/CMBlocks.java`, `registry/CMBlockEntities.java`, `registry/CMEntities.java` |
-| 机器与多方块 | `registry/CMMachines.java`, `registry/CMMultiblockMachines.java`，分组定义在 `registry/multiblock/`（BloodMagic 1277 行、Botania 2035 行、ManaMachine 539 行、Misc 3025 行、ZenithMachine 425 行） |
+| 机器与多方块 | `registry/CMMachines.java`, `registry/CMMultiblockMachines.java`，分组定义在 `registry/multiblock/`（BloodMagic 1276 行、Botania 2035 行、ManaMachine 538 行、Misc 3025 行、ZenithMachine 425 行）；`BloodMagic.DEMON_WILL_GENERATOR` 用 `.cnLangValue("觉恋贴贴发电机")`，实现类 `DemonWillMachine`、id `demon_will_generator` |
 | 材料 / 元素 / tag prefix | `registry/CMMaterials.java`, `registry/CMElements.java`, `registry/CMTagPrefixes.java`, `registry/GTMaterialAddon.java` |
 | 配方类型 / 条件 | `registry/CMRecipeTypes.java`（28 个 `GTRecipeType`）, `registry/CMRecipeConditions.java` |
 | 效果 / 音效 / 粒子 / 贴图 / 模型层 | `registry/CMMobEffects.java`, `registry/sounds/{CMSoundEvent, CMSoundDefinitionsProvider}`, `registry/CMParticleTypes.java`, `registry/CMGuiTextures.java`, `registry/CMModelLayers.java` |
