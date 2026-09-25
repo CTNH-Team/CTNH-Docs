@@ -48,7 +48,7 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 
 | 模块 | 包 | 场景分组 |
 |------|----|----------|
-| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/` |
+| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/`、`Misc/`（不属于前两类的通用内容，如桶） |
 | CTNH-Energy | `tech.luckyblock.mcmod.ctnhenergy.client.ponder` | `ae2/` |
 | CTNH-Mana | `com.magicbee.ctnhmana.client.ponder` | `mana/`（含 `PonderParticleUtil`） |
 | CTPP | `com.mo_guang.ctpp.client.ponder` | `electric/`、`kinetic/` |
@@ -186,6 +186,9 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 | tag 不出现 | 没 `addToIndex()`，或没 `register()` | 补齐调用链，重跑 `runData` |
 | 场景里结构错位/悬空 | 蓝图的 `pos` 与 `pattern` 还原不一致，或忘了套地板 | 用 `--print` 看 footprint 与控制器坐标，再和 `aisle` 对照 |
 | 生成时报"没有 controller"或"y=0 保留" | 蓝图漏标主方块，或结构压到了地板层 | 给主方块加 `"controller": true`；结构 y 从 1 起 |
+| 管道在场景里是**一根光柱、没连上** | GT 管道的连接存在 BE 的 `connections` 位掩码里，Ponder 不跑 tick 不会自动连 | 在蓝图该方块的 `nbt` 里写 `"connections"`（竖直贯通 = 3）；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 6 节 |
+| 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
+| 同一方块要在不同步骤"换位置" | 用坐标魔法数字或准备两份 NBT | `showIndependentSection` + `moveSection`，见 [references/api-cheatsheet.md](references/api-cheatsheet.md) |
 
 ## 上游 Ponder 改动边界
 
@@ -207,6 +210,13 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
   这些必须来自文件、源码或玩家的实际摆放；不确定就标注为待确认。
 - **不要假装验证过**：`runData` 只证明 lang；场景的观感、镜头、时序需要在游戏内确认。
   只编译通过不等于场景可用。
+- **上游方块 id 要落到证据上，不要靠拼名字猜。** 常见来源，按可靠度排序：
+  1. 游戏注册日志——跑过一次 `runClient`/`runData` 后，`modules/<Module>/run/logs/debug.log`
+     里有 `Registered <id> to registry minecraft:block`，这是运行时真值；
+  2. 生成物——`src/generated/resources/assets/<mod>/blockstates/<name>.json`、`models/`；
+  3. 注册代码——例如 GT 管道是 `"%s_%s_fluid_pipe".formatted(material.getName(), pipeType.name)`
+     （→ `bronze` + `normal` = `gtceu:bronze_normal_fluid_pipe`）。
+  注意上游 mod 的 `langValue` 显示名（"Normal Bronze Fluid Pipe"）**不等于**注册 id，别直接转换。
 
 ## 何时提问、停止或拒绝
 

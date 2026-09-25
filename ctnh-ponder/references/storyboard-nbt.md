@@ -96,6 +96,24 @@ entities   : list<compound>          nbt: 实体完整 NBT、blockPos: int[3]
 若要把主方块转到别的朝向，就在蓝图里显式写 `"props": {"facing": "south"}`——
 脚本会保留你的值并打印警告（因为它偏离了 CTNH 惯例）。
 
+### 4.1 例外：`RotationState.NONE` 的机器没有朝向属性
+
+GT 的 `MetaMachineBlock.createBlockStateDefinition` **只在 `RotationState != NONE` 时**才注册
+`facing` / `upwards_facing`。注册时声明 `.rotationState(RotationState.NONE)` 的机器
+（典型：各种**桶 Drum**、各类**储罐**）blockstate 里只有一条 `"variants": {"": {…}}`，
+**不存在** `facing`。
+
+给它们硬塞 `facing` 不会崩——原版 `NbtUtils.readBlockState` 对"方块没有该属性"是
+**静默跳过**的（只对"属性存在但取值非法"打 warn）——但那是脏数据，会掩盖真实状态。
+蓝图里对该方块（或对整个蓝图）写 `"controller_props": false` 即可：
+
+```json
+{ "pos": [0, 3, 0], "block": "gtceu:bronze_drum", "controller": true, "controller_props": false }
+```
+
+`--print` 会显示 `"props": {}`，确认没有被补朝向。判断方法：打开该机器的注册代码看
+`.rotationState(...)`，或直接查生成的 blockstate json 有没有 `facing` 变体。
+
 ## 5. 自动生成流程
 
 ```bash
@@ -125,6 +143,7 @@ gzip mtime 归零，同一份蓝图重复生成字节一致。
 | `floor_padding` | 否 | 每边外扩格数，默认 1 |
 | `data_version` | 否 | 默认 3465 |
 | `structure` | 是 | `{pos:[x,y,z], block:"id", props:{}, nbt:{}, controller:true}` 列表 |
+| `controller_props` | 否 | 默认 `true`；`false` 时不给主方块补 `facing`/`upwards_facing`（见 4.1） |
 | `entities` | 否 | 原样透传的实体列表 |
 
 `props` 的值会转成字符串；需要非 int 的 NBT 类型时用带类型标记的对象，
@@ -139,7 +158,43 @@ gzip mtime 归零，同一份蓝图重复生成字节一致。
 - palette 里有从未被引用的条目
 - `age` 取值非法且未显式给 `floor`
 
-## 6. 注意
+## 6. GT 管道：连接状态必须写进 NBT
+
+GT 的管道（`gtceu:bronze_normal_fluid_pipe` 等 `FluidPipeBlock`）**不从邻居现算连接**，
+而是把连接存成方块实体自己的位掩码字段：
+
+```java
+// PipeBlockEntity
+@DescSynced @Persisted @RequireRerender
+protected int connections = Node.ALL_CLOSED;   // 0b000000
+```
+
+渲染取的是它：`IPipeNode#getModelData` → `PIPE_CONNECTION_MASK` → `BakedPipeModel`。
+Ponder 的 level **不跑 `serverTick`**，也没有"放下方块时自动连接"的逻辑，
+所以只摆一个管道方块而不写 `connections`，场景里就是一根**光秃秃的中心柱**（看起来"没连上"）。
+
+位 = `1 << Direction.ordinal()`，ordinal 顺序是
+`DOWN=0, UP=1, NORTH=2, SOUTH=3, WEST=4, EAST=5`：
+
+| 需要的连接 | 计算 | 值 |
+|-----------|------|----|
+| 上 + 下（竖直贯通，最常见） | `(1<<0)` + `(1<<1)` | `3` |
+| 上 + 下 + 北 + 南 | `3 \| (1<<2) \| (1<<3)` | `15` |
+| 只朝下 | `1<<0` | `1` |
+| 全通 | `Node.ALL_OPENED` | `63` |
+
+蓝图里写在方块的 `nbt` 中（键名就是字段名 `connections`，LDLib 的 `@Persisted` 默认用字段名）：
+
+```json
+{ "pos": [0, 2, 0], "block": "gtceu:bronze_normal_fluid_pipe",
+  "nbt": { "id": "gtceu:bronze_normal_fluid_pipe", "connections": 3 } }
+```
+
+**验证方法**：`--check` 只校验几何，不会告诉你连接不对；要在游戏里 `/ponder <sceneId>`
+看管道是否呈现"已连接"的粗管形状。管道方块**只有 `WATERLOGGED` 一个 blockstate 属性**，
+连接形状是模型层的，所以不要试图用 `props` 表达连接。
+
+## 7. 注意
 
 - **不要手改 `src/generated/resources`**；只写 `src/main/resources/.../ponder/*.nbt`。
 - 生成完仍要走 datagen 与游戏内确认：`runData` 只验证 lang，NBT 的观感、镜头、时序必须在

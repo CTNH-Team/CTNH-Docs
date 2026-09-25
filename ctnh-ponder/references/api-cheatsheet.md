@@ -106,6 +106,47 @@ scene.markAsFinished();
 
 文案链式：`scene.showText(...).pointAt(vec).attachKeyFrame();`
 
+### 让同一个方块"换位置"（讲两种布局）
+
+讲"先贴在一起、再插一格管道"这类对照时，不要让同一坐标显示两种结构，而是把该方块
+**独立成一个 section**，后续用 `moveSection` 平移它：
+
+```java
+// 1) 独立 section：从基座 world section 里摘出来，可以单独动
+ElementLink<WorldSectionElement> drumLink =
+        scene.world().showIndependentSection(util.select().position(1, 3, 1), Direction.DOWN);
+
+// 2) 平移（offset 是相对位移，不是目标坐标；duration 是 tick 数）
+scene.world().moveSection(drumLink, new Vec3(0, -1, 0), 10);   // 下落一格，底面贴住下方容器
+scene.world().moveSection(drumLink, new Vec3(0, 1, 0), 10);    // 升回去，腾出中间一格放管道
+
+// 3) 整个 section 淡出
+scene.world().hideSection(util.select().position(1, 1, 1), Direction.DOWN);
+```
+
+要点：
+
+- `showIndependentSection` 返回的 link 必须存下来；`moveSection` / `rotateSection` /
+  `hideIndependentSection` 都按 link 操作。
+- 平移量与`showSection` 的淡入可以并行安排时间；平移本身是**阻塞**的 ticking instruction，
+  后面接 `idle(...)` 才有停顿感。
+- 结构 NBT 里只需要一种摆放；"另一种布局"用移动表达，比准备两份 NBT 更好维护。
+
+### 粒子（表现流体/能量流动）
+
+```java
+scene.effects().emitParticles(
+        Vec3.atLowerCornerOf(util.grid().at(x, y, z)).add(0.5, 0.0, 0.5),   // 锚点=方块中心
+        scene.effects().simpleParticleEmitter(ParticleTypes.FALLING_WATER,   // 粒子类型
+                new Vec3(0, -0.15, 0)),                                      // 初速度
+        2f,      // 每 tick 生成个数（小数部分按概率取整）
+        20);     // 持续 tick 数
+```
+
+- `simpleParticleEmitter` = 精确锚点；`particleEmitterWithinBlockSpace` = 锚点所在方块内随机散布。
+- 锚点用 `Vec3.atLowerCornerOf(pos).add(.5, 0, .5)` 取方块中心；直接传 `util.vector().centerOf(...)` 亦可。
+- 这两个 emit 调用是**非阻塞**的，会与后续 `idle`/`modifyBlockEntityNBT` 重叠，适合做持续流动感。
+
 ## 四个模块的接线点
 
 | 模块 | ClientProxy 注册 | gatherData lang 抽取 | 适配层 |

@@ -8,7 +8,10 @@
 - [ ] y=0 铺满地板，材质按时代选（`create:andesite_casing` / `create:railway_casing`）
 - [ ] 地板尺寸 = 结构水平外接矩形每边外扩 1 格（每轴 +2）
 - [ ] 多方块结构逐条对照机器定义的 `pattern(...)` 还原，`Predicates.air()` 的符号未放方块
-- [ ] 主方块标了 `"controller": true`，且为 `facing=north` + `upwards_facing=north`
+- [ ] 主方块标了 `"controller": true`；朝向类方块为 `facing=north` + `upwards_facing=north`
+      （`RotationState.NONE` 的机器如桶/储罐例外：写 `"controller_props": false`，不带朝向属性）
+- [ ] 若结构里有 GT 管道，该方块的 `nbt` 写了 `connections` 位掩码（竖直贯通 = 3）；
+      否则场景里会是一根没连上的光柱
 - [ ] `--print` 的 footprint 与 `aisle` 一致，`--check` 无 warning
 - [ ] 锚点是注册对象，用 `<RegistryObject>.getId()`，没有字符串拼 id
 - [ ] sceneId 稳定、蛇形、与 storyboard 文件名语义一致
@@ -18,6 +21,8 @@
 - [ ] 注册写入 `*PonderScenes.register`，带 tag（若非刻意不加）
 - [ ] 无硬编码方块/物品 id；结构展示来自 NBT 与 `util.select()`，场景坐标与生成的 NBT 一致
 - [ ] 未新增仅客户端类到 `common/` 引用链
+- [ ] 讲"两种布局/两种接法"时用 `showIndependentSection` + `moveSection` 表达，没有为同一方块准备两份 NBT
+- [ ] 粒子/流动效果用 `effects().emitParticles(...)`，锚点取方块中心，且不阻塞后续步骤
 
 ## 修改/扩展场景
 
