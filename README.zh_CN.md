@@ -84,9 +84,15 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 ## 自动发布（Auto Release Docs）
 
-为同步分支 `auto-doc-update` 的每个提交发布 GitHub Release，tag 与附件同名：`ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`（内容取自同一 ref，含 `SKILL.md` + `references/`）。
+为默认分支的每个新提交发布 GitHub Release。每个技能目录各打成一个附件，命名为 `<技能>-skill-<YYYY-MM-DD>-<提交hash前8位>.zip`；tag 为 `ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`，只表示「该提交已发布」，因此两个附件始终同源同提交。
 
-- 每 4 小时轮询；仅当**该同步分支提交**已有 release 时跳过（手动 `force` 可覆盖）——同一天发布多次是正常情况。`auto-doc-update` 不存在时回落到默认分支 head
+| 附件 | 技能 |
+| --- | --- |
+| `ctnh-docs-skill-*.zip` | `ctnh-docs` —— `SKILL.md` + `references/` |
+| `ctnh-ponder-skill-*.zip` | `ctnh-ponder` —— `SKILL.md` + `references/` + `assets/` + `scripts/` |
+
+- 每 4 小时轮询；仅当**该提交**已有 release 时跳过（手动 `force` 可覆盖）——同一天发布多次是正常情况
+- 打包是「全有或全无」：任一技能目录在发布提交中缺失，本轮直接失败且不发布任何附件
 - 下载：https://github.com/CTNH-Team/CTNH-Docs/releases/latest
 
 ## 维护

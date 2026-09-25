@@ -17,7 +17,14 @@ from datetime import datetime, timezone
 from typing import Dict, Optional, Set
 from urllib.request import Request, urlopen
 
-SKILL_DIR = "ctnh-docs"
+# 发布的 skill 目录：每个目录打成一个独立附件，同一次 release 一起发布。
+# 键 = 仓库内目录名，值 = 该附件的名称前缀。
+SKILL_DIRS = {
+    "ctnh-docs": "ctnh-docs-skill",
+    "ctnh-ponder": "ctnh-ponder-skill",
+}
+# release tag：沿用 ctnh-docs 前缀作为去重锚点——tag 只表示"该提交已发布"，
+# 附件才是交付物；两个附件同源同提交。
 TAG_PREFIX = "ctnh-docs-skill"
 SHORT_SHA_LEN = 8
 
@@ -85,26 +92,32 @@ def _release_tags(repo: str, token: str) -> Set[str]:
     return {r.get("tag_name", "") for r in (releases or [])}
 
 
-def _archive_skill(ref: str, asset_name: str) -> str:
-    """用 `git archive` 从指定 ref 取 ctnh-docs/ 打成 zip。
+def _archive_skill(ref: str, skill_dir: str, asset_name: str) -> str:
+    """用 `git archive` 从指定 ref 取 skill_dir/ 打成 zip。
 
     不用工作树打包：workflow 的工作树留在默认分支（否则 scripts/ 会变成该分支的旧版本），
-    而发布内容必须来自 auto-doc-update 的 head —— git archive 正好按 ref 取内容，
-    zip 内路径仍是 `ctnh-docs/...`，与工作树打包结果一致。
+    而发布内容必须来自 RELEASE_SHA —— git archive 正好按 ref 取内容，
+    zip 内路径仍是 `<skill_dir>/...`，解压到 skills 目录即可用。
+
+    ref 上不存在该目录时 git archive 会以非零退出，这里显式转成可读错误：
+    目录缺失说明该 skill 还没合进发布源，直接发出去会产出缺件的 release。
     """
     try:
         subprocess.run(
-            ["git", "archive", "--format=zip", f"--output={asset_name}", ref, SKILL_DIR],
+            ["git", "archive", "--format=zip", f"--output={asset_name}", ref, skill_dir],
             check=True, capture_output=True, text=True,
         )
     except subprocess.CalledProcessError as e:
-        print(f"git archive 失败（{ref}）: {e.stderr.strip()}", file=sys.stderr)
+        # git archive 会先建出输出文件再校验 pathspec，失败时留下空/残缺 zip，清掉它
+        if os.path.exists(asset_name):
+            os.remove(asset_name)
+        print(f"git archive 失败（ref={ref} 缺少 {skill_dir}/）: {e.stderr.strip()}", file=sys.stderr)
         raise SystemExit(4)
     with zipfile.ZipFile(asset_name) as zf:
         names = zf.namelist()
-    if f"{SKILL_DIR}/SKILL.md" not in names:
-        raise SystemExit(f"打包结果缺少 {SKILL_DIR}/SKILL.md，ref={ref}")
-    print(f"已生成: {asset_name}（来自 {ref}，{len(names)} 个条目）")
+    if f"{skill_dir}/SKILL.md" not in names:
+        raise SystemExit(f"打包结果缺少 {skill_dir}/SKILL.md，ref={ref}")
+    print(f"已生成: {asset_name}（来自 {ref}/{skill_dir}，{len(names)} 个条目）")
     return asset_name
 
 
@@ -123,10 +136,23 @@ def main() -> int:
     tag = f"{TAG_PREFIX}-{today}-{short_sha}"
 
     # 打包源：优先用解析出的 sha（保证与 tag 同源），否则退回 ref 名。
+    # 每个 skill 目录打成一个附件，缺目录即硬失败——不发缺件的 release。
     source_ref = sha or release_ref
-    asset_name = _archive_skill(source_ref, f"{tag}.zip")
+    asset_names = []
+    try:
+        for skill_dir, prefix in SKILL_DIRS.items():
+            asset_names.append(
+                _archive_skill(source_ref, skill_dir, f"{prefix}-{today}-{short_sha}.zip")
+            )
+    except SystemExit:
+        # 任一 skill 打包失败就不发 release；清掉本轮已产出的附件，避免留下半套包
+        for name in asset_names:
+            if os.path.exists(name):
+                os.remove(name)
+        raise
 
     # 去重只看 tag 是否已存在：同一天可以发多次，但同一提交只发一次。
+    # tag 只表示"该提交已发布"，与附件数量无关。
     existing = _release_tags(repo, token)
     already = tag in existing
     should_release = force or not already
@@ -136,15 +162,14 @@ def main() -> int:
         else f"already released ({tag})"
     )
 
-    release_title = f"CTNH-Docs Skill {today} ({short_sha})"
+    release_title = f"CTNH Skills {today} ({short_sha})"
     release_body = (
-        f"CTNH-Docs 层级知识库（skill 格式）{today} 版本，来自同步分支 "
-        f"`{release_ref or 'auto-doc-update'}` 的提交 `{short_sha}`。\n\n"
-        f"附件为 skill 包（`ctnh-docs/` 目录），解压到 skills 目录后即可作为 "
-        f"`ctnh-docs` skill 使用，包含：\n"
-        f"- `SKILL.md`：skill 入口与路由表\n"
-        f"- `agents/openai.yaml`：界面元数据\n"
-        f"- `references/`：8 个模块的层级 AGENTS.md（模块主文档 + 域文档）+ _architecture 契约\n\n"
+        f"CTNH 技能包 {today} 版本，来自默认分支的提交 `{short_sha}`。\n\n"
+        f"每个附件解压到 skills 目录后即可按名称调用：\n"
+        f"- `ctnh-docs-skill-*.zip` → `ctnh-docs`：8 个模块的层级 AGENTS.md"
+        f"（模块主文档 + 域文档）与 _architecture 架构契约，`SKILL.md` 为路由入口\n"
+        f"- `ctnh-ponder-skill-*.zip` → `ctnh-ponder`：思索场景开发流程、"
+        f"storyboard NBT 规范、模板与零依赖打包脚本\n\n"
         f"下载地址（latest）：https://github.com/{repo}/releases/latest"
     )
     _write_github_output({
@@ -153,7 +178,7 @@ def main() -> int:
         "release_tag": tag,
         "release_title": release_title,
         "release_body": release_body,
-        "asset_name": asset_name,
+        "asset_names": "\n".join(asset_names),
     })
     return 0
 

@@ -38,19 +38,17 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      # 发布源：同步分支 auto-doc-update 的 head（同步 PR 未合并时也要能发）；
-      # 该分支不存在时回落到默认分支 head。这里只解析 sha，**不切换工作树**——
-      # 工作树必须留在默认分支，否则 workflow 自己的 scripts/ 会变成该分支上的旧版本。
-      # 打包由 check_release.py 用 `git archive <sha> ctnh-docs` 从该 ref 取内容，tag 与内容同源。
+      # 发布源：默认分支 head。skill 目录（ctnh-docs/、ctnh-ponder/）都随默认分支演进，
+      # 同步分支 auto-doc-update 只承载 references/ 的自动改写，不能作为发布源——
+      # 它由同步 PR 推进，遇到没有文档改动的轮次就不会前进，发布内容会一直停在旧提交。
+      # 这里只解析 sha、**不切换工作树**：工作树必须留在默认分支，否则 workflow 自己的
+      # scripts/ 会变成旧版本。打包由 check_release.py 用 `git archive <sha> <dir>` 取内容，
+      # tag 与内容同源。
       - name: Resolve release source
         id: source
         run: |
           set -euo pipefail
-          if git ls-remote --exit-code --heads origin auto-doc-update >/dev/null 2>&1; then
-            ref=auto-doc-update
-          else
-            ref="${{ github.event.repository.default_branch }}"
-          fi
+          ref="${{ github.event.repository.default_branch }}"
           git fetch --no-tags --quiet origin "$ref"
           sha=$(git rev-parse "origin/$ref")
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
@@ -76,7 +74,8 @@ jobs:
           tag_name: ${{ steps.check.outputs.release_tag }}
           name: ${{ steps.check.outputs.release_title }}
           body: ${{ steps.check.outputs.release_body }}
-          files: ${{ steps.check.outputs.asset_name }}
+          # check_release.py 用 heredoc 写多行 asset_names（一个 skill 目录一个附件）。
+          files: ${{ steps.check.outputs.asset_names }}
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

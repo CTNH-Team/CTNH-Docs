@@ -84,9 +84,15 @@ Pipeline: `check_pending.py` (fast-exit poll) → `prepare_sync.py` (writes `wor
 
 ## Auto Release (Auto Release Docs)
 
-Publishes a GitHub Release for each commit on the sync branch `auto-doc-update`, named `ctnh-docs-skill-<YYYY-MM-DD>-<short-sha>.zip` (tag and asset share that name; content is taken from that same ref; `SKILL.md` + `references/`).
+Publishes a GitHub Release for each new commit on the default branch. Every skill directory ships as its own asset, named `<skill>-skill-<YYYY-MM-DD>-<short-sha>.zip`; the tag is `ctnh-docs-skill-<YYYY-MM-DD>-<short-sha>` and only marks "this commit is published", so both assets always come from the same commit.
 
-- Polls every 4 h; skips only when that sync-branch commit already has a release (manual `force` overrides) — several releases per day are expected. Falls back to the default branch head when `auto-doc-update` does not exist
+| Asset | Skill |
+| --- | --- |
+| `ctnh-docs-skill-*.zip` | `ctnh-docs` — `SKILL.md` + `references/` |
+| `ctnh-ponder-skill-*.zip` | `ctnh-ponder` — `SKILL.md` + `references/` + `assets/` + `scripts/` |
+
+- Polls every 4 h; skips only when that commit already has a release (manual `force` overrides) — several releases per day are expected
+- Packaging is all-or-nothing: if any skill directory is missing from the release commit, the run fails and publishes nothing
 - Download: https://github.com/CTNH-Team/CTNH-Docs/releases/latest
 
 ## Maintenance
