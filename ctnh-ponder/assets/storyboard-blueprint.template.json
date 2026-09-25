@@ -1,0 +1,274 @@
+{
+  "_comment": "土高炉 gtceu:primitive_blast_furnace 蓝图。结构 3x3x4 (宽3 深3 高4)，地板每边外扩 1 格 -> 5x5。",
+  "_derived_from": "GregTech-Modern GTMultiMachines.PRIMITIVE_BLAST_FURNACE 的 FactoryBlockPattern (LEFT/UP/FRONT)，controller 符号 Y",
+  "output": "src/main/resources/assets/<modid>/ponder/primitive_blast_furnace/common.nbt",
+  "age": "mechanical",
+  "data_version": 3465,
+  "structure": [
+    {
+      "pos": [
+        2,
+        1,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        1,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        1,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        2,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        2,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        2,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        3,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        3,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        3,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        4,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        4,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        4,
+        2
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        1,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        1,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        1,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        2,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        2,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        3,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        3,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        4,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        4,
+        1
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        1,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        1,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        1,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        2,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        2,
+        0
+      ],
+      "block": "gtceu:primitive_blast_furnace",
+      "controller": true
+    },
+    {
+      "pos": [
+        0,
+        2,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        3,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        3,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        3,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        2,
+        4,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        1,
+        4,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    },
+    {
+      "pos": [
+        0,
+        4,
+        0
+      ],
+      "block": "gtceu:firebricks"
+    }
+  ]
+}

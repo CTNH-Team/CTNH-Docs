@@ -1,0 +1,51 @@
+// 模板：一个 CTNH 思索场景类（把 <Module>/<modid>/<REGISTRATE> 换成目标模块）
+// 放置：modules/<Module>/src/main/java/<包>/client/ponder/<分组>/<SceneName>.java
+package <包>.client.ponder.<分组>;
+
+import <包>.client.ponder.<Module>PonderSceneBuilder;
+import <包>.registry.<机器注册类>;
+
+import net.createmod.catnip.math.Pointing;
+import net.createmod.ponder.api.scene.SceneBuilder;
+import net.createmod.ponder.api.scene.SceneBuildingUtil;
+import net.minecraft.core.Direction;
+
+public class <SceneName> {
+
+    private <SceneName>() {}
+
+    public static void Common(SceneBuilder builder, SceneBuildingUtil util) {
+        <Module>PonderSceneBuilder scene = new <Module>PonderSceneBuilder(builder);
+
+        // 1) 标题：页眉(标题栏) + 页面标题，双语
+        scene.title("<scene_id>", "How to build <Machine>", "如何搭建<机器名>",
+                "<Machine>", "<机器名>");
+
+        // 2) 打开世界
+        scene.showBasePlate();
+        scene.idle(10);
+
+        // 3) 逐步展示：先选区，再解说，关键帧可跳步
+        scene.world().showSection(util.select().position(3, 1, 1), Direction.DOWN);
+        scene.showText(40, "First, place the controller.", "首先放置主方块。")
+                .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.UP))
+                .attachKeyFrame();
+        scene.idle(60);
+
+        scene.world().showSection(util.select().fromTo(1, 1, 5, 5, 6, 1), Direction.DOWN);
+        scene.showText(60, "Place the full structure.", "搭建完整结构。")
+                .attachKeyFrame();
+        scene.idle(60);
+
+        // 4) 引导玩家操作（示例：右键 + 手持某物品 + 潜行）
+        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.UP),
+                Pointing.LEFT, 40)
+                .rightClick()
+                .withItem(<REGISTRATE>.<ITEM>.asStack())
+                .whileSneaking();
+        scene.idle(40);
+
+        // 5) 结束
+        scene.markAsFinished();
+    }
+}

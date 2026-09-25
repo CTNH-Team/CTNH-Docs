@@ -10,7 +10,7 @@
 
 ## Overview
 
-This repository hosts the authoritative CTNH-Modules guides as a single skill (`ctnh-docs`), so agents can read module conventions before editing CTNH module code.
+This repository hosts the authoritative CTNH-Modules guides as a skill (`ctnh-docs`), plus companion skills that document CTNH engineering workflows, so agents can read module conventions before editing CTNH module code.
 
 Each CTNH module is an independent git submodule. This repo carries only documentation:
 
@@ -25,6 +25,7 @@ Guides are written in Simplified Chinese: section headings, class names, paths, 
 | Skill | Purpose |
 | --- | --- |
 | `ctnh-docs` | Authoritative AGENTS.md guides for CTNH-Core, CTNH-Lib, CTNH-Bio, CTNH-Energy, CTNH-Mana, CTNH-Astral, CTPP and Create-Enough-Items, plus the machine/trait/recipe-capability/Jade architecture contract. |
+| `ctnh-ponder` | Create Ponder scene authoring: the CTNH-Lib shared scene builder, per-module plugin/scene/tag adapters, storyboard `.nbt` generation, and bilingual lang datagen. |
 
 ## Repository Layout
 
@@ -43,6 +44,12 @@ Guides are written in Simplified Chinese: section headings, class names, paths, 
 |       |-- CTNH-Astral/
 |       |-- CTPP/
 |       `-- Create-Enough-Items/
+|-- ctnh-ponder/                  # companion skill: Ponder scene authoring
+|   |-- SKILL.md                  # skill entry: workflows + CTNH conventions
+|   |-- agents/openai.yaml        # interface metadata
+|   |-- references/               # API cheatsheet, storyboard NBT spec, checklist
+|   |-- assets/                   # scene / registration / blueprint templates
+|   `-- scripts/                  # zero-dependency storyboard .nbt generator
 |-- prompts/                      # init-deep update-mode prompt (CI only)
 |-- scripts/                      # auto-sync / release scripts
 `-- .github/workflows/            # Auto Sync Docs / Auto Release Docs CI
@@ -50,10 +57,11 @@ Guides are written in Simplified Chinese: section headings, class names, paths, 
 
 ## Usage
 
-Place the `ctnh-docs/` directory under your skills directory, then invoke it by name in a session:
+Place the skill directories under your skills directory, then invoke them by name in a session:
 
 ```text
 $ctnh-docs
+$ctnh-ponder
 ```
 
 `SKILL.md` is the canonical routing source; each module/domain guide is a `references/` file it points to.
@@ -83,9 +91,11 @@ Publishes a GitHub Release for each commit on the sync branch `auto-doc-update`,
 
 ## Maintenance
 
-- Keep the `name` in `SKILL.md` aligned with the `ctnh-docs/` directory name.
+- Keep the `name` in each `SKILL.md` aligned with its directory name (`ctnh-docs/`, `ctnh-ponder/`).
 - Edit guides under `references/` (module docs) or `_architecture/` (contract) and push; auto-sync only rewrites `references/<Module>/`.
+- Auto-sync and Auto Release touch only `ctnh-docs/`; companion skills are maintained by hand and ship outside the release archive.
 - The DOMAIN GUIDE ROUTING table in the root module `AGENTS.md` (CTNH-Modules) is the routing source of truth — keep it in sync when guides move.
+- Companion skills whose instructions depend on a module guide name the guide they follow; keep those references valid when guides move.
 - Update both README files when the layout or usage model changes.
 
 ## License

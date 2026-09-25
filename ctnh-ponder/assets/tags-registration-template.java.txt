@@ -1,0 +1,34 @@
+// 模板：模块 PonderTag 注册表
+// 放置：modules/<Module>/src/main/java/<包>/client/ponder/<Module>PonderTags.java
+package <包>.client.ponder;
+
+import <包>.<ModMain>;
+import <包>.registry.<机器注册类>;
+
+import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
+import net.minecraft.resources.ResourceLocation;
+
+import tech.vixhentx.mcmod.ctnhlib.client.ponder.CTNHPonderTagHelper;
+
+import static <包>.registry.<Module>Registration.REGISTRATE;
+
+public final class <Module>PonderTags {
+
+    public static final ResourceLocation <TAG> = ResourceLocation.tryBuild(<ModMain>.MODID, "<tag_path>");
+
+    public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
+        // tag 名与描述的双语由 CTNHPonderTagHelper 写进 registrate，再由 runData 落到 lang
+        CTNHPonderTagHelper.registerTag(REGISTRATE, helper, <TAG>,
+                "English Tag Name", "中文标签名",
+                "What this tag covers", "这个标签覆盖的内容")
+                .addToIndex()                                  // 是否出现在思索索引里
+                .item(<代表物品>, true, false)                  // useAsIcon, useAsMainItem
+                .register();
+
+        helper.addToTag(<TAG>)
+                .add(<机器注册类>.<MACHINE_A>.getId())
+                .add(<机器注册类>.<MACHINE_B>.getId());
+
+        <ModMain>.LOGGER.info("Ponder tags initialized");
+    }
+}

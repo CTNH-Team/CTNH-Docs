@@ -1,0 +1,86 @@
+// 模板：一个模块首次接入 CTNH Ponder 所需的四个文件
+// 把 <Module>/<modid>/<包>/<REGISTRATE>/<ModMain> 换成实际值。
+// 场景类模板见 scene-template.java.txt，注册表模板见 scenes/tags-registration-template.java.txt。
+
+// ---------------------------------------------------------------------------
+// 1) <Module>PonderPlugin.java —— 入口，只做转发
+// ---------------------------------------------------------------------------
+package <包>.client.ponder;
+
+import <ModMain 的包>.<ModMain>;
+
+import net.createmod.ponder.api.registration.PonderPlugin;
+import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
+import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
+import net.minecraft.resources.ResourceLocation;
+
+public class <Module>PonderPlugin implements PonderPlugin {
+
+    @Override
+    public String getModId() {
+        return <ModMain>.MODID;
+    }
+
+    @Override
+    public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+        <Module>PonderScenes.register(helper);
+    }
+
+    @Override
+    public void registerTags(PonderTagRegistrationHelper<ResourceLocation> helper) {
+        <Module>PonderTags.register(helper);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 2) <Module>PonderSceneBuilder.java —— 把共享构建器接到本模块的 lang 写入
+// ---------------------------------------------------------------------------
+package <包>.client.ponder;
+
+import com.gregtechceu.gtceu.GTCEu;
+
+import net.createmod.ponder.api.scene.SceneBuilder;
+
+import <ModMain 的包>.<ModMain>;
+import tech.vixhentx.mcmod.ctnhlib.client.ponder.CTNHPonderSceneBuilder;
+
+import static <包>.registry.<Module>Registration.REGISTRATE;
+
+public class <Module>PonderSceneBuilder extends CTNHPonderSceneBuilder {
+
+    public <Module>PonderSceneBuilder(SceneBuilder builder) {
+        super(builder, <ModMain>.MODID, <Module>PonderSceneBuilder::registerLang);
+    }
+
+    private static void registerLang(String key, String en, String cn) {
+        if (GTCEu.isDataGen()) {          // 只能在这里写 lang，且必须门控
+            REGISTRATE.genLang(key, en, cn);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 3) ClientProxy —— 客户端注册插件（event.enqueueWork 内）
+// ---------------------------------------------------------------------------
+// import net.createmod.ponder.foundation.PonderIndex;
+// import <包>.client.ponder.<Module>PonderPlugin;
+//
+// @SubscribeEvent
+// public void onClientSetup(FMLClientSetupEvent event) {
+//     event.enqueueWork(() -> {
+//         PonderIndex.addPlugin(new <Module>PonderPlugin());
+//     });
+// }
+
+// ---------------------------------------------------------------------------
+// 4) CommonProxy.gatherData —— 只做 lang 抽取
+// ---------------------------------------------------------------------------
+// import tech.vixhentx.mcmod.ctnhlib.client.ponder.CTNHPonderLang;
+// import <包>.client.ponder.<Module>PonderPlugin;
+//
+// @SubscribeEvent
+// public void gatherData(GatherDataEvent event) {
+//     if (event.includeClient()) {
+//         CTNHPonderLang.init(new <Module>PonderPlugin());
+//     }
+// }

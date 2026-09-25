@@ -1,0 +1,4 @@
+interface:
+  display_name: "CTNH Ponder"
+  short_description: "CTNH 思索（Ponder）场景开发与排障：共享构建器、模块适配层、storyboard NBT 与双语 lang datagen"
+  default_prompt: "Use $ctnh-ponder to add or modify a CTNH Ponder scene, register a PonderTag, wire a module's Ponder adapter, or diagnose scenes that do not show up or render lang keys."

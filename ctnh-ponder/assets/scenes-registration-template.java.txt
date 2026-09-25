@@ -1,0 +1,35 @@
+// 模板：模块场景注册表
+// 放置：modules/<Module>/src/main/java/<包>/client/ponder/<Module>PonderScenes.java
+package <包>.client.ponder;
+
+import <包>.<ModMain>;
+import <包>.client.ponder.<分组>.<SceneName>;
+import <包>.registry.<机器注册类>;
+
+import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
+import net.minecraft.resources.ResourceLocation;
+
+public final class <Module>PonderScenes {
+
+    private <Module>PonderScenes() {}
+
+    public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+        // 1) 本模块机器
+        helper.forComponents(<机器注册类>.<MACHINE>.getId())
+                .addStoryBoard("<path>", <SceneName>::Common, <Module>PonderTags.<TAG>);
+
+        // 2) 同一台机器多段故事板：再加一条 addStoryBoard（不同 <path>）
+        // helper.forComponents(<机器注册类>.<MACHINE>.getId())
+        //         .addStoryBoard("<path2>", <SceneName>::Work, <Module>PonderTags.<TAG>);
+
+        // 3) 同一场景挂到多个组件（例如全部等级的仓室）
+        // helper.forComponents(<a>.getId(), <b>.getId())
+        //         .addStoryBoard("<path>", <SceneName>::Common, <Module>PonderTags.<TAG>);
+
+        // 4) 上游 mod 的对象：只有拿不到静态注册对象时才用字符串 id，并注明来源 mod
+        // helper.forComponents(ResourceLocation.fromNamespaceAndPath("jackseconomy", "mechanical_exporter"))
+        //         .addStoryBoard("<path>", <SceneName>::Common, <Module>PonderTags.<TAG>);
+
+        <ModMain>.LOGGER.info("Ponder scenes initialized");
+    }
+}
