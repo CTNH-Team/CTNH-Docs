@@ -34,8 +34,10 @@ Rules enforced
 * Structure blocks must start at y>=1 (y=0 is reserved for the floor).
 * Shipped size is [floorX, maxY+1, floorZ].
 * A block marked "controller": true gets facing=north + upwards_facing=north
-  unless the blueprint states those properties explicitly (then a warning is
-  printed, because it breaks the CTNH convention).
+  unless the blueprint states those properties explicitly. Set
+  "controller_props": false (per block, or at blueprint level) for machines whose
+  rotation state is NONE -- drums, tanks, single-state blocks -- which carry no
+  facing property at all.
 * Output is deterministic: palette and blocks are sorted, gzip mtime is 0.
 """
 
@@ -373,8 +375,11 @@ def compile_blueprint(blueprint: dict):
         props = dict(entry.get("props", {}))
         if entry.get("controller"):
             controllers.append((i, pos, block, props))
-            for key, value in CONTROLLER_DEFAULT_PROPS.items():
-                props.setdefault(key, value)
+            # RotationState.NONE machines (drums, tanks) have no facing property;
+            # "controller_props": false keeps their state clean.
+            if entry.get("controller_props", blueprint.get("controller_props", True)):
+                for key, value in CONTROLLER_DEFAULT_PROPS.items():
+                    props.setdefault(key, value)
         cells.append({"pos": pos, "block": block, "props": props, "nbt": entry.get("nbt")})
 
     if not controllers:
