@@ -21,6 +21,9 @@
 - [ ] storyboard 位于 `src/main/resources/assets/<modid>/ponder/<path>.nbt`，与 `addStoryBoard("<path>")` 完全对应
 - [ ] 场景类使用模块 `*PonderSceneBuilder`（继承 `CTNHPonderSceneBuilder`），文案全走双语重载
 - [ ] 场景以 `title(...)` 开头、`markAsFinished()` 结尾，步骤间有 `idle` 与 `attachKeyFrame`
+- [ ] 同一机器的多个相关思索可共用一个 Java 类，但各自有独立静态方法、sceneId、注册路径和 NBT
+- [ ] 文案描述的配方触发方式来自 recipe logic / capability 证据，没有把不存在的 UI 操作写进场景
+- [ ] 连续动作的节奏按 tick 设计（20 tick = 1 秒；半秒间隔 = `idle(10)`），没有连续 `showText` 重叠
 - [ ] 注册写入 `*PonderScenes.register`，带 tag（若非刻意不加）
 - [ ] 无硬编码方块/物品 id；结构展示来自 NBT 与 `util.select()`，场景坐标与生成的 NBT 一致
 - [ ] 未新增仅客户端类到 `common/` 引用链
@@ -45,6 +48,7 @@
 
 - [ ] `:modules:<Module>:runData` 通过
 - [ ] `src/generated/resources/assets/<modid>/lang/en_us.json` 与 `zh_cn.json` 中 `.ponder.` 条目成对
+- [ ] 用 `scripts/check_ponder_lang.py` 按 scene 前缀检查 `header`、`title` 和连续的 `text_N`
 - [ ] 未手工修改 `src/generated/resources`
 - [ ] 有条件时游戏内用 `/ponder <sceneId>` 验证观感与节奏（编译通过 ≠ 可用）
 - [ ] `spotlessCheck` 通过

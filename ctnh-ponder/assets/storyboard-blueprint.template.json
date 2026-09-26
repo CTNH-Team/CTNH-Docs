@@ -1,6 +1,34 @@
 {
   "_comment": "土高炉 gtceu:primitive_blast_furnace 蓝图。结构 3x3x4 (宽3 深3 高4)，地板每边外扩 1 格 -> 5x5。",
   "_derived_from": "GregTech-Modern GTMultiMachines.PRIMITIVE_BLAST_FURNACE 的 FactoryBlockPattern (LEFT/UP/FRONT)，controller 符号 Y",
+  "_direction_examples": [
+    {
+      "case": "默认朝向",
+      "entry": {
+        "controller": true
+      },
+      "result": "脚本自动补 props.facing=north 和 props.upwards_facing=north"
+    },
+    {
+      "case": "显式改变朝向",
+      "entry": {
+        "controller": true,
+        "props": {
+          "facing": "south",
+          "upwards_facing": "north"
+        }
+      },
+      "result": "显式 props 会被保留，不会被默认朝向覆盖"
+    },
+    {
+      "case": "方块没有朝向属性",
+      "entry": {
+        "controller": true,
+        "controller_props": false
+      },
+      "result": "RotationState.NONE 等方块不补 facing/upwards_facing"
+    }
+  ],
   "output": "src/main/resources/assets/<modid>/ponder/primitive_blast_furnace/common.nbt",
   "age": "mechanical",
   "data_version": 3465,
@@ -212,7 +240,11 @@
         0
       ],
       "block": "gtceu:primitive_blast_furnace",
-      "controller": true
+      "controller": true,
+      "props": {
+        "facing": "north",
+        "upwards_facing": "north"
+      }
     },
     {
       "pos": [

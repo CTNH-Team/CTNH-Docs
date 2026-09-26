@@ -4,7 +4,7 @@ description: >-
   CTNH 模组的 Create Ponder（思索）场景开发与排障指南。覆盖 CTNH-Lib 共享构建器
   （CTNHPonderSceneBuilder / CTNHPonderLang / CTNHPonderTagHelper）、CTNH-Core /
   CTNH-Energy / CTNH-Mana / CTPP 各自的 Plugin-Scenes-Tags 适配层、
-  assets/<modid>/ponder/<path>.nbt storyboard 资源，以及双语 lang 的 datagen 规则。
+  assets/模块 id/ponder/场景路径.nbt storyboard 资源，以及双语 lang 的 datagen 规则。
   新增或修改思索场景、调整 PonderTag、给模块补齐 Ponder 适配层、按上游 Create/GTCEu 补场景、
   或排查场景不显示 / 文案显示成 lang key 时使用。Triggers: Ponder, 思索, pondering, storyboard,
   CTNHPonderSceneBuilder, PonderTag, addStoryBoard, ponder nbt, 场景不显示
@@ -122,6 +122,41 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
    字符串 id 只允许出现在 storyboard NBT 与外部 mod 目标（例：Core 组合
    `ResourceLocation.fromNamespaceAndPath("jackseconomy", "mechanical_exporter")`）中，且要注明来源 mod。
 
+## 经验证的场景设计经验（跨机器通用）
+
+这些经验用于同一台机器的多个相关思索，也适用于之后新增的其他机器；不要把某一台机器的部件名称或配方术语当成通用规则。
+
+### 1. 先还原真实触发链
+
+- 先读目标机器的 recipe type、recipe logic、输入 capability 和 UI，再决定场景文案。机器有 UI 不等于玩家在 UI 中选择配方；配方可能由物品、流体、能源、实体或其他能力自动匹配。
+- 场景必须展示实际触发配方的设备和输入来源。若配方选择由输入物品触发，就展示输入设备和匹配过程，不要编造一个不存在的“打开主方块界面选择配方”步骤。
+- 能力限制要限定到真实的配方类型或工作模式，不要把某个配方的限制写成整台机器的绝对限制。
+- 场景中的方块、部件和物品都从注册对象取得；显示名称、配方名称和注册 id 不能互相推断。
+
+### 2. 用 tick 控制阅读和动作节奏
+
+- `20 tick = 1 秒`，所以半秒间隔是 `idle(10)`。中文文案较长时通常给 `140–180` tick，并让下一段 `showText` 在前一段结束后再出现，避免文字重叠。
+- 一段说明需要演示多个位置时，让同一条文字保持可读，再按顺序执行 `world().setBlock(...)`、`overlay().showControls(..., 10)`（或轮廓高亮）和 `idle(10)`，把指向和替换放在同一时间线上。
+- `showControls(...).rightClick().withItem(...)` 只用于确实存在的放置或操作；只是强调位置时用 `pointAt` 或 `showOutline`，避免画面暗示错误的交互方式。
+- 运行时替换结构中的部件前，确认坐标属于要展示的结构选区；后续清理结构时，明确这些临时部件是否也应被移除。
+
+### 3. 侧面目标要同时处理镜头和坐标
+
+- 侧面或背面的目标必须先用 `rotateCameraY(...)` 暴露，等待 `idle(20–40)` 让镜头完成旋转，再展示控制和文案；步骤结束后旋回原视角。只改 `pointAt` 不会让被遮挡的面自动可见。
+- 修改结构主方块位置或朝向时，要同时核对 NBT 的 controller 坐标、Java 中的选区和所有 `pointAt` 坐标。用蓝图脚本的 `--print`、NBT `--check` 和实际镜头确认屏幕上的左右顺序，不要只凭世界坐标判断“左边”。
+- 朝向类方块应按其真实 `RotationState` 设置属性；不要给没有朝向属性的方块强行写 `facing`。
+
+### 4. 同一机器的相关思索保持同源、分场景
+
+同一机器的多个相关思索可以放在一个场景 Java 类中，用不同的静态方法、sceneId、注册路径和 NBT 文件分别承载。这样可以共享坐标和叙事约定，同时保持每个 storyboard 独立可校验；不要为了复用而把不同步骤硬塞进一个过长场景。
+
+### 5. 文案、资源和验证必须一起更新
+
+- 插入或删除 `showText` 会让后续 `text_N` 整体重排；只改 Java 后必须重跑 datagen，并检查当前 scene 前缀下的 `header`、`title`、`text_1..N`。全局语言文件可能有历史遗留差异，验收时先比较当前 scene 的 key 集合，并确认旧文案已消失。
+- 生成流程通过后，再运行模块的 `compileJava`、`spotlessCheck`，并对每个 storyboard NBT 执行 `--check`。编译成功只能证明 Java 正确，不能证明资源路径、结构边界或镜头可读。
+- 项目脚本还提供 scene 级语言检查：
+  `python CTNH-Docs/ctnh-ponder/scripts/check_ponder_lang.py <lang-dir> --namespace <modid> --scene <sceneId>`。
+
 ## 工作流 A：给机器新建一个思索场景
 
 输入：目标组件（方块/机器注册对象）、场景要讲的步骤、机器是否为多方块（决定要不要读 `pattern(...)`）。
@@ -168,6 +203,12 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
    ./gradlew :modules:<Module>:runData
    ```
    在 `zh_cn.json` / `en_us.json` 中确认 `<modid>.ponder.<sceneId>.header`、`.title`、`.text_1..N` 齐全且双语一致。
+   再运行：
+   ```bash
+   python CTNH-Docs/ctnh-ponder/scripts/check_ponder_lang.py \
+       modules/<Module>/src/generated/resources/assets/<modid>/lang \
+       --namespace <modid> --scene <sceneId>
+   ```
 7. **游戏内确认（有条件必做）。** `/ponder <sceneId>` 直接打开；`/ponder index`、`/ponder tags`、
    `/ponder reload` 用于索引与热重载。开启 Ponder 客户端的 `editingMode` 会显示缺失文案与场景调试信息。
 
@@ -229,6 +270,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 | 管道在场景里是**一根光柱、没连上** | GT 管道的连接存在 BE 的 `connections` 位掩码里，Ponder 不跑 tick 不会自动连 | 在蓝图该方块的 `nbt` 里写 `"connections"`（竖直贯通 = 3）；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 6 节 |
 | 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
 | 同一方块要在不同步骤"换位置" | 用坐标魔法数字或准备两份 NBT | `showIndependentSection` + `moveSection`，见 [references/api-cheatsheet.md](references/api-cheatsheet.md) |
+| `runData` 报 `fml.toml` 的 `Not enough data available` | 模块 `run/config/fml.toml` 被截断或填成零字节，属于可再生的运行目录文件 | 删除对应模块的 `run/config` 后重新运行 `runData`，不要为此修改源码或生成的语言文件 |
 
 ## 上游 Ponder 改动边界
 
@@ -248,6 +290,8 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 - **需要**：目标注册对象、sceneId、要讲的步骤顺序、机器结构（多方块要能读到 `pattern(...)`）。
 - **不要凭空推断**：NBT 里到底摆了哪些方块、机器朝向与正面、上游 mod 的内部实现。
   这些必须来自文件、源码或玩家的实际摆放；不确定就标注为待确认。
+- **不要把 UI 当成配方来源的证据**：必须从 recipe logic、输入 capability 或实际配方代码确认配方是由 UI、输入物品、流体还是其他能力选择的。
+- **不要把世界坐标直接当成屏幕左右**：镜头旋转和默认可见面会改变视觉顺序；侧面步骤要在对应镜头下验证。
 - **不要假装验证过**。编译通过 + `runData` 成功，只证明"代码能编译、lang 能生成"，
   **对场景是否可用几乎零信息量**。按下面的分界老实话说什么验过了：
 
