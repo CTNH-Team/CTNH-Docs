@@ -1,7 +1,7 @@
 # CTNH-MANA CLIENT DOMAIN
 
 ## OVERVIEW
-`client/` 是 CTNH-Mana 的客户端面（43 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
+`client/` 是 CTNH-Mana 的客户端面（44 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景（4 个 `ponder/` 顶层类 + `ponder/mana/` 4 个场景类）、渲染器与粒子，以及虚境入侵的客户端镜像。
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,7 @@ client/
 ├── gui/radial/                # CaduceusRadialMenu, RadialMenu, RadialMenuScreen, RadialMenuSlot
 ├── model/                     # 8: CMModels, GiantBeeModel, MagicCubeModel, ModelBase, ModelDefinition, RoyalServantBeeModel, StarCakeBlockModel, StarCakeItemModel
 ├── ponder/                    # CTNHManaPonderPlugin, CTNHManaPonderSceneBuilder, CTNHManaPonderScenes, CTNHManaPonderTags
-│   └── mana/                  # MagicRituals, MysticSpire, PonderParticleUtil
+│   └── mana/                  # IndustrialAltar, MagicRituals, MysticSpire, PonderParticleUtil
 ├── render/                    # 19: AntagonismRender, BeeNukeProjectileRenderer, DeltaSparkRenderer, DemonWillRender, EternalGardenRender, GiantBeeRenderer, MaliciousThermalilyProjectileRenderer, ManaCondenserRender, ManaReactorRender, OmegaSparkRenderer, RoyalServantBeeRenderer, ShroudGazingRender, StarCakeItemRender, StarCakeMachineBERProvider, StarCakeRender, UltraManaMistModel, UltraManaMistRenderType, WitherAconiteProjectileRenderer, ZenithMatrixRender
 │   └── particle/              # IconParticle
 └── utils/                     # RenderUtils
@@ -26,8 +26,9 @@ client/
 | 粒子 / 模型层 | `ClientProxy.onRegisterParticleProviders()`（`CMParticleTypes.INDEX_TARGET` → `IconParticle.Provider`）、`onRegisterLayerDefinitions()`（`CMModelLayers.init()`） |
 | Caduceus 轮盘 | `client/gui/radial/`（4 类）；按键触发在 `event/ForgeEventHandler.keyEvent` |
 | Ponder 插件 | `client/ponder/CTNHManaPonderPlugin.java`（`getModId` → `CTNHMana.MODID`；注册 `CTNHManaPonderScenes` 与 `CTNHManaPonderTags`） |
-| Ponder 场景/标签 | `client/ponder/CTNHManaPonderScenes.java`, `CTNHManaPonderTags.java` |
+| Ponder 场景/标签 | `client/ponder/CTNHManaPonderScenes.java`（`MysticSpire` 三幕 + `industrial_altar/common` + `blaze/common` + `rune_rituals/common` + `ritual_diviner/common`）、`CTNHManaPonderTags.java`（`ctnhmana:mana` 标签） |
 | 尖塔 / 仪式场景 | `client/ponder/mana/`（`MagicRituals`, `MysticSpire`, `PonderParticleUtil`） |
+| 工业血祭坛场景 | `client/ponder/mana/IndustrialAltar.java`：storyboard 存 4 级超集，按 box 露出/隐藏演示 2→3→4→3 级结构升降级与仓室替换；storyboard NBT 在 `src/main/resources/assets/ctnhmana/ponder/industrial_altar/common.nbt` |
 | Ponder 构建器适配 | `client/ponder/CTNHManaPonderSceneBuilder.java` |
 | 模型 | `client/model/`（8） |
 | 渲染器 | `client/render/`（19）+ `render/particle/IconParticle` |
@@ -36,7 +37,8 @@ client/
 
 ## CONVENTIONS
 - `CTNHManaPonderSceneBuilder extends CTNHPonderSceneBuilder`（CTNH-Lib），只做薄适配：构造时传入 `CTNHMana.MODID` 与 `registerLang`，后者在 `GTCEu.isDataGen()` 时调 `REGISTRATE.genLang(key, en, cn)` 抽取文案。
-- Ponder 场景文案内嵌在场景文件里，用 `scene.title(id, en, cn)` / `scene.showText(ticks, en, cn)` 三参形式，不走 lang key。
+- Ponder 场景文案内嵌在场景文件里，用 `scene.title(id, en, cn)` / `scene.showText(ticks, en, cn)` 三参形式（标题带两级文案时用 `title(id, en, cn, titleEn, titleCn)`），不走 lang key。
+- 多级结构演出复用同一 storyboard：`IndustrialAltar` 依赖各级 pattern 还原到同一坐标系后的严格包含关系（base ⊂ L3 ⊂ L4 ⊂ L5 ⊂ L6，重叠处方块 id 一致），用 `showSection` / `hideSection` 切换 box 列表实现升级与降级，不换 NBT。
 - Ponder 插件由 `ClientProxy.onClientSetup()` 经 `PonderIndex.addPlugin(new CTNHManaPonderPlugin())` 挂载；插件本身不含注册逻辑。
 - 动态渲染类型必须在 `ClientProxy.init()` 注册，渲染类本身只提供 `TYPE`。
 - Caduceus / Saber 的客户端行为由「网络包 + 物品属性谓词」两处共同决定，改动需成对检查。

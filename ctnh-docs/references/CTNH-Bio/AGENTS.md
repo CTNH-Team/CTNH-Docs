@@ -1,7 +1,7 @@
 # CTNH-BIO MODULE
 
 ## OVERVIEW
-CTNH-Bio（包 `com.moguang.ctnhbio`，mod id `ctnhbio`）是 CTNH 的生物机械模块：Biomancy 风格的活体机器（宿主实体 + 活体多方块）、生物 recipe capability（实体 / 模型 / 营养 / Cogni 物品）、生物配方与资源生成，以及针对上游 mod 的 Mixin 兼容补丁。共 172 个 Java 文件。入口类：`CTNHBio`（mod 主类）、`CTNHBioGTAddon`（GT addon：配方 capability / 元素 / 配方 / 配方移除）、`CBConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
+CTNH-Bio（包 `com.moguang.ctnhbio`，mod id `ctnhbio`）是 CTNH 的生物机械模块：Biomancy 风格的活体机器（宿主实体 + 活体多方块）、生物 recipe capability（实体 / 模型 / 营养 / Cogni 物品）、生物配方与资源生成、意识装配机 Ponder 思索场景，以及针对上游 mod 的 Mixin 兼容补丁。共 177 个 Java 文件。入口类：`CTNHBio`（mod 主类）、`CTNHBioGTAddon`（GT addon：配方 capability / 元素 / 配方 / 配方移除）、`CBConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Bio/src/main/java/com/moguang/ctnhbio/`（括号内为该域 Java 文件数）
@@ -11,7 +11,7 @@ ctnhbio/
 ├─ CTNHBio.java / CTNHBioGTAddon.java / CBConfig.java   入口 / GT addon / 配置
 ├─ api/         (61) 活体机器基类与 block / blockentity / entity / item 层级、recipe capability、
 │                   实体与模型原料、属性算子、营养序列化
-├─ client/      (14) ClientProxy，model/（7），renderer/（5），Text/ModelOutputLine
+├─ client/      (19) ClientProxy，model/（7），renderer/（5），ponder/（5），Text/ModelOutputLine
 ├─ common/      (7)  CommonProxy，condition/，item/，recipe/，serum/
 ├─ data/        (28) CBDatagen、CBElements，lang/，loot/，materials/，recipe/，tags/
 ├─ event/       (3)  EventHandler、ForgeEventHandler、TransformManager
@@ -40,6 +40,7 @@ ctnhbio/
 | 配方与数据生成 | `data/recipe/`, `data/CBDatagen.java` |
 | 磨碎配方 | `common/recipe/MobCrushingRecipe.java`, `common/recipe/MobCrushingRecipeManager.java`, `integration/jei/MobCrushingCategory.java` |
 | 集成 | `integration/`（EMI / Jade / JEI / XEI） |
+| 客户端思索（Ponder） | `client/ponder/`（`CTNHBioPonderPlugin` / `CTNHBioPonderScenes` / `CTNHBioPonderTags` / `CTNHBioPonderSceneBuilder` / `CogniAssembler`） |
 | Mixin 补丁 | `mixin/`；配置 `src/main/resources/ctnhbio.mixins.json` |
 | 通用工具 | `utils/` |
 
@@ -47,7 +48,7 @@ ctnhbio/
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
 | `api/**` | `ctnh-docs/references/CTNH-Bio/api/AGENTS.md` | 改 recipe capability / 实体与模型原料 / 机器 API 面 |
-| `client/**` | `ctnh-docs/references/CTNH-Bio/client/AGENTS.md` | 改渲染器 / 模型 / 客户端文本 |
+| `client/**` | `ctnh-docs/references/CTNH-Bio/client/AGENTS.md` | 改渲染器 / 模型 / 客户端文本 / Ponder 场景 |
 | `common/**` | `ctnh-docs/references/CTNH-Bio/common/AGENTS.md` | 改 CommonProxy 装配 / 条件 / 通用物品 / 磨碎配方 / 血清 |
 | `data/**` | `ctnh-docs/references/CTNH-Bio/data/AGENTS.md` | 改配方生成器 / lang / 掉落 / 材料 / tag |
 | `event/**` | `ctnh-docs/references/CTNH-Bio/event/AGENTS.md` | 改数据生成钩子 / Forge 事件订阅 / 血肉转换 |
@@ -87,6 +88,7 @@ ctnhbio/
 - 修改 Bio 的数据生成 provider、静态数据 JSON 或 Mixin 补丁。
 - 新增 Bio 注册对象（物品 / 方块 / 实体 / 机器 / 配方类型）。
 - 调整 EMI / Jade / JEI / XEI 集成。
+- 新增或修改客户端 Ponder 思索场景、tag 与双语文案。
 
 ## SOURCE OF TRUTH
 - 注册与生命周期：`CTNHBio.java`, `CTNHBioGTAddon.java`, `common/CommonProxy.java`。

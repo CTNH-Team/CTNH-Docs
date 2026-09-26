@@ -1,7 +1,7 @@
 # CTPP CLIENT DOMAIN
 
 ## OVERVIEW
-CTPP 的客户端侧（33 个 Java 文件）：`ClientProxy`、Ponder 插件/场景/标签、方块与实体渲染器、工具箱 UI、接线柱选线，以及顶层 Visual 类。
+CTPP 的客户端侧（34 个 Java 文件）：`ClientProxy`、Ponder 插件/场景/标签、方块与实体渲染器、工具箱 UI、接线柱选线，以及顶层 Visual 类。
 
 ## STRUCTURE
 ```text
@@ -12,7 +12,7 @@ client/
 |-- TerminalWireTooltipHandler.java
 |-- ponder/                    # CTPPPonderPlugin, CTPPPonderSceneBuilder, CTPPPonderScenes, CTPPPonderTags
 |   |-- electric/              # CarbonBrushes
-|   `-- kinetic/               # BigDam, KineticHatch, SmashingFactory, WindmillControlCenter
+|   `-- kinetic/               # BigDam, KineticGenerator, KineticHatch, SmashingFactory, WindmillControlCenter
 |-- renderer/                  # CTPPBeamRenderTypes, CTPPToolboxCurioRenderer, CTPPToolboxRenderer, CTPPWireRenderTypes,
 |                              EmitterBeamRenderer, GTWireCutterRenderer, VoltageTerminalRenderer
 |-- terminal/                  # TerminalClientSelection, TerminalClientSelectionEvents
@@ -24,7 +24,7 @@ client/
 | Concern | Location |
 |---------|----------|
 | 客户端代理 | `client/ClientProxy.java` |
-| Ponder 插件 / 场景 / 标签 | `client/ponder/`（9 个类；`electric/` + `kinetic/` 两组场景） |
+| Ponder 插件 / 场景 / 标签 | `client/ponder/`（10 个类；`electric/` + `kinetic/` 两组场景） |
 | 渲染器 | `client/renderer/`（7 个：工具箱、线剪、接线柱、发射器光束，以及两套 RenderType 常量） |
 | 顶层 Visual / 渲染 | `client/{CarbonBrushesRenderer, CarbonBrushesVisual, GeneratorCoilRenderer, GeneratorCoilVisual, SplitShaftVisual}` |
 | 方块实体渲染 | `client/KineticMachineBlockEntityRenderer.java` |

@@ -1,16 +1,16 @@
 # CTNH-MANA MODULE
 
 ## OVERVIEW
-CTNH-Mana 是 CTNH 的魔法内容模块，包根 `com.magicbee.ctnhmana`，mod id `ctnhmana`，335 个 Java 文件。承载 Botania / Blood Magic / Ars Nouveau / Apotheosis 集成、魔力驱动的 GTCEu 多方块、血魔法仪式适配、自定义物品与生物效果、客户端 Caduceus 轮盘 UI，以及「虚境(Zenith)」入侵事件系统。入口类：`CTNHMana`（`@Mod`）、`CTNHManaGTAddon`（`@GTAddon`，`addRecipes` / `removeRecipes`）、`CMConfig`；代理为 `common/CommonProxy` 与 `client/ClientProxy`（`ClientProxy extends CommonProxy`）。
+CTNH-Mana 是 CTNH 的魔法内容模块，包根 `com.magicbee.ctnhmana`，mod id `ctnhmana`，336 个 Java 文件。承载 Botania / Blood Magic / Ars Nouveau / Apotheosis 集成、魔力驱动的 GTCEu 多方块、血魔法仪式适配、自定义物品与生物效果、客户端 Caduceus 轮盘 UI，以及「虚境(Zenith)」入侵事件系统。入口类：`CTNHMana`（`@Mod`）、`CTNHManaGTAddon`（`@GTAddon`，`addRecipes` / `removeRecipes`）、`CMConfig`；代理为 `common/CommonProxy` 与 `client/ClientProxy`（`ClientProxy extends CommonProxy`）。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Mana/src/main/java/com/magicbee/ctnhmana/`（括号内为该域 Java 文件数）
 
 ```
-com.magicbee.ctnhmana/                        # 335 个 Java 文件
+com.magicbee.ctnhmana/                        # 336 个 Java 文件
 ├── CTNHMana / CTNHManaGTAddon / CMConfig     # mod 入口、GT addon、配置
 ├── api/        (35)  效果(16)、配方条件(4)、自定义配方逻辑(6)、图案、机器 trait(3)、Botania 网络扩展
-├── client/     (43)  代理、轮盘(4)、模型(8)、Ponder(4+3)、渲染(19+1)、Zenith 客户端镜像
+├── client/     (44)  代理、轮盘(4)、模型(8)、Ponder(4+4)、渲染(19+1)、Zenith 客户端镜像
 ├── common/     (125) 代理、多方块(31)、物品(8 子包)、实体(5+ai8+nav2+proj3)、GUI(7)、仓室(5+3)、仪式(2+6)
 ├── data/       (55)  CMDatagen、ManaData、配方(35)、builder(11)、lang(3)、tags(2)、materials(1)
 ├── event/      (16)  EventHandler(MOD 总线空标记) + 13 个 Forge 处理器 + 按键绑定 + Boss 池

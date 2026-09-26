@@ -1,7 +1,7 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（22 个 Java 文件）。
+客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（24 个 Java 文件）。
 
 ## STRUCTURE
 ```text
@@ -10,8 +10,9 @@ client/
 |-- ClientUtil.java
 |-- model/                     # ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel
 |-- ponder/                    # CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags
-|   |-- Electric/              # GregTechMultiblocks, NeutronActivator
-|   `-- Kinetic/               # Meadow, MechanicalExporter
+|   |-- Electric/              # ChemicalPlant, GregTechMultiblocks, NeutronActivator
+|   |-- Kinetic/               # Meadow, MechanicalExporter
+|   `-- Misc/                  # Drum
 |-- renderer/                  # ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender, MartialMoralityEyeRender, TurbineRotorRender
 |-- renderer/utils/            # RenderUtils
 `-- util/                      # SnowOverlayQuadOffset
@@ -23,7 +24,7 @@ client/
 |---------|----------|
 | 客户端引导 | `client/ClientProxy.java`, `client/ClientUtil.java` |
 | Ponder 插件/场景/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
-| Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（GregTechMultiblocks, NeutronActivator） |
+| Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（ChemicalPlant, GregTechMultiblocks, NeutronActivator）, `client/ponder/Misc/`（Drum） |
 | Ponder 适配构建器 | `client/ponder/CTNHCorePonderSceneBuilder.java` |
 | 模型 | `client/model/`（ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel） |
 | 渲染器 | `client/renderer/`（ArcBlockRender, DynamicCasingRender, HyperPlasmaTurbineRender, TurbineRotorRender, AstralPlanetSpecialEffects） |

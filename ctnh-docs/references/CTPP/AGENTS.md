@@ -1,7 +1,7 @@
 # CTPP MODULE
 
 ## OVERVIEW
-CTPP（`CT++`）是 Create 与 GregTech 的联动模块，包根 `com.mo_guang.ctpp`，mod id `ctpp`，248 个 Java 文件。承载动能/电动多方块机器、Create 风扇催化处理、自定义配方 builder 与数据生成、GTCEu addon 注册，以及工具箱（Toolbox）与接线柱（Voltage Terminal）系统。入口类：`CTPP`（mod 主类）、`CTPPGTAddon`（GT addon）、`CTPPRegistration` / `CTPPRegistrate`（Registrate）、`CTPPEntityTypes`（实体）；代理为 `CommonProxy` / `ClientProxy`。
+CTPP（`CT++`）是 Create 与 GregTech 的联动模块，包根 `com.mo_guang.ctpp`，mod id `ctpp`，249 个 Java 文件。承载动能/电动多方块机器、Create 风扇催化处理、自定义配方 builder 与数据生成、GTCEu addon 注册，以及工具箱（Toolbox）与接线柱（Voltage Terminal）系统。入口类：`CTPP`（mod 主类）、`CTPPGTAddon`（GT addon）、`CTPPRegistration` / `CTPPRegistrate`（Registrate）、`CTPPEntityTypes`（实体）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTPP/src/main/java/com/mo_guang/ctpp/`（括号内为该域 Java 文件数）。
@@ -14,7 +14,7 @@ ctpp/
 |                              KineticMachineDefinition、IBlockStressValues、IEnergyTransferHandler；
 |                              pattern/ (3: CTPPBlockMaps, FactoryStaticBlockPattern, StaticBlockPattern)；
 |                              terminal/ (3: TerminalLinkState, TerminalProperties, TerminalWireGeometry)
-|-- client/                   # 33: ClientProxy 与 9 个顶层渲染/Visual 类；ponder/ (9)、renderer/ (7)、
+|-- client/                   # 34: ClientProxy 与 9 个顶层渲染/Visual 类；ponder/ (10)、renderer/ (7)、
 |                              terminal/ (2)、toolbox/ (5)
 |-- common/                   # 71: CommonProxy；beam/ (4)、block/ (7)、blockentity/ (5)、command/ (2)、
 |                              condition/ (2)、data/ (2)、gui/widget/ (1)、item/ (4)、kinetic/fan/ (5)、
@@ -30,7 +30,7 @@ ctpp/
 |-- registry/                 # 12: Registrate 物品/方块/BE/机器/多方块/菜单/网络/配方类型与修饰符、
 |                              CreateMaterials、GTMaterialAddon
 |-- syncdata/                 # 1: TerminalLinkStateAccessor
-`-- util/                     # 6: CommonTooltips, ICustomSlot, IMatrix3dAccessor, IWorkingMachineStep,
+`-- util/                     # 6: CommonTooltips, ICustomSlot, IMatrix3dAccess, IWorkingMachineStep,
                               ItemAxisBuilder, MathUtil
 ```
 
@@ -48,7 +48,7 @@ ctpp/
 | 可放置发射器 | `common/machine/simple/PlaceableEmitterMachine.java`、`event/PlaceableEmitterEventHandler.java`、`data/recipe/PlaceableEmitterRecipes.java` |
 | 反射镜与光束 | `common/block/MirrorBlock.java`、`common/beam/` |
 | 接线柱与线缆 | `api/terminal/`、`common/terminal/`、`common/blockentity/VoltageTerminalBlockEntity.java`、`client/renderer/VoltageTerminalRenderer.java`、`syncdata/` |
-| 客户端 Ponder / 渲染 | `client/ponder/`（9）、`client/renderer/`（7） |
+| 客户端 Ponder / 渲染 | `client/ponder/`（10）、`client/renderer/`（7） |
 | Mixin | `mixin/`、`src/main/resources/ctpp.mixins.json` |
 | 生成资源（444 个 JSON） | `src/generated/resources/`（`assets/ctpp/` 与 `data/{ctpp,create,curios,forge,gtceu,minecraft}/`） |
 | 静态资源 | `src/main/resources/assets/ctpp/` |
