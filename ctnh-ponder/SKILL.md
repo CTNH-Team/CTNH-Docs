@@ -34,7 +34,43 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
    - 上游 Create 提供 `com.simibubi.create.foundation.ponder.CreateSceneBuilder`，CTNH 共享构建器继承它；
    - 版本（`CTNH-Modules/gradle/ctnh.versions.toml`）：Create `6.0.8-291`、Ponder-Forge 1.20.1 `1.0.78`，
      运行时包名为 `net.createmod.ponder`；
-   - 现有 storyboard 注册条数：Core 5、Energy 24、Mana 6、CTPP 6，另有 CTPP 对 Create 的 Mixin 注入。
+   - 现有 storyboard 注册条数：Core 5、Energy 24、Mana 6、CTPP 7（含 `kinetic_generator`），另有 CTPP 对 Create 的 Mixin 注入。
+
+## 证据阶梯与时间预算（硬纪律）
+
+本 skill 的绝大多数返工来自**证据获取顺序错误**，而不是知识不足。按下面的阶梯取证据，
+**能用上层结论就不要去下层试错**：
+
+| 优先级 | 证据来源 | 成本 | 适用 |
+|--------|---------|------|------|
+| 1 | **框架源码**（`BlockPattern.setActualRelativeOffset`、`PonderSceneBuilder`、`MetaMachineBlock`） | 一次 `read` | 一切"映射/语义/行为"问题——**默认从这里开始** |
+| 2 | **机器注册代码**（`.pattern(...)`、`.rotationState(...)`、`.where(...)`） | 一次 `read` | 结构、朝向、属性、方块 id |
+| 3 | **运行时注册日志**（`modules/<M>/run/logs/debug.log` 的 `Registered <id>`） | 一次 `grep` | 只有拿不准注册 id 时 |
+| 4 | **反查已有 storyboard / 生成物** | 数次 `read` + 脚本 | **仅当上层都没有答案时**——对称结构反查不出方向，极易空耗 |
+
+**禁止的循环**：拿"直觉映射"生成一版 → 与已有文件比对 → 不一致 → 换一种猜测再比对。
+这是猜测驱动的循环，收敛慢且结论不可信。**一旦发现自己在做第二次"试一种再比一比"，
+立刻停下来去读第 1 层的源码。**
+
+**时间预算（单个新场景）**：查证事实 ≤ 总时长的一半，写代码与验证占另一半。
+如果一直在 grep/read 而没有产出任何文件，就是已经跑偏了——此时必须立刻
+**问用户要结构，或直接读框架源码下结论**，不要继续扩大搜索面。
+
+**另一条**：不确定的细节要**问**，不要靠搜索堆证据。玩家手上的实际摆放、
+sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜多久都搜不出来。
+
+**第三条——按需读取，不要整文件吞**：本 skill 涉及的类（`CTNHPonderSceneBuilder`、
+`PonderLocalization`、工厂 pattern、机器类）都不大，但**一次只读你要用的那一段**。
+判断"这个类的行为"时读它的方法签名与关键分支即可；把整个类读完再动手，
+是"过度查询"最常见的形态。**读文件是有明确问题的**——写下你要回答的问题，
+读完就回答它，不要顺手读别的。
+
+**第四条——注释写给维护者，不写给自己**。代码注释只放：这个场景的坐标事实、
+非显然的耦合（"文案里的百分比为什么写成文字"这类若确实必要，一句话，且应当
+已经进了本 skill 排障表）。**不要**在代码里留"这里容易写错""注意不要用 X"
+这类给自己看的便条——那是本 skill 的内容，不是源码的内容。
+写完自问：**这段注释是写给下一个改这个文件的人，还是写给我自己看的？**
+后者一律删掉，并把信息搬进本 skill 的排障表。
 
 ## 三层结构（唯一所有权）
 
@@ -185,6 +221,10 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 | 场景下标越界/看不到方块 | `util.grid().at(...)` 坐标与 NBT 结构不一致 | 用 `util.select().fromTo(...)` 选区与 NBT 对齐；先 `showSection` 再操作 |
 | tag 不出现 | 没 `addToIndex()`，或没 `register()` | 补齐调用链，重跑 `runData` |
 | 场景里结构错位/悬空 | 蓝图的 `pos` 与 `pattern` 还原不一致，或忘了套地板 | 用 `--print` 看 footprint 与控制器坐标，再和 `aisle` 对照 |
+| **场景里机器左右镜像**（仓室/控制器开口在错误一侧） | 只翻转了 y，没按 `setActualRelativeOffset` 同时翻转 x/z | 读 [references/storyboard-nbt.md](references/storyboard-nbt.md) 3.1；`x = -i`、`y = +j`、`z = -k` |
+| **文案显示 `Format error:` 后跟原文** | 文案里写了字面 `%`。Ponder 文案走 `I18n`/`Component` 格式化，裸 `%` 抛 `UnknownFormatConversionException` | 百分比改写"个百分点"等文字，或转义成 `%%`。**这是文案层问题，与 datagen 无关**——`runData` 照常通过 |
+| 讲解某个仓室时**看不到它**（默认镜头只露 NORTH/WEST） | 仓室在背面（EAST/SOUTH 面），没转镜头 | 讲背面的部件前 `scene.rotateCameraY(180)`，讲完再 `-180` 转回。别为了镜头去改仓室朝向 |
+| `rotateSection` 转的不是该转的东西 | 把"机器外壳"当成旋转体。真实旋转体由机器自己决定 | 读机器的 `getContraptionRotationAxis()` / `getAssemblyPivot()`（或 `IContraptionMultiblock`）确定是哪批方块、绕哪根轴 |
 | 生成时报"没有 controller"或"y=0 保留" | 蓝图漏标主方块，或结构压到了地板层 | 给主方块加 `"controller": true`；结构 y 从 1 起 |
 | 管道在场景里是**一根光柱、没连上** | GT 管道的连接存在 BE 的 `connections` 位掩码里，Ponder 不跑 tick 不会自动连 | 在蓝图该方块的 `nbt` 里写 `"connections"`（竖直贯通 = 3）；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 6 节 |
 | 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
@@ -208,8 +248,19 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 - **需要**：目标注册对象、sceneId、要讲的步骤顺序、机器结构（多方块要能读到 `pattern(...)`）。
 - **不要凭空推断**：NBT 里到底摆了哪些方块、机器朝向与正面、上游 mod 的内部实现。
   这些必须来自文件、源码或玩家的实际摆放；不确定就标注为待确认。
-- **不要假装验证过**：`runData` 只证明 lang；场景的观感、镜头、时序需要在游戏内确认。
-  只编译通过不等于场景可用。
+- **不要假装验证过**。编译通过 + `runData` 成功，只证明"代码能编译、lang 能生成"，
+  **对场景是否可用几乎零信息量**。按下面的分界老实话说什么验过了：
+
+  | 能静态验证 | 必须游戏内 `/ponder <sceneId>` 看 |
+  |-----------|-----------------------------------|
+  | 编译通过、lang key 成对生成 | 结构是否显示、位置是否与讲解一致 |
+  | NBT 几何（尺寸/越界/地板空洞/连接掩码） | 镜头能不能看见被讲解的方块 |
+  | 场景坐标与 NBT 逐格一致 | 旋转体转得对不对、朝向观感 |
+  | 文案无裸 `%`（可 grep 生成物） | 文案长度是否溢出、时序是否够读完 |
+  | | 部件遮挡、箭头指向、淡入淡出 |
+
+  交付时**逐条写明哪一格验过、哪一格没验**。把"编译通过"说成"验证完成"，等于让用户
+  替你做验收——本 skill 的返工大多是这样产生的。
 - **上游方块 id 要落到证据上，不要靠拼名字猜。** 常见来源，按可靠度排序：
   1. 游戏注册日志——跑过一次 `runClient`/`runData` 后，`modules/<Module>/run/logs/debug.log`
      里有 `Registered <id> to registry minecraft:block`，这是运行时真值；
@@ -217,6 +268,29 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
   3. 注册代码——例如 GT 管道是 `"%s_%s_fluid_pipe".formatted(material.getName(), pipeType.name)`
      （→ `bronze` + `normal` = `gtceu:bronze_normal_fluid_pipe`）。
   注意上游 mod 的 `langValue` 显示名（"Normal Bronze Fluid Pipe"）**不等于**注册 id，别直接转换。
+
+## 本仓库的构建环境事实（datagen 前置）
+
+跑 `runData` 前先确认这三件事，否则会在构建系统上报错而不是在 Ponder 上报错：
+
+1. **JDK**：项目目标 Java 17，但机器上可能只有 JDK 21（`~/.gradle/jdks/eclipse_adoptium-21-*`），
+   21 可以跑构建。
+2. **Gradle 版本**：仓库 wrapper 锁 9.1.0；但根 `settings.gradle` 的
+   `org.gradle.toolchains.foojay-resolver-convention` 若为 `0.5.0`，在 Gradle 9 上会直接抛
+   `JvmVendorSpec does not have member field 'IBM_SEMERU'`。临时调到 `1.0.0` 可解，
+   **验证完必须还原**（它属于根仓库，不属于本模块改动）。
+3. **Gradle 8.x 不可用**：`modules/GregTech-Modern/gradle/scripts/moddevgradle.gradle` 用了
+   `failOnNoDiscoveredTests`，8.14 没有该属性；不要靠降版本绕。
+
+命令模板：
+
+```bash
+JAVA_HOME=~/.gradle/jdks/eclipse_adoptium-21-amd64-windows.2 ./gradlew :modules:<Module>:runData --console=plain
+```
+
+**spotlessCheck 的红灯要先归因**：Windows 检出下 CRLF 与仓库 LF 不一致会让 spotless 报
+几百个**既有**文件违规。用 `| Select-String <你的文件名>` 过滤——你的文件不在列表里就说明
+不是你的问题，不要为此重排整个仓库的换行。
 
 ## 何时提问、停止或拒绝
 

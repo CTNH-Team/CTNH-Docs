@@ -9,6 +9,9 @@
 - [ ] 地板尺寸 = 结构水平外接矩形每边外扩 1 格（每轴 +2）
 - [ ] 多方块结构逐条对照机器定义的 `pattern(...)` 还原，`Predicates.air()` 的符号未放方块
 - [ ] 主方块标了 `"controller": true`；朝向类方块为 `facing=north` + `upwards_facing=north`
+- [ ] 不对称结构的 K/E 等能力符号已按 `BlockPattern` 映射核对，未发生左右镜像或能力仓错位
+- [ ] 场景中新放置的朝向类仓室显式设置了 `FACING`；`facing`、`pointAt` 面与当前镜头可见面一致
+- [ ] 不同能力仓使用不同 outline 颜色，并逐个确认文案目标不是相邻的另一仓室
       （`RotationState.NONE` 的机器如桶/储罐例外：写 `"controller_props": false`，不带朝向属性）
 - [ ] 若结构里有 GT 管道，该方块的 `nbt` 写了 `connections` 位掩码（竖直贯通 = 3）；
       否则场景里会是一根没连上的光柱

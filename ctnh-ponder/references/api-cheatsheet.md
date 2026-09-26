@@ -132,6 +132,83 @@ scene.world().hideSection(util.select().position(1, 1, 1), Direction.DOWN);
   后面接 `idle(...)` 才有停顿感。
 - 结构 NBT 里只需要一种摆放；"另一种布局"用移动表达，比准备两份 NBT 更好维护。
 
+### 镜头：默认只看得见 NORTH / WEST / UP
+
+默认相机在场景的 `(-x, +y, -z)` 象限，**可见面只有 NORTH、WEST、UP**，
+正对视线的是 NORTH。这意味着：**摆在 EAST / SOUTH 面（或机体东侧、南侧）的部件，
+在默认镜头下完全看不见**——写了讲解文案等于白写，玩家只看到一堵墙。
+
+仓室摆放与镜头必须一起设计，二选一：
+
+```java
+// 方案 1：讲背面部件的段落前把镜头转过去，讲完转回来
+scene.rotateCameraY(180);
+scene.idle(40);
+scene.world().setBlock(util.grid().at(6, 2, 4), CTPPMachines.MECHANICAL_UPGRADE_BUS[GTValues.LV]
+        .defaultBlockState(), true);
+scene.showText(80, "...", "...")
+        .pointAt(util.vector().blockSurface(util.grid().at(6, 2, 4), Direction.SOUTH))  // 面也要跟着改
+        .attachKeyFrame();
+scene.idle(90);
+// ...讲完
+scene.rotateCameraY(-180);
+scene.idle(40);
+```
+
+方案 2：把仓室放在西侧/北侧这些可见面上（前提是结构允许）。
+
+注意 `pointAt` 的面要和当前镜头一致——转了 180° 之后还指 `Direction.WEST`，箭头会穿到机体后面。
+
+### `rotateSection`：转哪个方块由机器决定，不是由你挑
+
+表现"机器运转"时，**不要凭直觉挑一组方块去转**。真机里哪些方块是旋转体、
+绕哪根轴，都写在机器代码里：
+
+```java
+// KineticGeneratorMachine
+private Direction.Axis getContraptionRotationAxis() {
+    return getFrontFacing().getAxis() == Direction.Axis.Z ? Direction.Axis.X : Direction.Axis.Z;
+}
+@Override public BlockPos getAssemblyPivot() { return MachineUtils.getOffset(this, 2, 0, 1); }
+```
+
+实现 `IContraptionMultiblock` 的机器还会有 `assembleFromPattern(pivot, rotationAxis)`，
+把 pattern 里标为 dynamic part 的方块打包成旋转体。**去读这两个方法，再照着挑方块和轴。**
+
+用法（`x,y,z` 是**角度**，单位度，按 tick 匀速补间）：
+
+```java
+ElementLink<WorldSectionElement> link = scene.world().showIndependentSection(magnets, Direction.DOWN);
+scene.world().moveSection(link, PARK, 20);                       // 先挪到一边单独讲
+scene.world().moveSection(link, PARK.scale(-1d), 20);            // 归位
+scene.world().rotateSection(link, 360, 0, 0, 200);               // 绕 X 轴整圈，200 tick
+```
+
+`rotateSection` 的旋转中心是**该 section 的几何中心**，不是 pivot 坐标；如果旋转体
+不对称、中心与真机 pivot 不一致，观感会和游戏内对不上。
+
+### 文案：字面 `%` 会渲染成 `Format error:`
+
+Ponder 文案最终走 `I18n.get(...)` → `Component` 的格式化路径，**裸 `%` 会抛
+`UnknownFormatConversionException`**，屏幕上显示成：
+
+```text
+Format error:
+<你写的原文>
+```
+
+两种写法：
+
+```java
+scene.showText(80, "each tier adds 10 percentage points of efficiency", "每提升一级效率增加 10 个百分点");
+// 或者真的需要百分号时转义
+scene.showText(80, "10%% faster", "快 10%%");
+```
+
+**这个错误 `runData` 抓不到**：lang 会正常生成，`%s`、`%d` 这类占位符更是会被
+原样写出（GT 的机器 tooltip 用的就是 `%d%%`，那是另一套格式化路径，可以照写）。
+所以 `.ponder.` 的文案里出现 `%` 时，必须游戏内确认。
+
 ### 粒子（表现流体/能量流动）
 
 ```java
