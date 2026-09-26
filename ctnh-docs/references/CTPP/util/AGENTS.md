@@ -7,7 +7,7 @@ CTPP 的共享工具（6 个 Java 文件）：通用 tooltip、槽位接口、�
 | Concern | Location |
 |---------|----------|
 | 通用 tooltip | `util/CommonTooltips.java`（`KINETIC_OVERCLOCK`、`INPUT_SPEED`、`MECHANICAL_TIER_MACHINE`，lang key 前缀 `ctpp.commontooltips.*`） |
-| 槽位与自定义接口 | `util/ICustomSlot.java`, `util/IMatrix3dAccessor.java`, `util/IWorkingMachineStep.java` |
+| 槽位与自定义接口 | `util/ICustomSlot.java`, `util/IMatrix3dAccess.java`, `util/IWorkingMachineStep.java` |
 | 物品朝向构建 | `util/ItemAxisBuilder.java` |
 | 数学工具 | `util/MathUtil.java`（如 `rotateByVec`，被 `KineticGeneratorMachine` 用于旋转 contraption 的转速方向） |
 

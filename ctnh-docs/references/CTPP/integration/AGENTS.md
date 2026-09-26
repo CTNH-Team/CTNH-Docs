@@ -19,7 +19,7 @@ integration/
 | 风扇类别 | `integration/jei/category/`（`FanAcidWashingCategory`, `FanBreathingCategory`） |
 | Jade 插件 | `integration/jade/CTPPJadePlugin.java`（`IWailaPlugin` + 内部 `PlaceableEmitterProvider`） |
 | LDLib 插件 | `integration/ldlib/CTPPLDLibPlugin.java`（`@LDLibPlugin`；`onLoad()` 把 `TerminalLinkStateAccessor` 注册进 `TypedPayloadRegistries`，优先级 50） |
-| EMI（已迁出） | CTNH-Core `integration/emi/`——不要在本模块重建 `integration/emi/CTPPEmiPlugin.java` |
+| EMI | 由 CTNH-Core `integration/emi/`（`CTNHCoreEmiPlugin`, `CTNHExtraEmiPlugin`）对接；本模块不建 EMI 插件 |
 
 ## CONVENTIONS
 - 集成类保持隔离与可选，不得成为 `common/` 的硬依赖。
@@ -28,8 +28,8 @@ integration/
 
 ## ANTI-PATTERNS
 - 让集成类成为 common 代码的硬依赖。
-- 在 CTPP 中重新引入 `CTPPEmiPlugin`（它在 Core）。
-- 重新加回 `KineticOutputMachineProvider`；Jade 侧只用 `CTPPJadePlugin`。
+- 在 CTPP 中另建 EMI 插件（EMI 对接由 CTNH-Core 的 `CTNHCoreEmiPlugin` 承担）。
+- 绕过 `CTPPJadePlugin` 另加 Jade provider。
 - 在 Jade provider 中重复序列化客户端已能推导的数据（如 `lastRecipe`）。
 
 ## SCOPE
