@@ -1,7 +1,7 @@
 # CTNH-CORE MODULE
 
 ## OVERVIEW
-CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，432 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
+CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，434 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/`（括号内为该域 Java 文件数）
@@ -13,9 +13,10 @@ ctnhcore/
 │                     data/material/{CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty}；
 │                     gui/CTNHGuiTextures；jade/{MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider}（整体注释停用）；
 │                     machine/feature/{IDigitalMiner, IDynamicCasing}；machine/multiblock/UnlimitedItemStackTransfer；recipe/DigitalMinerLogic
-├── client/     (22) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
+├── client/     (24) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
 │                     ponder/{CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags,
-│                             Electric/{GregTechMultiblocks, NeutronActivator}, Kinetic/{Meadow, MechanicalExporter}}；
+│                             Electric/{GregTechMultiblocks, NeutronActivator, ChemicalPlant},
+│                             Kinetic/{Meadow, MechanicalExporter}, Misc/Drum}；
 │                     renderer/{ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender,
 │                               MartialMoralityEyeRender, TurbineRotorRender, utils/RenderUtils}；util/SnowOverlayQuadOffset
 ├── common/     (124) 代理与机器/方块/物品实现
@@ -25,28 +26,29 @@ ctnhcore/
 │   ├── entity/monster/{astralslime/AstralSlime, sightseerspitter/SightSeerSpitter}
 │   ├── gui/ (MachineModeFancyConfiguratorTest, SimpleNumberInputWidget, WPAAcceleratorGui,
 │   │         terminal/TerminalInputWidget, widget/SimpleNumberInputWidget)
-│   ├── item/ (18) ArkOfHomoItem, AstronomyCircuitItem, CatalystBehavior, ConnectTerminalItem, IDataItem, IDroneItem,
+│   ├── item/ (19) ArkOfHomoItem, AstronomyCircuitItem, CatalystBehavior, ConnectTerminalItem, IDataItem, IDroneItem,
 │   │              IThrowableItem, MEAdvancedTerminalItem/Behavior, MultiblockHelper, ProgramItem,
 │   │              TurbineRotorItem/MaterialTurbineRotorItem, TagPrefixBehavior, ThrowableSummoner, debug/ReloadItem ...
-│   ├── machine/ cover/CreativeEnergyCover；multiblock/{KineticElectricMultiblockMachine, LargeBottleMachine,
-│   │            MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine}
-│   │   ├── electric/ (29) AstronomicalMachine, BioMachine, ChemicalPlantMachine, FactoryMachine, MegaLCRMachine,
-│   │   │                   NeutronActivatorMachine, PlanetMiner, WideParticleAccelerator, multithread/CNCAlloySmelter,
-│   │   │                   rareearth/{ProcessControlMachine, ProcessControlProfile, ProcessControlled*MultiblockMachine} ...
-│   │   ├── generator/ (12) Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine,
-│   │   │                    LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator,
-│   │   │                    NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine,
-│   │   │                    WaterPowerStationMachine, WindPowerArrayMachine
-│   │   ├── kinetic/ (5) IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine,
-│   │   │                 MeadowMachine, NoEnergyMachine
-│   │   ├── part/ (12) CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine,
-│   │   │                Creative*HatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock,
-│   │   │                NeutronAcceleratorMachine, NeutronSensorMachine
-│   │   └── quantum/quantum_core
-│   ├── simple/ (DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine)
-│   ├── trait/ (ScalableReservoirComputingLogic, SimpleComputationContainer,
-│   │           providable_net/{ProvidableNetInfo, ProvidableNetTrait, ProviderInfo})
-│   ├── recipe/ (KeepIngredientShapedRecipe, NeutronActivatorCondition, PlantCasingCondition, TierCasingCondition,
+│   ├── machine/ (79) cover/CreativeEnergyCover
+│   │   ├── multiblock/ (69) 顶层 5 个通用多方块：KineticElectricMultiblockMachine, LargeBottleMachine,
+│   │   │            MultiblockComputationMachine, SlaughterHouseMachine, UnderfloorHeatingMachine
+│   │   │   ├── electric/ (34) AstronomicalMachine, BioMachine, ChemicalPlantMachine, FactoryMachine, MegaLCRMachine,
+│   │   │   │                   NeutronActivatorMachine, PlanetMiner, WideParticleAccelerator, multithread/CNCAlloySmelter,
+│   │   │   │                   rareearth/{ProcessControlMachine, ProcessControlProfile, ProcessControlled*MultiblockMachine} ...
+│   │   │   ├── generator/ (12) Arc_Generator, Arc_Reactor, ChemicalGeneratorMachine, HyperPlasmaTurbineMachine,
+│   │   │   │                    LargeNaquadahReactorMachine, MegaTurbineMachine, NanoscaleTriboelectricGenerator,
+│   │   │   │                    NaqReactorMachine, PhotoVoltaicDroneStation, PhotovoltaicPowerStationMachine,
+│   │   │   │                    WaterPowerStationMachine, WindPowerArrayMachine
+│   │   │   ├── kinetic/ (5) IndustrialPrimitiveBlastFurnaceMachine, KineticCentrifugeMachine, KineticMixerMachine,
+│   │   │   │                 MeadowMachine, NoEnergyMachine
+│   │   │   ├── part/ (12) CTNHPartAbility, CatalystHatchPartMachine, CircuitBusPartMachine, CompilerMachine,
+│   │   │   │                Creative*HatchPartMachine, DroneHolderMachine, HighSpeedPipeBlock,
+│   │   │   │                NeutronAcceleratorMachine, NeutronSensorMachine
+│   │   │   └── quantum/quantum_core
+│   │   ├── simple/ (4) DigitalMiner, EfficiencyGeneratorMachine, HighPerformanceComputerMachine, SimpleComputationMachine
+│   │   └── trait/ (5) ScalableReservoirComputingLogic, SimpleComputationContainer,
+│   │               providable_net/{ProvidableNetInfo, ProvidableNetTrait, ProviderInfo}
+│   ├── recipe/ (5) KeepIngredientShapedRecipe, NeutronActivatorCondition, PlantCasingCondition, TierCasingCondition,
 │   │            builder/CTNHRecipeBuilder)
 │   └── world/CTNHChunkLoading
 ├── data/       (149) CTNHCoreDatagen, CTNHMaterialFlags, CreateRecipeTypes；item/CrystalItems；machines/GTNNMachines；
@@ -80,7 +82,7 @@ ctnhcore/
 | 配方类型 / 条件 / 修饰符 | `registry/CTNHRecipeTypes`, `registry/CTNHRecipeCategories`, `registry/CTNHRecipeConditions`, `registry/CTNHRecipeModifiers` |
 | 材料与材料标志 | `registry/material/{CTNHMaterials, CTNHMaterialFlags, CTNHMaterialBlocks, GTMaterialAddon}`；材料集定义在 `data/materials/*` |
 | 矿物与矿脉 | `registry/ores/*`（按维度拆分）, `registry/CTNHOres`, `registry/CTNHWorldgenLayers`, `registry/CTNHFluidVeins` |
-| 多方块机器实现 | `common/machine/multiblock/electric/**`（29）、`generator/**`（12）、`kinetic/**`（5）、`part/**`（12）、`quantum/**`、顶层 5 个通用多方块 |
+| 多方块机器实现 | `common/machine/multiblock/electric/**`（34）、`generator/**`（12）、`kinetic/**`（5）、`part/**`（12）、`quantum/**`、顶层 5 个通用多方块 |
 | 多方块构建与图案 | `api/CTNHMultiblockBuilder`, `api/Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}` |
 | 方块数据 / 方块实体 | `common/block/blockdata/{IPBData, ISSFData, PlanetMinerData}`, `common/blockentity/TurbineRotorBE`, `common/block/*` |
 | 机器 GUI / widget | `common/gui/**`（含 `WPAAcceleratorGui`, `terminal/TerminalInputWidget`）, `api/gui/CTNHGuiTextures` |
