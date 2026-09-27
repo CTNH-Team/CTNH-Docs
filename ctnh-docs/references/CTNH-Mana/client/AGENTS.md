@@ -1,7 +1,7 @@
 # CTNH-MANA CLIENT DOMAIN
 
 ## OVERVIEW
-`client/` 是 CTNH-Mana 的客户端面（43 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
+`client/` 是 CTNH-Mana 的客户端面（45 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,7 @@ client/
 ├── gui/radial/                # CaduceusRadialMenu, RadialMenu, RadialMenuScreen, RadialMenuSlot
 ├── model/                     # 8: CMModels, GiantBeeModel, MagicCubeModel, ModelBase, ModelDefinition, RoyalServantBeeModel, StarCakeBlockModel, StarCakeItemModel
 ├── ponder/                    # CTNHManaPonderPlugin, CTNHManaPonderSceneBuilder, CTNHManaPonderScenes, CTNHManaPonderTags
-│   └── mana/                  # MagicRituals, MysticSpire, PonderParticleUtil
+│   └── mana/                  # 5: IndustrialAltar, MagicRituals, MysticSpire, PonderParticleUtil, TerraPlate
 ├── render/                    # 19: AntagonismRender, BeeNukeProjectileRenderer, DeltaSparkRenderer, DemonWillRender, EternalGardenRender, GiantBeeRenderer, MaliciousThermalilyProjectileRenderer, ManaCondenserRender, ManaReactorRender, OmegaSparkRenderer, RoyalServantBeeRenderer, ShroudGazingRender, StarCakeItemRender, StarCakeMachineBERProvider, StarCakeRender, UltraManaMistModel, UltraManaMistRenderType, WitherAconiteProjectileRenderer, ZenithMatrixRender
 │   └── particle/              # IconParticle
 └── utils/                     # RenderUtils
@@ -27,7 +27,7 @@ client/
 | Caduceus 轮盘 | `client/gui/radial/`（4 类）；按键触发在 `event/ForgeEventHandler.keyEvent` |
 | Ponder 插件 | `client/ponder/CTNHManaPonderPlugin.java`（`getModId` → `CTNHMana.MODID`；注册 `CTNHManaPonderScenes` 与 `CTNHManaPonderTags`） |
 | Ponder 场景/标签 | `client/ponder/CTNHManaPonderScenes.java`, `CTNHManaPonderTags.java` |
-| 尖塔 / 仪式场景 | `client/ponder/mana/`（`MagicRituals`, `MysticSpire`, `PonderParticleUtil`） |
+| 尖塔 / 仪式场景 | `client/ponder/mana/`（`MysticSpire` 奥法尖塔、`MagicRituals` 烈焰人 / 符文仪式 / 仪式推测杖、`IndustrialAltar` 工业血之祭坛、`TerraPlate` 泰拉凝聚板、`PonderParticleUtil`） |
 | Ponder 构建器适配 | `client/ponder/CTNHManaPonderSceneBuilder.java` |
 | 模型 | `client/model/`（8） |
 | 渲染器 | `client/render/`（19）+ `render/particle/IconParticle` |

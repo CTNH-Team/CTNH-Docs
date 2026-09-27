@@ -1,7 +1,7 @@
 # CTNH-BIO MODULE
 
 ## OVERVIEW
-CTNH-Bio（包 `com.moguang.ctnhbio`，mod id `ctnhbio`）是 CTNH 的生物机械模块：Biomancy 风格的活体机器（宿主实体 + 活体多方块）、生物 recipe capability（实体 / 模型 / 营养 / Cogni 物品）、生物配方与资源生成，以及针对上游 mod 的 Mixin 兼容补丁。共 172 个 Java 文件。入口类：`CTNHBio`（mod 主类）、`CTNHBioGTAddon`（GT addon：配方 capability / 元素 / 配方 / 配方移除）、`CBConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
+CTNH-Bio（包 `com.moguang.ctnhbio`，mod id `ctnhbio`）是 CTNH 的生物机械模块：Biomancy 风格的活体机器（宿主实体 + 活体多方块）、生物 recipe capability（实体 / 模型 / 营养 / Cogni 物品）、生物配方与资源生成，以及针对上游 mod 的 Mixin 兼容补丁。共 178 个 Java 文件。入口类：`CTNHBio`（mod 主类）、`CTNHBioGTAddon`（GT addon：配方 capability / 元素 / 配方 / 配方移除）、`CBConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Bio/src/main/java/com/moguang/ctnhbio/`（括号内为该域 Java 文件数）
@@ -11,7 +11,7 @@ ctnhbio/
 ├─ CTNHBio.java / CTNHBioGTAddon.java / CBConfig.java   入口 / GT addon / 配置
 ├─ api/         (61) 活体机器基类与 block / blockentity / entity / item 层级、recipe capability、
 │                   实体与模型原料、属性算子、营养序列化
-├─ client/      (14) ClientProxy，model/（7），renderer/（5），Text/ModelOutputLine
+├─ client/      (20) ClientProxy，model/（7），renderer/（5），ponder/（6），Text/ModelOutputLine
 ├─ common/      (7)  CommonProxy，condition/，item/，recipe/，serum/
 ├─ data/        (28) CBDatagen、CBElements，lang/，loot/，materials/，recipe/，tags/
 ├─ event/       (3)  EventHandler、ForgeEventHandler、TransformManager
@@ -47,7 +47,7 @@ ctnhbio/
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
 | `api/**` | `ctnh-docs/references/CTNH-Bio/api/AGENTS.md` | 改 recipe capability / 实体与模型原料 / 机器 API 面 |
-| `client/**` | `ctnh-docs/references/CTNH-Bio/client/AGENTS.md` | 改渲染器 / 模型 / 客户端文本 |
+| `client/**` | `ctnh-docs/references/CTNH-Bio/client/AGENTS.md` | 改渲染器 / 模型 / 客户端文本 / Ponder 场景与 tag |
 | `common/**` | `ctnh-docs/references/CTNH-Bio/common/AGENTS.md` | 改 CommonProxy 装配 / 条件 / 通用物品 / 磨碎配方 / 血清 |
 | `data/**` | `ctnh-docs/references/CTNH-Bio/data/AGENTS.md` | 改配方生成器 / lang / 掉落 / 材料 / tag |
 | `event/**` | `ctnh-docs/references/CTNH-Bio/event/AGENTS.md` | 改数据生成钩子 / Forge 事件订阅 / 血肉转换 |
