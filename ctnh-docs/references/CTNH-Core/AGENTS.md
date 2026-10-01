@@ -1,7 +1,7 @@
 # CTNH-CORE MODULE
 
 ## OVERVIEW
-CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，434 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
+CTNH-Core 是 CTNH 整合包的核心模块，包根 `io.github.cpearl0.ctnhcore`，435 个 Java 文件。承载 GT/GregTech 机器实现（多元件多方块、发电机、动力机器）、材料与配方链、注册与数据生成、跨 mod 集成以及 Mixin 补丁。入口类：`CTNHCore`（mod 主类）、`CTNHCoreGTAddon`（GT addon，注册配方类型/材料/机器）、`CTNHConfig`（配置）；代理为 `CommonProxy` / `ClientProxy`。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/`（括号内为该域 Java 文件数）
@@ -13,10 +13,10 @@ ctnhcore/
 │                     data/material/{CTNHMaterialIconSet, CTNHMaterialIconType, CTNHPropertyKeys, CatalystProperty}；
 │                     gui/CTNHGuiTextures；jade/{MultithreadRecipeLogicProvider, MultithreadRecipeOutputProvider, ThreadStatusProvider}（整体注释停用）；
 │                     machine/feature/{IDigitalMiner, IDynamicCasing}；machine/multiblock/UnlimitedItemStackTransfer；recipe/DigitalMinerLogic
-├── client/     (24) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
+├── client/     (25) ClientProxy, ClientUtil；model/{ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel}；
 │                     ponder/{CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags,
 │                             Electric/{GregTechMultiblocks, NeutronActivator, ChemicalPlant},
-│                             Kinetic/{Meadow, MechanicalExporter}, Misc/Drum}；
+│                             Kinetic/{Meadow, MechanicalExporter}, Misc/Drum, example/ChemicalReactorUi}；
 │                     renderer/{ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender,
 │                               MartialMoralityEyeRender, TurbineRotorRender, utils/RenderUtils}；util/SnowOverlayQuadOffset
 ├── common/     (124) 代理与机器/方块/物品实现
@@ -86,7 +86,7 @@ ctnhcore/
 | 多方块构建与图案 | `api/CTNHMultiblockBuilder`, `api/Pattern/{CTNHBlockMaps, CTNHPredicates, AsynBlockPattern, CTNHBoilerFireboxType}` |
 | 方块数据 / 方块实体 | `common/block/blockdata/{IPBData, ISSFData, PlanetMinerData}`, `common/blockentity/TurbineRotorBE`, `common/block/*` |
 | 机器 GUI / widget | `common/gui/**`（含 `WPAAcceleratorGui`, `terminal/TerminalInputWidget`）, `api/gui/CTNHGuiTextures` |
-| 客户端渲染 / 模型 / Ponder | `client/renderer/**`, `client/model/*`, `client/ponder/**` |
+| 客户端渲染 / 模型 / Ponder | `client/renderer/**`, `client/model/*`, `client/ponder/**`（机器界面示例 `client/ponder/example/ChemicalReactorUi`） |
 | 配方实现 | `data/recipe/**`（顶层 34；`age/`, `chain/`, `create/`, `multiblock/`, `migrated/`, `mana/`, `wood/`, `utils/`）, `data/recipe/CTNHCoreRecipeAddition` |
 | 配方移除 | `data/recipe/RecipeRemoval`（只登记过滤规则；通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper` 提供） |
 | 数据生成 | `data/CTNHCoreDatagen`, `data/tags/**`, `data/worldgen/CTNHBiomeModifiers` |
