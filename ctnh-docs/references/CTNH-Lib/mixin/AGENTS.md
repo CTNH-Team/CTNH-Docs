@@ -1,7 +1,7 @@
 # CTNH-LIB MIXIN DOMAIN
 
 ## OVERVIEW
-面向 GTM 与 `RecipeManager` 的字节码补丁（4 个 Java 文件）。配置 `src/main/resources/ctnhlib.mixins.json`。
+面向 GTM、`RecipeManager` 与 Create Ponder 的字节码补丁（5 个 Java 文件）。配置 `src/main/resources/ctnhlib.mixins.json`。
 
 ## WHERE TO LOOK
 | Concern | Location |
@@ -10,14 +10,16 @@
 | 静态过滤表清理 | `GTRecipesMixin.java`：`@Mixin(value = GTRecipes.class, remap = false)`，在 `recipeRemoval` HEAD 调 `DataFilterPack.FILTERED.clear()` |
 | 机器构建器 lang 注入 | `MachineBuilderMixin.java`：`@Redirect` 拦 `MachineBuilder.register()` 内的 `BlockBuilder.register()`，实例实现 `ICNBuilder` 且 `getCNLangValue()` 非空时用 `ProviderTypes.CNLANG` 写入 descriptionId |
 | TMRV 配方 id 保留 | `TMRVMixin.java`：`@Redirect` 拦 `RecipeManager.Category.Recipe.getID` 内的 `ResourceLocation.fromNamespaceAndPath`，改返回 `getOriginalID()` |
-| 注册 | `ctnhlib.mixins.json`：`mixins=[GTRecipesMixin, MachineBuilderMixin, RecipeManagerApplyMixin, TMRVMixin]`，`client` 数组为空 |
+| 思索 UI 详情按钮接线 | `PonderUIMixin.java`：`@Mixin(PonderUI.class)`，各 `@Inject` 标 `remap = false`，在 `init` / `renderWindow` / `mouseClicked` / `tick` / `getPartialTicks` 注入，委托 `PonderUiButtons`；`MachineUiInteraction.enabled()` 时冻结场景与 partial ticks |
+| 注册 | `ctnhlib.mixins.json`：`mixins=[GTRecipesMixin, MachineBuilderMixin, RecipeManagerApplyMixin, TMRVMixin]`（4 个），`client=[PonderUIMixin]` |
 
 ## CONVENTIONS
 - 新增 mixin 类必须登记到 `ctnhlib.mixins.json` 的 `mixins`（客户端专用进 `client`）数组，否则不会加载。
 - 顺序敏感时显式写 `priority`（`RecipeManagerApplyMixin` = 1100）。
 - mixin 只读 Lib 自身状态（`RecipeRemovalHelper.getFilters()`、`DataFilterPack.FILTERED`），不引用任何功能模块。
 - 过滤器列表为空时提前 return（`RecipeManagerApplyMixin`）。
-- 目标类在 GTCEu 等非 MC 包下时加 `remap = false`（`GTRecipesMixin`、`MachineBuilderMixin`、`TMRVMixin`）。
+- 目标类在 GTCEu、Create 等非 MC 包下时加 `remap = false`（`GTRecipesMixin`、`MachineBuilderMixin`、`TMRVMixin`、`PonderUIMixin`）。
+- 客户端 mixin 登记到 `client` 数组，且只委托 Lib 客户端类（`PonderUIMixin` → `PonderUiButtons` / `MachineUiInteraction`），不直接引用功能模块。
 
 ## ANTI-PATTERNS
 - 加了 mixin `.java` 却不登记 `ctnhlib.mixins.json`。
