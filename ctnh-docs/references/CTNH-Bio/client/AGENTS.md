@@ -30,6 +30,7 @@ client/
 | Ponder 插件 | `client/ponder/CTNHBioPonderPlugin.java`（`registerScenes` → `CTNHBioPonderScenes`；`registerTags` → `CTNHBioPonderTags`） |
 | Ponder 场景注册 | `client/ponder/CTNHBioPonderScenes.java`：`CBMultiblocks.COGNI_ASSEMBLER` 绑定 `cogni_assembler/common`；`CBMultiblocks.GREAT_FLESH` 绑定 `great_flesh/growth` 与 `great_flesh/differentiation`；均挂 `CTNHBioPonderTags.BioMultiblock` |
 | Ponder 场景类 | `client/ponder/CogniAssembler.java`（`common`）、`client/ponder/GreatFlesh.java`（`growth` / `differentiation`） |
+| Ponder 机器界面 | `CogniAssembler` 用 Lib `MachineUI` 演示数据模型接口、LV 输入总成与 LV 物品输出总线；`GreatFlesh` 的分化场景用 MV 输入总成同时演示物品与流体输入；机器坐标一律经 `.machinePos(pos)` 显式指定 |
 | Ponder tag | `client/ponder/CTNHBioPonderTags.java`（`BioMultiblock` = `ctnhbio:bio_multiblock`，经 `CTNHPonderTagHelper` 注册并加入 `COGNI_ASSEMBLER` / `GREAT_FLESH`） |
 | Ponder 场景适配器 | `client/ponder/CTNHBioPonderSceneBuilder.java`（继承 CTNH-Lib `CTNHPonderSceneBuilder`，构造传入 `CTNHBio.MODID`，datagen 时经 `REGISTRATE.genLang` 产出 lang） |
 
@@ -38,6 +39,7 @@ client/
 - `LivingMetaMachineBERProvider` 是机器与模型的唯一绑定入口，模型按 key 从 `CBModels.MODELS` 取；新增机器模型在 `CBModels` 注册，不要在机器类里直接 new 渲染器。
 - `ClientProxy` 只在客户端分发路径构造（`CTNHBio` 经 `DistExecutor.unsafeRunForDist` 选择 `ClientProxy` / `CommonProxy`），客户端专属类不得进入 common 构造路径。
 - Ponder 场景文案用 `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` 双语直接内联在场景类里；datagen 时由 `CTNHBioPonderSceneBuilder.registerLang` 经 `REGISTRATE.genLang(key, en, cn)` 写入 lang（仅 `GTCEu.isDataGen()` 时）。
+- Ponder 机器界面经 CTNH-Lib `MachineUI` 构造：`CogniAssembler` 演示意识模型接入数据模型接口的唯一槽位、LV 输入总成的锻炉肥料配方与 LV 物品输出总成的成品产出；`GreatFlesh` 的分化场景用 MV 输入总成同时演示物品与流体输入。机器坐标必须 `.machinePos(pos)` 显式指定。
 - Ponder 插件注册在 `ClientProxy.onClientSetup(FMLClientSetupEvent)`；思索 lang 抽取在 `common/CommonProxy.gatherData()` 调 CTNH-Lib `CTNHPonderLang.init(new CTNHBioPonderPlugin())`。场景 / tag / 插件均属 Bio 专属，不放 CTNH-Lib。
 
 ## ANTI-PATTERNS
