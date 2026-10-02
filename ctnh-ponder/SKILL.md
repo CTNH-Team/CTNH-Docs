@@ -275,6 +275,10 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 | 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
 | 同一方块要在不同步骤"换位置" | 用坐标魔法数字或准备两份 NBT | `showIndependentSection` + `moveSection`，见 [references/api-cheatsheet.md](references/api-cheatsheet.md) |
 | 机器 UI 面板没出现 | 这一段没调 `scene.showUI(...)`，或 `show(ticks)` 太短 | 面板是**逐段**登记的：每段都要自己 `scene.showUI(ui)`；`show(...)` 按演示内容留够时间 |
+| **画了 `showUI` 但面板完全不出现** | `forMachine(pos)` 指的坐标上不是那台机器（storyboard 里主方块常与场景文案惯用的坐标差一格）；只写 `.at(topOf(pos))` 没写 `.forMachine(pos)` 时机器坐标会落到上方那一格 | 先看日志：`CTNHLib: cannot draw the machine UI for <坐标>: …` 会给出真正解析用的坐标与原因；对着它去 storyboard 的 palette+blocks 里查主方块真实位置，让 `at(...)` 与 `forMachine(...)` 都用它 |
+| 面板里的数字框/文本框**是空的** | 那个控件没开 client-side：LDLib `TextFieldWidget` 只在 client-side 模式下每帧从 `textSupplier` 取文本（构造函数不初始化文本） | Lib 的面板构建器已给槽位、储罐、进度条、文本框统一打开这个开关；**自己新建控件容器时要照做** |
+| 改了机器字段，面板上的数字**不跟着变** | 直接 `modifyBlockEntityNBT` 不会请求面板重建，控件读的还是旧值 | 写成 `MachineEdit` 用 `MachineEdits.add(...)` 挂上时间线，落地后会自动重建面板 |
+| 两块面板叠在一起，或反而不该同时出现 | 按先后写了两条 `showUI`，或两块锚点挨太近 | `showUI` 是非阻塞的，连续两条本来就会同屏：用 `.pointing(...)` 往不同侧推，挤不开就分成两段 |
 | 日志 `there is no GT recipe with this id` | 配方 id 在本包里不存在；或把配方形态认错了 | 用 JEI 里那条配方的 id；本仓库的 fork 往 `RecipeManager` 里放的是 `GTRecipeDefinition`，要先 `toRuntime()` 再当 `GTRecipe` 用（`RecipeFiller.runtime(...)` 就是干这个的） |
 | 配方填了但槽位/储罐对不上 | 机器的 `IngredientIO` 标签与预期不符 | 输入/输出槽位由 GT 自己打的标签决定，不要手工猜顺序；用 `outlineSlot` / `outlineTank` 核对序号 |
 | 配置器里的开关点了没反应 | 思索里没有 LDLib 容器，`Toggle` 的 `isPressed` 缓存没人刷新 | `ConfiguratorTabs.syncConfigurators(...)` 每 tick 调一次 `detectAndSendChange`（Lib 已封装） |
@@ -317,6 +321,58 @@ scene.showUI(FULL_UI).at(machinePos)
 - 机器状态（与界面无关，独立指令）：`MachineEdits.placeCover(scene, pos, side, item|CoverDefinition[, delay])`、
   `setWorkingModel(scene, pos, boolean[, delay])`、`setItemOutput` / `setFluidOutput` / `setAutoOutput(scene, pos, side[, delay])`；
   每一段演完与场景回退都会还原。要看输出面就把镜头转过去（`scene.rotateCameraY(180)`）。
+- **要改机器自己的字段，就写一个 `MachineEdit`，不要直接 `modifyBlockEntityNBT`。** 模块专属的变更类放本模块的
+  `client/ponder/machine/`：实现 `apply` / `revert`（机器不是预期那台、能力不支持时记一行 error 就返回，不要抛），
+  用 `MachineEdits.add(scene, pos, edit[, delay])` 挂上时间线。落地后 Lib 会自动重画机器并 `requestRebuild()`，
+  **画着这台机器的面板下一次 tick 重建**，控件才读得到新值——直接写 NBT 不会触发重建，面板上还是旧的。
+- **连续变化（"一秒内递增"那类）**：`MachineEditInstruction` 同样是非阻塞的，而 `PonderScene.tick()` 会并行 tick
+  所有非阻塞指令、只在遇到阻塞指令时停下，所以按 `1..N` tick 的延迟排 N 条变更就能得到逐帧爬升；
+  时长跟面板里槽位/储罐的写入对齐（20 tick = 1 秒）。代价是 N 次面板重建与重画，档位可以调粗。
+- **面板演过的事，不要再叠一条操作提示。** 面板已经把"往仓室里灌东西 / 填数值"演出来了，同一处的
+  `showControls(...).rightClick().withItem(...)` 就删掉——同一件事说两遍反而互相打架；
+  没有对应面板的动作（终端一键放置、给机器贴覆盖板等）才留提示。
+
+### 时序：面板不占时间线
+
+`showUI(...).show(ticks)` 走 `FadeInOutInstruction`（`TickingInstruction(false, ticks + 10)`），**非阻塞**：
+
+- 面板与紧随其后的 `showText(...)`、`idle(...)` **并行**——想让文字与面板同屏，就照这个顺序写；
+- 连续两条 `showUI(...)` 会**同时在屏上**，可以一次摆出两块面板（两种产物、两个仓室各一块）；
+  要错开就 `.pointing(...)` 把它们往不同侧推，别指望时间线帮你分先后；
+- 真正占时间线的是 `idle(ticks)`。`show(ticks)` 只决定面板什么时候淡出：给少了会出现"字还在、面板先没了"。
+- 落点会被 `clampOffset` 拉回屏幕内，锚点贴近屏幕边缘不会被裁；但两块面板**是不是互相压住只能游戏内看**。
+
+### 画面板之前要确认的两件事
+
+- **哪些方块画得出来**：目标机器要实现 `IUIMachine`。多方块的仓室与总线天然满足
+  （`IMultiPart extends IFancyUIMachine`）；单方块机器看它自己的实现（`MetaMachine` 本身不是 `IUIMachine`），
+  不满足的那一段面板会被跳过，只在日志里留一行。
+- **序号怎么定**：`slot(i)` / `tank(i)` 就是实机 UI 里**可见**控件按机器 `createUIWidget()` 添加顺序收集出来的序号。
+  `LargeStackSlotWidget` 也算 `SlotWidget`；储罐同时认 GT 与 LDLib 两种 `TankWidget`。
+  拿不准就用 `outlineSlot(i)` / `outlineTank(i)` 在游戏里打框确认，不要猜。
+
+### 仓室选型：总成优先，装不下就升等级
+
+要展示的配方**同时要物品和流体**时，优先用**输入 / 输出总成**（`GTMachines.DUAL_IMPORT_HATCH` /
+`DUAL_EXPORT_HATCH`）：一块方块上就带物品格与储罐，面板也只占一块，比"物品总线 + 流体仓"少一块方块、
+少一块面板，`.slot(i)` 与 `.tank(i)` 可以在同一段里一起写。总成只到 `LV..UHV`
+（`GTMachineUtils.DUAL_HATCH_TIERS`）；只有物品或只有流体的场合，用对应的总线 / 仓就够。
+
+**先数需求再挑等级**——槽位与容量都随等级走，别让演示用的仓室装不下自己引用的配方：
+
+| 要数的东西 | 从哪来 |
+|------------|--------|
+| 物品格数 | `ItemBusPartMachine.INVENTORY_SIZE[tier]`：ULV 1 / LV 4 / MV 6 / HV 8 … |
+| 物品每格堆叠倍率 | `ItemBusPartMachine.getSlotMultiplier(tier)`（tooltip 的 item_storage_multiplier） |
+| 储罐个数 | `FluidHatchPartMachine.TANKS[tier]`：LV 2 / MV 3 / HV 4 …，总成用同一张表 |
+| 单罐容量 | `FluidHatchPartMachine.getTankCapacity(8000, tier)` = `8000 × (1 << 2 × tier)`：LV 32000、MV 128000 |
+
+输出侧同样按证据挑：**配方真的产出流体**才值得上输出总成，否则那块储罐永远是空的，用物品输出总线更贴实情
+（只出物品的配方就是这种情况）。
+
+总成的面板里**物品格在前、储罐在后**：`DualHatchPartMachine#createUIWidget()` 先 `addItemGrid` 再
+`addTankGrid`，所以 `slot(0..n-1)` 是物品、`tank(0..)` 是流体，序号互不串。
+只给**真有槽位或储罐**的仓室挂面板：动能仓、能源仓没有可画的槽位，给它们画面板只会得到默认的方块预览页。
 
 ### 交互：「查看 UI 详情」按钮
 

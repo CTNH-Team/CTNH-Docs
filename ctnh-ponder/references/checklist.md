@@ -64,10 +64,15 @@
 
 - [ ] 面板是**逐段**登记的：这一段要展示界面就必须有 `scene.showUI(ui)`，`show(ticks)` 留够演示时间
 - [ ] 写入用的槽位/储罐序号按实机 UI 核对过（不确定就用 `outlineSlot` / `outlineTank` 在游戏里看）
+- [ ] 配方同时要物品和流体时优先用输入/输出总成；等级按需求挑过（物品格 `INVENTORY_SIZE[tier]`、
+      罐位 `TANKS[tier]`、单罐 `8000×(1<<2tier)`），没有让演示仓室装不下自己引用的配方
 - [ ] 配方 id 抄自 JEI，且属于这台机器的配方类型
 - [ ] 机器状态改动（覆盖板、工作/待机模型、输出口）与界面分开写，不依赖上一段的残留
 - [ ] 要框配置器里的按钮时，这一段用 `showFullUI()`；裁剪版里那些红框会各报一行 error
 - [ ] 没有自己搭控件树、没有自己摆「查看 UI 详情」按钮
+- [ ] 改机器字段走 `MachineEdit`（`MachineEdits.add(...)`），没有直接 `modifyBlockEntityNBT` 就指望面板跟着变
+- [ ] 同屏多块面板时确认过它们不互相压住（`showUI` 非阻塞，连续两条本来就会同屏；挤不开就 `.pointing(...)` 或分段）
+- [ ] 面板已经演过的动作没有另配一条重复的 `showControls(...)` 提示
 - [ ] 改过 Lib 的 UI 类之后跑 `:modules:CTNH-Lib:compileJava` 并**完整重启客户端**再验
 
 ## 本 skill 的自测请求

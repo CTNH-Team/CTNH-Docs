@@ -246,18 +246,38 @@ scene.effects().emitParticles(
 | `.showPlayerInventory()` / `.showConfigurators()` / `.showNavigationButtons()` | 逐个打开默认裁掉的部件 |
 | `.hideTitleBar()` / `.hideSideTabs()` | 反过来藏掉标题栏与左侧页签（把面板压到最小） |
 
+两条与"画不画得出来"有关的前提：
+
+- 目标机器要实现 `IUIMachine`。多方块的仓室与总线都满足（`IMultiPart extends IFancyUIMachine`）；
+  单方块机器看它自己的实现（`MetaMachine` 本身不是 `IUIMachine`），不满足时这一段面板被跳过，只留一行日志。
+- `.slot(i)` / `.tank(i)` 的序号 = 实机 UI 里**可见**控件按机器 `createUIWidget()` 添加顺序收集的序号。
+  `LargeStackSlotWidget` 也是 `SlotWidget`；储罐同时认 GT 与 LDLib 两种 `TankWidget`。不确定就先用红框核对。
+- **仓室选型**：配方同时要物品和流体就用输入 / 输出总成（`GTMachines.DUAL_IMPORT_HATCH` /
+  `DUAL_EXPORT_HATCH`，LV..UHV），一块面板上 `.slot(i)` 与 `.tank(i)` 一起写；装不下就升等级。
+  容量表与选型流程见 [../SKILL.md](../SKILL.md) 工作流 E〈仓室选型〉。
+
 摆放、写入与红框（`CTNHPonderSceneBuilder.showUI(MachineUI)` 返回的摆放对象上的链式调用）：
 
 | 调用 | 说明 |
 |------|------|
-| `.at(BlockPos)` / `.at(Vec3)` / `.at(Vec3, BlockPos)` / `.forMachine(BlockPos)` | 指向点与机器分开指定；`at(vec)` 把该点所在方块当机器 |
+| `.at(BlockPos)` / `.at(Vec3)` / `.at(Vec3, BlockPos)` / `.forMachine(BlockPos)` | 指向点与机器分开指定；`at(vec)` 把该点**所在**方块当机器。用 `topOf(...)` 这类贴面锚点时它会落到上方那一格，那种写法必须补 `.forMachine(pos)`，否则整块面板建不出来 |
 | `.pointing(Pointing.DOWN)` | 面板落在指向点的哪一侧，默认 DOWN |
 | `.scale(f)` | 覆盖定义上的缩放 |
 | `.slot(i).withItem(stack, startTick)` / `.tank(i).withFluid(fluidStack, startTick)` | 第 i 个槽位/储罐，`startTick` 之后开始写，写入固定 1 秒，从 0 涨到目标值 |
 | `.recipe(recipeId, startTick)` | 入料 → 进度条 → 成品；配方带 `circuitMeta(n)` 时自动写电路 |
 | `.outlineSlot(i[, delay])` / `.outlineTank(i[, delay])` / `.outlineProgress([delay])` / `.outlineCircuit([delay])` | 面板内控件的红框 |
+| `.outlineButton(i[, delay])` | **机器页里**第 i 个按钮/开关的红框，序号按 `createUIWidget()` 的添加顺序；标题栏、页签、配置器那一列都不算在内（LDLib 里 `SwitchWidget` 与 `ButtonWidget` 都算按钮） |
 | `.outlinePowerToggle()` / `.outlineAutoOutput()` / `.outlineCircuitButton()` / `.outlineDistinct()` | 配置器那一列按钮的红框（这一段需要 `showFullUI()`） |
-| `.show(ticks)` | 这一段持续多久；面板淡出时把这一段写进去的东西还原 |
+| `.outline(Part, i[, delay])` | 上面这些的底层入口；`Part` 是公开的扩展点 |
+| `.show(ticks)` | 这一段持续多久；**非阻塞**（不占时间线，与后续 `showText`/`idle` 并行）。连续两条 `showUI` 会同时在屏上，用 `.pointing(...)` 错开；面板淡出时把这一段写进去的东西还原 |
+
+写 `slot(i)` / `tank(i)` / `outlineButton(i)` 的 `i` 不用猜：**ponder 编辑模式**下把鼠标停在控件上，
+tooltip 第一行就是它在机器里的真实序号（槽位 / 储罐 / 按钮都有，用的是和场景 API 同一份收集清单）；
+按钮自己的悬停提示（模式名那类）现在也会一并显示。
+
+带索引的红框（`SLOT` / `TANK` / `BUTTON`）身份由**收集顺序**决定：改机器 `createUIWidget()` 里的添加顺序会让编号整体平移，
+所以这类红框要和「按实机 UI 核对序号」一样对待。`Part` 枚举是公开的扩展点——新增一类可框控件要三处一起动：
+在 `Part` 里加值、在 `MachineUiPanelBuilder` 里收集、在 `MachineUiPanel#parts` 里解析。
 
 机器状态（`machine/MachineEdits`，与面板无关，独立指令）：
 
@@ -270,6 +290,24 @@ MachineEdits.setAutoOutput(scene, pos, Direction.NORTH);    // 物品与流体�
 ```
 
 delay 都可省略；机器不支持时每条报一行 error 并跳过，场景继续播，场景回退时一并还原。
+
+| 调用 | 说明 |
+|------|------|
+| `MachineEdits.add(scene, pos, edit[, delay])` | 把模块自写的 `MachineEdit` 挂到时间线上 |
+| `MachineEdits.redraw(scene)` / `requestRebuild()` | `MachineEditInstruction` 落地后自己会调，场景侧一般不用管 |
+
+自己写变更类（放**本模块**的 `client/ponder/machine/`）：实现 `MachineEdit` 的 `apply` / `revert`；
+机器不是预期那台或能力不支持时记一行 error 就返回、不要抛；`revert` 把改动前的值写回去。
+**改机器字段就走它，别直接 `modifyBlockEntityNBT`**——只有 `MachineEditInstruction` 落地后才会
+`redraw + requestRebuild()`，画着这台机器的面板下一次 tick 重建，控件才读得到新值。
+
+连续变化（例如"一秒内递增"）：`MachineEditInstruction` 是非阻塞的，而 `PonderScene.tick()` 并行 tick 所有非阻塞
+指令、遇到阻塞指令才停，所以按 `1..N` tick 的延迟排 N 条变更就是逐帧爬升；时长与面板里槽位/储罐的写入对齐
+（20 tick = 1 秒）。排 N 条会有 N 次面板重建，档位可以调粗。
+
+面板里的**文本框**（数字输入框那类）只有在 client-side 模式下才会每帧从 `textSupplier` 取回文本
+（LDLib `TextFieldWidget` 的构造函数不初始化文本）。Lib 的面板构建器已经统一给槽位、储罐、进度条与文本框
+打开这个开关；**自己新建控件容器时要照做**，否则数字框在思索里永远是空的，机器上的值改了也看不见。
 
 **fork 形态差异**（照官方 GTCEu 写会踩）：配方在 `RecipeManager` 里是 `GTRecipeDefinition`（要 `toRuntime()`）、
 编程电路是 `ProgrammableCircuitSlotTrait`、自动输出在 `AutoOutputTrait`、`RecipeHelper` 多一个 `simulate` 参数。
