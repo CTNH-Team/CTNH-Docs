@@ -275,7 +275,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 | 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
 | 同一方块要在不同步骤"换位置" | 用坐标魔法数字或准备两份 NBT | `showIndependentSection` + `moveSection`，见 [references/api-cheatsheet.md](references/api-cheatsheet.md) |
 | 机器 UI 面板没出现 | 这一段没调 `scene.showUI(...)`，或 `show(ticks)` 太短 | 面板是**逐段**登记的：每段都要自己 `scene.showUI(ui)`；`show(...)` 按演示内容留够时间 |
-| **画了 `showUI` 但面板完全不出现** | `forMachine(pos)` 指的坐标上不是那台机器（storyboard 里主方块常与场景文案惯用的坐标差一格）；只写 `.at(topOf(pos))` 没写 `.forMachine(pos)` 时机器坐标会落到上方那一格 | 先看日志：`CTNHLib: cannot draw the machine UI for <坐标>: …` 会给出真正解析用的坐标与原因；对着它去 storyboard 的 palette+blocks 里查主方块真实位置，让 `at(...)` 与 `forMachine(...)` 都用它 |
+| **画了 `showUI` 但面板完全不出现** | 整段只写了 `.at(...)` 没写 `.machinePos(pos)`；或者 `machinePos(pos)` 指的坐标上不是那台机器（storyboard 里主方块常与场景文案惯用的坐标差一格）。现在不再兜底猜锚点所在的那一格，而是一行 error 且这一段什么都不画 | 按日志分三种情况：`this UI segment has no machine position …` 说明缺机器坐标，补 `.machinePos(pos)`；`no block entity at <坐标> …` 说明那一格没有方块实体（多半是代码 `setBlock` 摆的机器，要写进 storyboard）；`the block at <坐标> (<方块>) produced no panel …` 说明坐标对了但建不出面板。对着日志里的坐标去 storyboard 的 palette+blocks 查主方块真实位置 |
 | 面板里的数字框/文本框**是空的** | 那个控件没开 client-side：LDLib `TextFieldWidget` 只在 client-side 模式下每帧从 `textSupplier` 取文本（构造函数不初始化文本） | Lib 的面板构建器已给槽位、储罐、进度条、文本框统一打开这个开关；**自己新建控件容器时要照做** |
 | 改了机器字段，面板上的数字**不跟着变** | 直接 `modifyBlockEntityNBT` 不会请求面板重建，控件读的还是旧值 | 写成 `MachineEdit` 用 `MachineEdits.add(...)` 挂上时间线，落地后会自动重建面板 |
 | 两块面板叠在一起，或反而不该同时出现 | 按先后写了两条 `showUI`，或两块锚点挨太近 | `showUI` 是非阻塞的，连续两条本来就会同屏：用 `.pointing(...)` 往不同侧推，挤不开就分成两段 |
@@ -314,7 +314,7 @@ scene.showUI(FULL_UI).at(machinePos)
   `.showCircuit()` / `.showPlayerInventory()` / `.showConfigurators()` / `.showNavigationButtons()`。
   默认只画标题栏、页签与机器页；`showFullUI()` 一次画出原版整套 UI（配置器、提示面板、玩家背包都不裁）。
 - 摆放：面板由**构建器**登记——`CTNHPonderSceneBuilder.showUI(MachineUI)` 返回摆放对象，再链 `.at(pos)` /
-  `.at(vec)` / `.at(vec, machinePos)` / `.forMachine(pos)` / `.pointing(Pointing.DOWN)` / `.scale(f)`；
+  `.at(vec)` / `.machinePos(pos)` / `.at(pos)` / `.pointing(Pointing.DOWN)` / `.scale(f)`；
   缩放要么写在定义上（`.scale(f)` / `.fitToPanel(f)`），要么写在摆放这一步。写入与红框见上面的链式调用。
 - 配方：`.recipe("<配方 id>", 起始 tick)` 之后，入料、编程电路（配方带 `circuitMeta(n)` 时）、进度条、成品全自动；
   机器与配方对不上（不是配方机器、id 不存在、配方类型不符、面板没有对应槽位）只报一行 error 并跳过这一段。

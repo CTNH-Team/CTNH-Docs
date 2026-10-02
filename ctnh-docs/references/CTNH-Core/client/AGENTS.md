@@ -35,7 +35,7 @@ client/
 ## CONVENTIONS
 - Ponder 场景用 `scene.title(sceneId, headerEn, headerCn, titleEn, titleCn)`（仅要标题时用 `title(sceneId, en, cn)`）/ `scene.showText(tick, en, cn)`，文案直接内嵌在场景文件里。
 - `CTNHCorePonderSceneBuilder` 只是 Lib 共享构建器之上的 Core 适配层；可复用的构建器/文本行为留在 CTNH-Lib。
-- 机器界面 Ponder 用 CTNH-Lib 的 `MachineUI`（`MachineUI.of(机器)`）与 `MachineUiPlacement` 链：`scene.showUI(MY_MACHINE_UI).at(anchor).forMachine(pos).slot(0).withItem(stack).show(200)`；`CTNHPonderSceneBuilder.showUI(MachineUI)` 转 `ui.in(this)`，`MachineUI.in(SceneBuilder)` 返回 `MachineUiPlacement`。`ChemicalReactorUi` 是覆盖槽位、储罐、配方、输出口与配置器开关红框的完整示例。
+- 机器界面 Ponder 用 CTNH-Lib 的 `MachineUI`（`MachineUI.of(机器)`）与 `MachineUiPlacement` 链：`scene.showUI(MY_MACHINE_UI).at(anchor).machinePos(pos).slot(0).withItem(stack).show(200)`；`CTNHPonderSceneBuilder.showUI(MachineUI)` 转 `ui.in(this)`，`MachineUI.in(SceneBuilder)` 返回 `MachineUiPlacement`。`ChemicalReactorUi` 是覆盖槽位、储罐、配方、输出口与配置器开关红框的完整示例。
 - 一个 storyboard 可注册到多个组件：`drum/common` 经 `GTMachines` 的 8 种桶（木 / 青铜 / 钢 / 铝 / 不锈钢 / 金 / 钛 / 钨钢）共用 `Drum::Common`；`chemical_plant/common` 绑定 `GTNNMultiblocks.CHEMICAL_PLANT` 的 7x7x7 塔体，绑定组件与 storyboard 一一对应。
 - Ponder 注册发生在 `ClientProxy.onClientSetupEvent()`；客户端 datagen 的语言提取在 `CommonProxy.gatherData()` 中经 `CTNHPonderLang.init(new CTNHCorePonderPlugin())` 完成。
 - 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。

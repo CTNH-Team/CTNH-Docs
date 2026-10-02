@@ -260,7 +260,7 @@ scene.effects().emitParticles(
 
 | 调用 | 说明 |
 |------|------|
-| `.at(BlockPos)` / `.at(Vec3)` / `.at(Vec3, BlockPos)` / `.forMachine(BlockPos)` | 指向点与机器分开指定；`at(vec)` 把该点**所在**方块当机器。用 `topOf(...)` 这类贴面锚点时它会落到上方那一格，那种写法必须补 `.forMachine(pos)`，否则整块面板建不出来 |
+| `.at(BlockPos)` / `.at(Vec3)` / `.machinePos(BlockPos)` | 指向点与机器位置分开指定：`at(vec)` 只定箭头（不再把该点所在方块当机器），机器一律由 `machinePos(pos)` 给；`at(pos)` 是一次到位（指向方块中心并画该方块上的机器）。两者必须都给，否则该段报一行 error 且不绘制 |
 | `.pointing(Pointing.DOWN)` | 面板落在指向点的哪一侧，默认 DOWN |
 | `.scale(f)` | 覆盖定义上的缩放 |
 | `.slot(i).withItem(stack, startTick)` / `.tank(i).withFluid(fluidStack, startTick)` | 第 i 个槽位/储罐，`startTick` 之后开始写，写入固定 1 秒，从 0 涨到目标值 |
