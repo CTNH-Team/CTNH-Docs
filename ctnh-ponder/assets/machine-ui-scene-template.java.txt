@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: LGPL-3.0-or-later
+// 机器 UI 场景模板：把<某台机器>在游戏里的界面画进思索，并按真实槽位序号演示写入。
+// 完整范例见 CTNH-Core 的 client/ponder/example/ChemicalReactorUi。
+
+package <模块包>.client.ponder.<分组>;
+
+import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.common.data.GTMachines;
+
+import net.createmod.ponder.api.scene.SceneBuilder;
+import net.createmod.ponder.api.scene.SceneBuildingUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+import tech.vixhentx.mcmod.ctnhlib.client.ponder.machine.MachineEdits;
+import tech.vixhentx.mcmod.ctnhlib.client.ponder.ui.MachineUI;
+
+<模块>.client.ponder.<模块>PonderSceneBuilder;
+
+public class <场景类> {
+
+    // 界面定义一次，别在场景里按字符串 id 查方块
+    private static final MachineUI <UI 常量> = MachineUI.of(GTMachines.<机器>[GTValues.LV]).scale(0.6f);
+    // 要框配置器那一列按钮时，这一段必须用整套 UI
+    private static final MachineUI <FULL UI 常量> = MachineUI.of(GTMachines.<机器>[GTValues.LV])
+            .showFullUI().scale(0.6f);
+
+    private <场景类>() {}
+
+    public static void <方法名>(SceneBuilder builder, SceneBuildingUtil util) {
+        <模块>PonderSceneBuilder scene = new <模块>PonderSceneBuilder(builder);
+        scene.title("<sceneId>", "<Header EN>", "<Header CN>", "<Title EN>", "<Title CN>");
+        scene.showBasePlate();
+        scene.idle(10);
+
+        BlockPos machinePos = util.grid().at(1, 1, 1);
+        scene.world().showSection(util.select().position(machinePos), Direction.DOWN);
+        scene.idle(10);
+
+        // 1. 只画界面（面板逐段登记：这一段不写就没有面板）
+        scene.showUI(<UI 常量>).at(machinePos).show(120);
+        scene.showText(60, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(140);
+
+        // 2. 写入：序号就是实机 UI 里的序号，startTick 之后开始，写入固定 1 秒
+        scene.showUI(<UI 常量>).at(machinePos)
+                .slot(1).withItem(new ItemStack(Items.GRASS_BLOCK, 64), 20)
+                .outlineSlot(1, 20)
+                .show(160);
+        scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(180);
+
+        // 3. 配方：入料 → 进度条 → 成品全自动；id 抄自 JEI
+        scene.showUI(<UI 常量>).at(machinePos)
+                .recipe("<配方 id>", 10)
+                .outlineProgress(20)
+                .show(160);
+        scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(180);
+
+        // 4. 机器状态：与界面无关的独立指令，演完自动还原
+        MachineEdits.placeCover(scene, machinePos, Direction.UP, GTItems.CONVEYOR_MODULE_LV.asStack(), 10);
+        MachineEdits.setWorkingModel(scene, machinePos, true, 10);
+        scene.idle(80);
+        MachineEdits.setWorkingModel(scene, machinePos, false, 10);
+        scene.idle(30);
+
+        // 5. 整套 UI + 配置器按钮红框（「查看 UI 详情」按钮只在这一段出现）
+        scene.showUI(<FULL UI 常量>).at(machinePos)
+                .outlinePowerToggle(20)
+                .outlineAutoOutput(20)
+                .outlineCircuitButton(20)
+                .show(160);
+        scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(180);
+
+        scene.markAsFinished();
+    }
+}

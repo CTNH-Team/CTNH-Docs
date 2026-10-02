@@ -18,6 +18,7 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 ## 何时使用
 
 - 给某台机器/方块新增一个思索场景。
+- 要把**机器自己在游戏里的那套界面**画进思索、并按真实槽位序号写入（`MachineUI`，见工作流 E）。
 - 修改或扩展已有场景（文案、步骤、镜头、结构展示）。
 - 新增或调整 PonderTag，或把组件挂到 tag 上。
 - 给一个还没有 Ponder 的模块补齐适配层。
@@ -76,7 +77,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 
 | 层 | 位置 | 职责 |
 |----|------|------|
-| 共享栈 | CTNH-Lib `client/ponder/` | `CTNHPonderSceneBuilder`（双语标题/正文、底板与缩放、`rotateAround`）、`CTNHPonderLang`（lang 抽取）、`CTNHPonderTagHelper`（tag lang） |
+| 共享栈 | CTNH-Lib `client/ponder/` | `CTNHPonderSceneBuilder`（双语标题/正文、底板与缩放、`rotateAround`）、`CTNHPonderLang`（lang 抽取）、`CTNHPonderTagHelper`（tag lang）；**机器 UI 层**在 `ui/`（`MachineUI`、`MachineUiPlacement`、`MachineUiElement`、`MachineUiOverlay`、`MachineUiPanel`、`MachineUiPanelBuilder`、`MachineUiWrites`、`RecipeFiller`、`ConfiguratorTabs`、`MachineUiInteraction`、`CircuitSlots`）与 `machine/`（`MachineEdit` 指令体系与 `MachineEdits`）；思索界面按钮在 `PonderUiButtons` + `mixin/PonderUIMixin` |
 | 模块适配层 | `<Module>/client/ponder/` | 每模块一个 `*PonderPlugin` / `*PonderScenes` / `*PonderTags` / `*PonderSceneBuilder` + 场景类 |
 | 资源与文案 | `src/main/resources/assets/<modid>/ponder/**/*.nbt`、`src/generated/resources/assets/<modid>/lang/{en_us,zh_cn}.json` | storyboard 结构；lang 由 datagen 生成，禁止手改 |
 
@@ -84,7 +85,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 
 | 模块 | 包 | 场景分组 |
 |------|----|----------|
-| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/`、`Misc/`（不属于前两类的通用内容，如桶） |
+| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/`、`Misc/`（不属于前两类的通用内容，如桶）、`example/`（机器 UI 示例：`ChemicalReactorUi`，八段覆盖画界面/写入/配方/机器状态/整套 UI 红框） |
 | CTNH-Energy | `tech.luckyblock.mcmod.ctnhenergy.client.ponder` | `ae2/` |
 | CTNH-Mana | `com.magicbee.ctnhmana.client.ponder` | `mana/`（含 `PonderParticleUtil`） |
 | CTPP | `com.mo_guang.ctpp.client.ponder` | `electric/`、`kinetic/` |
@@ -121,6 +122,9 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
    （`MultiblocksA.MEADOW.getId()`、`GTMultiMachines.COKE_OVEN.getId()`、`CTPPMultiblockMachines.BIG_DAM.getId()`）。
    字符串 id 只允许出现在 storyboard NBT 与外部 mod 目标（例：Core 组合
    `ResourceLocation.fromNamespaceAndPath("jackseconomy", "mechanical_exporter")`）中，且要注明来源 mod。
+8. **机器 UI 场景只用 Lib 的封装。** 画面板、写入、配方、红框、机器状态指令一律走 `MachineUI` + 构建器的 `scene.showUI(...)` + `MachineEdits`；
+   不要在场景里自己搭控件树、自己摆「查看 UI 详情」按钮，也不要绕过 `MachineUiElement` 直接画。
+   这条同时保证每段结束的还原（物品/流体/开关）与冻结后的点击转发仍然有效。
 
 ## 经验证的场景设计经验（跨机器通用）
 
@@ -270,8 +274,72 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 | 管道在场景里是**一根光柱、没连上** | GT 管道的连接存在 BE 的 `connections` 位掩码里，Ponder 不跑 tick 不会自动连 | 在蓝图该方块的 `nbt` 里写 `"connections"`（竖直贯通 = 3）；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 6 节 |
 | 桶/储罐等 `RotationState.NONE` 机器被补了 `facing` | 脚本默认给 controller 补朝向，但这类机器 blockstate 没有该属性 | 蓝图里写 `"controller_props": false`；见 [references/storyboard-nbt.md](references/storyboard-nbt.md) 第 4.1 节 |
 | 同一方块要在不同步骤"换位置" | 用坐标魔法数字或准备两份 NBT | `showIndependentSection` + `moveSection`，见 [references/api-cheatsheet.md](references/api-cheatsheet.md) |
+| 机器 UI 面板没出现 | 这一段没调 `scene.showUI(...)`，或 `show(ticks)` 太短 | 面板是**逐段**登记的：每段都要自己 `scene.showUI(ui)`；`show(...)` 按演示内容留够时间 |
+| 日志 `there is no GT recipe with this id` | 配方 id 在本包里不存在；或把配方形态认错了 | 用 JEI 里那条配方的 id；本仓库的 fork 往 `RecipeManager` 里放的是 `GTRecipeDefinition`，要先 `toRuntime()` 再当 `GTRecipe` 用（`RecipeFiller.runtime(...)` 就是干这个的） |
+| 配方填了但槽位/储罐对不上 | 机器的 `IngredientIO` 标签与预期不符 | 输入/输出槽位由 GT 自己打的标签决定，不要手工猜顺序；用 `outlineSlot` / `outlineTank` 核对序号 |
+| 配置器里的开关点了没反应 | 思索里没有 LDLib 容器，`Toggle` 的 `isPressed` 缓存没人刷新 | `ConfiguratorTabs.syncConfigurators(...)` 每 tick 调一次 `detectAndSendChange`（Lib 已封装） |
+| 点编程电路的格子没反应 | `ClickData` 的 `isRemote` 恒为 true，格子回调只在非远程时改本地槽位 | `MachineUiInteraction` 用反射造 `isRemote=false` 的 `ClickData` 直接调按钮回调，不要在场景里自己转发 |
+| 「查看 UI 详情」按钮位置不对、或多出一个 | 锚点每帧重算、只有贴好那一刻才可见；重挂后旧对象要收起 | 交给 Lib 的 `PonderUiButtons`，场景里不要自己摆按钮 |
+| 关掉详情后机器开关没还原 | 开关备份取的是**上一帧**登记的面板 | 面板必须每段都经 `MachineUiElement` 渲染登记；没有登记就无从还原 |
+| 改了 Lib 的 UI 类，游戏里没变化 | 客户端还在跑旧类 | `:modules:CTNH-Lib:compileJava` 后**完整重启**客户端（退出重进思索界面不够） |
 | `runData` 报 `fml.toml` 的 `Not enough data available` | 模块 `run/config/fml.toml` 被截断或填成零字节，属于可再生的运行目录文件 | 删除对应模块的 `run/config` 后重新运行 `runData`，不要为此修改源码或生成的语言文件 |
 
+## 工作流 E：把 GT 机器界面画进思索（MachineUI）
+
+共享栈里已经带了机器 UI 层：面板不是贴图，而是这台机器**真实的 fancy UI**（把 GT 的控件树直接搭出来再画），
+因此槽位序号、储量、配置器、页签都是真的。能力由 Lib 提供，模块侧只写场景调用，不要自己搭控件、不要自己摆按钮。
+
+### 场景侧写法（Core 的 `example/ChemicalReactorUi` 是完整范例）
+
+```java
+private static final MachineUI LV_UI = MachineUI.of(GTMachines.CHEMICAL_REACTOR[GTValues.LV]).scale(0.6f);
+private static final MachineUI FULL_UI = MachineUI.of(GTMachines.CHEMICAL_REACTOR[GTValues.LV]).showFullUI().scale(0.6f);
+
+scene.showUI(LV_UI).at(machinePos).show(120);                                  // 只画界面
+scene.showUI(LV_UI).at(machinePos)
+        .slot(1).withItem(new ItemStack(Items.GRASS_BLOCK, 64), 20)          // 按实机序号写入，1 秒内 0→目标值
+        .tank(0).withFluid(new FluidStack(Fluids.WATER, 1000), 20)
+        .outlineSlot(1, 20).outlineProgress(20)                             // 红框，可带延迟
+        .show(160);
+scene.showUI(FULL_UI).at(machinePos)
+        .outlinePowerToggle(20).outlineAutoOutput(20).outlineCircuitButton(20)
+        .show(160);
+```
+
+- 定义面板：`MachineUI.of(MachineDefinition | Block)`，可链式 `.scale(f)` / `.fitToPanel(f)` / `.showFullUI()` /
+  `.showCircuit()` / `.showPlayerInventory()` / `.showConfigurators()` / `.showNavigationButtons()`。
+  默认只画标题栏、页签与机器页；`showFullUI()` 一次画出原版整套 UI（配置器、提示面板、玩家背包都不裁）。
+- 摆放：面板由**构建器**登记——`CTNHPonderSceneBuilder.showUI(MachineUI)` 返回摆放对象，再链 `.at(pos)` /
+  `.at(vec)` / `.at(vec, machinePos)` / `.forMachine(pos)` / `.pointing(Pointing.DOWN)` / `.scale(f)`；
+  缩放要么写在定义上（`.scale(f)` / `.fitToPanel(f)`），要么写在摆放这一步。写入与红框见上面的链式调用。
+- 配方：`.recipe("<配方 id>", 起始 tick)` 之后，入料、编程电路（配方带 `circuitMeta(n)` 时）、进度条、成品全自动；
+  机器与配方对不上（不是配方机器、id 不存在、配方类型不符、面板没有对应槽位）只报一行 error 并跳过这一段。
+- 机器状态（与界面无关，独立指令）：`MachineEdits.placeCover(scene, pos, side, item|CoverDefinition[, delay])`、
+  `setWorkingModel(scene, pos, boolean[, delay])`、`setItemOutput` / `setFluidOutput` / `setAutoOutput(scene, pos, side[, delay])`；
+  每一段演完与场景回退都会还原。要看输出面就把镜头转过去（`scene.rotateCameraY(180)`）。
+
+### 交互：「查看 UI 详情」按钮
+
+按钮由 Lib 的 `PonderUiButtons` + `mixin/PonderUIMixin` 挂在思索界面底部，**场景不需要做任何接线**。
+它只在当前这一段是 `showFullUI()` 时出现（裁剪版不显示），点开后冻结场景，把左下配置器整列转发给 GT 原版
+（开关、页签、电路设置都能点），关闭时把观众拨过的开关与展开的配置器还原。
+它的位置跟着「显示方块名称」按钮走、每帧重算，锚点限定在左半边；不要自己再摆一个按钮，也不要改 Ponder 自己的按钮。
+
+### 与本仓库 fork 的对齐（照官方 GTCEu 写会踩的坑）
+
+| 官方 GTCEu 写法 | 本仓库 fork 的实际形态 | Lib 里的处理 |
+|-----------------|------------------------|--------------|
+| `RecipeManager` 里就是 `GTRecipe` | 放的是 `GTRecipeDefinition`（同样是原版 `Recipe`，带 id/inputs/outputs/duration/tier） | `RecipeFiller.runtime(...)` 认两种形态，遇到定义就 `toRuntime()` |
+| `RecipeHelper.getInputItems(recipe)` | 多了 `boolean simulate` 参数 | 调用处传 `false` |
+| `machine instanceof IHasCircuitSlot` | 编程电路是 `ProgrammableCircuitSlotTrait` 这个 trait | `CircuitSlots` 反射取 trait 里的 `storage`，拿不到就报一行 error 并跳过电路 UI |
+| `IAutoOutputItem` / `IAutoOutputFluid` | 物品与流体都在 `AutoOutputTrait` 里 | 用 `machine.getTrait(AutoOutputTrait.class)` 加 `hasAutoOutputItem()` / `hasAutoOutputFluid()` 守卫 |
+
+### 验证纪律
+
+- 改 Lib 的 UI 类之后跑 `:modules:CTNH-Lib:compileJava`，然后**完整重启客户端**：类被换掉了，重启思索界面不够。
+- 场景里的配方 id 必须在本包里真实存在（用 JEI 复制）；填不上时日志会写 `there is no GT recipe with this id`，
+  先确认 id 再怀疑代码。
+- 面板每段结束都会把写进去的物品/流体还原，所以**不要**靠上一段的残留来做下一段，每段都要自己写。
 ## 上游 Ponder 改动边界
 
 需要给上游对象（Create 方块、GTCEu 多方块）加场景时，**默认只读**：在模块的 `*PonderScenes` 里
@@ -354,4 +422,5 @@ JAVA_HOME=~/.gradle/jdks/eclipse_adoptium-21-amd64-windows.2 ./gradlew :modules:
 - 模板：场景类 [assets/scene-template.java.txt](assets/scene-template.java.txt)、
   场景注册 [assets/scenes-registration-template.java.txt](assets/scenes-registration-template.java.txt)、
   tag 注册 [assets/tags-registration-template.java.txt](assets/tags-registration-template.java.txt)、
-  模块适配层 [assets/module-adapter-templates.java.txt](assets/module-adapter-templates.java.txt)
+  模块适配层 [assets/module-adapter-templates.java.txt](assets/module-adapter-templates.java.txt)、
+  机器 UI 场景 [assets/machine-ui-scene-template.java.txt](assets/machine-ui-scene-template.java.txt)

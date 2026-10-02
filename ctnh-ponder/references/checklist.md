@@ -60,6 +60,16 @@
 - [ ] 上游注入（如有）放在 `mixin/<targetmod>/` 且登记进 `<modid>.mixins.json`
 - [ ] 未触碰 `build/`、`run/`、`src/generated/resources`
 
+## 机器 UI 场景
+
+- [ ] 面板是**逐段**登记的：这一段要展示界面就必须有 `scene.showUI(ui)`，`show(ticks)` 留够演示时间
+- [ ] 写入用的槽位/储罐序号按实机 UI 核对过（不确定就用 `outlineSlot` / `outlineTank` 在游戏里看）
+- [ ] 配方 id 抄自 JEI，且属于这台机器的配方类型
+- [ ] 机器状态改动（覆盖板、工作/待机模型、输出口）与界面分开写，不依赖上一段的残留
+- [ ] 要框配置器里的按钮时，这一段用 `showFullUI()`；裁剪版里那些红框会各报一行 error
+- [ ] 没有自己搭控件树、没有自己摆「查看 UI 详情」按钮
+- [ ] 改过 Lib 的 UI 类之后跑 `:modules:CTNH-Lib:compileJava` 并**完整重启客户端**再验
+
 ## 本 skill 的自测请求
 
 用下列请求检验触发与产出；前四类必须命中，第五类必须不命中。

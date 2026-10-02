@@ -233,6 +233,48 @@ scene.effects().emitParticles(
 | CTNH-Mana | `ClientProxy` → 同上 | 同上 | `CTNHManaPonderSceneBuilder` |
 | CTPP | `ClientProxy.onClientSetup` → 同上 | 同上 | `CTPPPonderSceneBuilder` + `CTPPRegistration.REGISTRATE` |
 
+## 机器 UI（CTNH-Lib `client/ponder/ui`）
+
+定义面板（`MachineUI`）：
+
+| 调用 | 说明 |
+|------|------|
+| `MachineUI.of(MachineDefinition \| Block)` | 用注册对象取界面定义，不要在场景里按字符串 id 查 |
+| `.scale(f)` / `.fitToPanel(fraction)` | 固定缩放 / 按 Ponder 面板宽度自适应 |
+| `.showFullUI()` | 一次画出原版整套 UI（配置器、提示面板、玩家背包都在），一个部件都不裁 |
+| `.showCircuit()` | 常开编程电路 UI（默认只在配方带 `circuitMeta(n)` 时出现） |
+| `.showPlayerInventory()` / `.showConfigurators()` / `.showNavigationButtons()` | 逐个打开默认裁掉的部件 |
+| `.hideTitleBar()` / `.hideSideTabs()` | 反过来藏掉标题栏与左侧页签（把面板压到最小） |
+
+摆放、写入与红框（`CTNHPonderSceneBuilder.showUI(MachineUI)` 返回的摆放对象上的链式调用）：
+
+| 调用 | 说明 |
+|------|------|
+| `.at(BlockPos)` / `.at(Vec3)` / `.at(Vec3, BlockPos)` / `.forMachine(BlockPos)` | 指向点与机器分开指定；`at(vec)` 把该点所在方块当机器 |
+| `.pointing(Pointing.DOWN)` | 面板落在指向点的哪一侧，默认 DOWN |
+| `.scale(f)` | 覆盖定义上的缩放 |
+| `.slot(i).withItem(stack, startTick)` / `.tank(i).withFluid(fluidStack, startTick)` | 第 i 个槽位/储罐，`startTick` 之后开始写，写入固定 1 秒，从 0 涨到目标值 |
+| `.recipe(recipeId, startTick)` | 入料 → 进度条 → 成品；配方带 `circuitMeta(n)` 时自动写电路 |
+| `.outlineSlot(i[, delay])` / `.outlineTank(i[, delay])` / `.outlineProgress([delay])` / `.outlineCircuit([delay])` | 面板内控件的红框 |
+| `.outlinePowerToggle()` / `.outlineAutoOutput()` / `.outlineCircuitButton()` / `.outlineDistinct()` | 配置器那一列按钮的红框（这一段需要 `showFullUI()`） |
+| `.show(ticks)` | 这一段持续多久；面板淡出时把这一段写进去的东西还原 |
+
+机器状态（`machine/MachineEdits`，与面板无关，独立指令）：
+
+```java
+MachineEdits.placeCover(scene, pos, Direction.UP, GTItems.CONVEYOR_MODULE_LV.asStack(), 10);
+MachineEdits.setWorkingModel(scene, pos, true, 20);        // 只换模型，不动配方逻辑
+MachineEdits.setItemOutput(scene, pos, Direction.WEST, 10);
+MachineEdits.setFluidOutput(scene, pos, Direction.SOUTH, 10);
+MachineEdits.setAutoOutput(scene, pos, Direction.NORTH);    // 物品与流体一起设
+```
+
+delay 都可省略；机器不支持时每条报一行 error 并跳过，场景继续播，场景回退时一并还原。
+
+**fork 形态差异**（照官方 GTCEu 写会踩）：配方在 `RecipeManager` 里是 `GTRecipeDefinition`（要 `toRuntime()`）、
+编程电路是 `ProgrammableCircuitSlotTrait`、自动输出在 `AutoOutputTrait`、`RecipeHelper` 多一个 `simulate` 参数。
+详见 [../SKILL.md](../SKILL.md) 工作流 E。
+
 ## 调试命令（Ponder 自带）
 
 `/ponder`（打开 tags）、`/ponder index`、`/ponder tags`、`/ponder <scene id>`、
