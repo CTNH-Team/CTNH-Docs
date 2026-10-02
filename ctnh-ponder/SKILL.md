@@ -314,7 +314,7 @@ scene.showUI(FULL_UI).at(machinePos)
   `.showCircuit()` / `.showPlayerInventory()` / `.showConfigurators()` / `.showNavigationButtons()`。
   默认只画标题栏、页签与机器页；`showFullUI()` 一次画出原版整套 UI（配置器、提示面板、玩家背包都不裁）。
 - 摆放：面板由**构建器**登记——`CTNHPonderSceneBuilder.showUI(MachineUI)` 返回摆放对象，再链 `.at(pos)` /
-  `.at(vec)` / `.machinePos(pos)` / `.at(pos)` / `.pointing(Pointing.DOWN)` / `.scale(f)`；
+  `.at(vec)`（返回 `MachineUiAnchor`，必须再 `.machinePos(pos)`）/ `.at(pos)`（一步到位） / `.pointing(Pointing.DOWN)` / `.scale(f)`；
   缩放要么写在定义上（`.scale(f)` / `.fitToPanel(f)`），要么写在摆放这一步。写入与红框见上面的链式调用。
 - 配方：`.recipe("<配方 id>", 起始 tick)` 之后，入料、编程电路（配方带 `circuitMeta(n)` 时）、进度条、成品全自动；
   机器与配方对不上（不是配方机器、id 不存在、配方类型不符、面板没有对应槽位）只报一行 error 并跳过这一段。

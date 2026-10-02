@@ -15,8 +15,8 @@ tech/vixhentx/mcmod/ctnhlib/ (68)
 ├── api/         (3)  CTNHValues, CrossParallelRecipeLogic, ICrossParallelRecipeLogicMachine
 ├── client/      (26) ClientProxy；ponder/{CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, PonderUiButtons}；
 │                     ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange,
-│                                      AutoOutputChange, WorkingModelChange}；
-│                     ponder/ui/{MachineUI, MachineUiPlacement, MachineUiElement, MachineUiOverlay, MachineUiPanel,
+│                                      AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}；
+│                     ponder/ui/{MachineUI, MachineUiStart, MachineUiAnchor, MachineUiPlacement, MachineUiElement, MachineUiOverlay, MachineUiPanel,
 │                                MachineUiPanelBuilder, MachineUiInteraction, MachineUiWrites, RecipeFiller,
 │                                ConfiguratorTabs, CircuitSlots, ShowMachineUiInstruction}；
 │                     render/ColorData；render/highlight/{HighlightHandler, HighlightRender}
@@ -71,8 +71,8 @@ src/main/resources/ctnhlib.mixins.json
 - **注册与 lang 统一走 `CNRegistrate`**：物品/方块/实体/机器/配方类型/材料全部经 `registrate/builders/*`；双语条目经 `com.ctnhlang` 注解 + `LangProcessor`，或 `CNRegistrate.genLang/addRawLang`。
 - **`ProviderTypes.CNLANG` 的注册 id 必须是 `ctnhlib_cnlang`**（裸 `cnlang` 会被第三方 mod `ae2pw` 的同名拷贝顶掉，静默产出空 `zh_cn.json`）。
 - **新增 mixin 必须登记** `src/main/resources/ctnhlib.mixins.json` 的 `mixins`（或 `client`）数组。
-- **Ponder 机器 UI 栈集中在 `client/ponder`**：门面 `MachineUI`（`of(MachineDefinition)` / `of(Block)`）经 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回 `MachineUiPlacement`，链式 API 完成摆放（`at` / `forMachine` / `scale` / `pointing`）、物品与流体写入（`slot(index).withItem(...)` / `tank(index).withFluid(...)`）、配方回放（`recipe(recipeId)`）、红框（`outline*`）与 `show(ticks)`；面板构建、写入时间线、点击转发、配方填充分别由 `MachineUiPanelBuilder`、`MachineUiWrites`、`MachineUiInteraction`、`RecipeFiller` 承担，`ponder/machine/*` 的 `MachineEdits` / `MachineEdit` 负责盖板、自动输出与工作模型的施加与还原。使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。
-- **思索「查看 UI 详情」按钮**：`client/ponder/PonderUiButtons` 把按钮挂进 `PonderUI` 自己的控件表，点击与开关状态经 `mixin/PonderUIMixin` 转给 `MachineUiInteraction`；`ctnhlib.tooltip.slot_index` / `ctnhlib.tooltip.tank_index` / `ctnhlib.ponder.ui.ui_details` 为对应 lang key。
+- **Ponder 机器 UI 栈集中在 `client/ponder`**：门面 `MachineUI`（`of(MachineDefinition)` / `of(Block)`）经 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`，链式 API 完成摆放（`at` / `machinePos` / `scale` / `pointing`）、物品与流体写入（`slot(index).withItem(...)` / `tank(index).withFluid(...)`）、配方回放（`recipe(recipeId)`）、红框（`outline*`）与 `show(ticks)`；面板构建、写入时间线、点击转发、配方填充分别由 `MachineUiPanelBuilder`、`MachineUiWrites`、`MachineUiInteraction`、`RecipeFiller` 承担，`ponder/machine/*` 的 `MachineEdits` / `MachineEdit` 负责盖板、自动输出与工作模型的施加与还原。使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。
+- **思索「查看 UI 详情」按钮**：`client/ponder/PonderUiButtons` 把按钮挂进 `PonderUI` 自己的控件表，点击与开关状态经 `mixin/PonderUIMixin` 转给 `MachineUiInteraction`；`ctnhlib.tooltip.slot_index` / `ctnhlib.tooltip.tank_index` / `ctnhlib.tooltip.button_index` / `ctnhlib.ponder.ui.ui_details` 为对应 lang key。
 - **Lib 不做游戏内容**：模块专属命令、包、构建器、Ponder 场景、Jade provider 一律放所属模块。
 
 ## ANTI-PATTERNS

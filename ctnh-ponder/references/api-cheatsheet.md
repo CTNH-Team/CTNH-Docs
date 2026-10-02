@@ -260,7 +260,7 @@ scene.effects().emitParticles(
 
 | 调用 | 说明 |
 |------|------|
-| `.at(BlockPos)` / `.at(Vec3)` / `.machinePos(BlockPos)` | 指向点与机器位置分开指定：`at(vec)` 只定箭头（不再把该点所在方块当机器），机器一律由 `machinePos(pos)` 给；`at(pos)` 是一次到位（指向方块中心并画该方块上的机器）。两者必须都给，否则该段报一行 error 且不绘制 |
+| `MachineUiStart.at(BlockPos)` 一步到位；`MachineUiStart.at(Vec3)` → `MachineUiAnchor.machinePos(BlockPos)` 分开指定 | 三段式由类型强制：`showUI` 返回 `MachineUiStart`，`at(Vec3)` 返回 `MachineUiAnchor`，拿到 `MachineUiPlacement` 才能链 `slot` / `tank` / `show` 等。忘写 `machinePos` 是**编译错误**，不再依赖运行期日志 |
 | `.pointing(Pointing.DOWN)` | 面板落在指向点的哪一侧，默认 DOWN |
 | `.scale(f)` | 覆盖定义上的缩放 |
 | `.slot(i).withItem(stack, startTick)` / `.tank(i).withFluid(fluidStack, startTick)` | 第 i 个槽位/储罐，`startTick` 之后开始写，写入固定 1 秒，从 0 涨到目标值 |
