@@ -1,7 +1,7 @@
 # CTNH-LIB CLIENT DOMAIN
 
 ## OVERVIEW
-客户端共享基础设施（26 个 Java 文件）：`ClientProxy` 引导、方块高亮渲染、共享 Ponder 框架（场景基类 / lang 抽取 / tag 助手 / 机器 UI 栈 / 思索内「查看 UI 详情」按钮）。
+客户端共享基础设施（30 个 Java 文件）：`ClientProxy` 引导、方块高亮渲染、共享 Ponder 框架（场景基类 / lang 抽取 / tag 助手 / 机器 UI 栈 / 思索内「查看 UI 详情」按钮）。
 
 ## STRUCTURE
 ```text
@@ -25,9 +25,9 @@ client/
 | Ponder 场景基类 | `client/ponder/CTNHPonderSceneBuilder.java` |
 | Ponder lang 抽取 | `client/ponder/CTNHPonderLang.java` |
 | Ponder tag 助手 | `client/ponder/CTNHPonderTagHelper.java` |
-| 机器 UI 门面与摆放 API | `client/ponder/ui/MachineUI.java`（`of(...)` / `showFullUI()` / `scale()` / `fitToPanel()` / `showCircuit()` / `in(SceneBuilder)`）、`MachineUiPlacement.java`（`at` / `machinePos` / `scale` / `pointing` / `slot` / `tank` / `recipe` / `outline*` / `show`） |
-| 机器 UI 面板 / 写入 / 点击 / 配方填充 | `client/ponder/ui/MachineUiPanelBuilder.java`, `MachineUiWrites.java`, `MachineUiInteraction.java`, `RecipeFiller.java`, `MachineUiElement.java`, `MachineUiOverlay.java`, `ConfiguratorTabs.java`, `CircuitSlots.java`, `ShowMachineUiInstruction.java` |
-| 机器编辑指令 | `client/ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange, AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}.java` |
+| 机器 UI 门面与摆放 API | `client/ponder/ui/MachineUI.java`（`of(...)` / `showFullUI()` / `scale()` / `fitToPanel()` / `showCircuit()` / `forceMultiblockActivated()` / `in(SceneBuilder)`）、`MachineUiStart.java`（`at` / `scale` / `pointing`）、`MachineUiAnchor.java`（`machinePos` / `scale` / `pointing`）、`MachineUiPlacement.java`（`at` / `machinePos` / `scale` / `pointing` / `slot` / `tank` / `recipe` / `outline*` / `outlineButton` / `outline(Part, ...)` / `show`） |
+| 机器 UI 面板 / 写入 / 点击 / 配方填充 | `client/ponder/ui/MachineUiPanelBuilder.java`（含 `reportUnavailable(machinePos, reason)`）, `MachineUiWrites.java`, `MachineUiInteraction.java`, `RecipeFiller.java`, `MachineUiElement.java`, `MachineUiOverlay.java`, `ConfiguratorTabs.java`, `CircuitSlots.java`, `ShowMachineUiInstruction.java` |
+| 机器编辑指令 | `client/ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange, AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}.java`（`MachineEdits.requestRebuild()` 在改动落地后请求面板重建） |
 | 思索「查看 UI 详情」按钮 | `client/ponder/PonderUiButtons.java`（`attach` / `beforeRender` / `afterRender` / `clickPanel` / `tick`，挂到 `PonderUI` 控件表） |
 | 颜色数据 | `client/render/ColorData.java` |
 
@@ -39,9 +39,9 @@ client/
 - `CTNHPonderLang.init(PonderPlugin plugin)`：注册插件 → `PonderIndex.registerAll()` → lang access 为 `PonderLocalization` 时调 `generateSceneLang()`。
 - `CTNHPonderTagHelper.registerTag(...)` 用 `CNRegistrate.genLang` 写 tag 名与描述，key 为 `<namespace>.ponder.tag.<path>` 与 `<...>.description`。
 - 机器 UI 入口 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`；`MachineUI.of(MachineDefinition)` / `of(Block)` 建门面，`showFullUI()` / `hideTitleBar()` / `hideSideTabs()` / `showPlayerInventory()` / `showConfigurators()` / `showCircuit()` / `showNavigationButtons()` 调界面形态，`scale(float)` / `fitToPanel(float)` 定尺寸。
-- 三段式摆放 API（编译期强制给机器位置）：`MachineUiStart`（`showUI` 的返回值，只有 `at(BlockPos)` 一步到位 / `at(Vec3)` 只定箭头 / `scale` / `pointing`）→ `at(Vec3)` 得到 `MachineUiAnchor`（只有 `machinePos(BlockPos)` / `scale` / `pointing`）→ 拿到 `MachineUiPlacement` 后才能链 `slot` / `tank` / `recipe` / `outline*` / `show(ticks)`；写入 `slot(int).withItem(ItemStack[, delayTicks])`、`tank(int).withFluid(FluidStack[, delayTicks])`；配方 `recipe(String[, delayTicks])`；红框 `outlineSlot` / `outlineTank` / `outlineProgress` / `outlineCircuit` / `outlinePowerToggle` / `outlineAutoOutput` / `outlineCircuitButton` / `outlineDistinct`；最后 `show(int ticks)` 落地。
+- 三段式摆放 API（编译期强制给机器位置）：`MachineUiStart`（`showUI` 的返回值，只有 `at(BlockPos)` 一步到位 / `at(Vec3)` 只定箭头 / `scale` / `pointing`）→ `at(Vec3)` 得到 `MachineUiAnchor`（只有 `machinePos(BlockPos)` / `scale` / `pointing`）→ 拿到 `MachineUiPlacement` 后才能链 `slot` / `tank` / `recipe` / `outline*` / `show(ticks)`；写入 `slot(int).withItem(ItemStack[, delayTicks])`、`tank(int).withFluid(FluidStack[, delayTicks])`；配方 `recipe(String[, delayTicks])`；红框 `outlineSlot` / `outlineTank` / `outlineProgress` / `outlineCircuit` / `outlinePowerToggle` / `outlineAutoOutput` / `outlineCircuitButton` / `outlineDistinct` / `outlineButton`，也可经公开枚举 `Part` 用 `outline(Part, int[, delayTicks])` 直接指定控件类别；最后 `show(int ticks)` 落地。
 - `MachineUiInteraction` 维护当前帧的面板视图（`publish` / `beginFrame` / `hasPanel` / `hasFullPanel`）、转发面板点击（`click`）、给冻住的场景继续 `tickPanels`，`enabled()` / `setEnabled(boolean)` 表示「查看 UI 详情」开关状态；`PonderUIMixin` 在 `tick` / `getPartialTicks` 里读它来冻结场景。
-- `MachineEdits` 提供按机器坐标施加与还原的指令（`placeCover` / `setWorkingModel` / `setItemOutput` / `setFluidOutput` / `setAutoOutput` / `setParallel` / `fixMaintenance` / `fixMaintenanceWithoutTape`），`MachineEdit` 的 `apply` / `revert` 由 `CoverChange`、`AutoOutputChange`、`WorkingModelChange`、`ParallelChange`、`MaintenanceChange` 实现。
+- `MachineEdits` 提供按机器坐标施加与还原的指令（`placeCover` / `setWorkingModel` / `setItemOutput` / `setFluidOutput` / `setAutoOutput` / `setParallel` / `fixMaintenance` / `fixMaintenanceWithoutTape`），`MachineEdit` 的 `apply` / `revert` 由 `CoverChange`、`AutoOutputChange`、`WorkingModelChange`、`ParallelChange`、`MaintenanceChange` 实现；`requestRebuild()` 在机器改动落地后请求面板下一次 tick 重建。
 - `RecipeFiller` 按配方 id 找配方（内部 `runtime(Recipe)` 同时接受 `GTRecipeDefinition` 与 `GTRecipe`），按 GT 的 `IngredientIO` 标签把入料写进输入槽 / 输入储罐，进度条走完后把成品写进输出槽 / 输出储罐，并在运行与待机之间切机器模型。
 - `PonderUiButtons` 把「查看 UI 详情」按钮挂进 `PonderUI` 自己的控件表，随底部一排淡入淡出、被派发点击；点击转 `MachineUiInteraction`，`PonderUIMixin` 在 `init` / `renderWindow` / `mouseClicked` / `tick` / `getPartialTicks` 上接线。
 - 消费方：Core、Energy、Bio、Mana、CTPP 各自的 `client/ponder/*SceneBuilder` + `*PonderTags`，在其 `CommonProxy` 中接线；机器 UI 栈的使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。

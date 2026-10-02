@@ -24,7 +24,7 @@ client/
 | Concern | Location |
 |---------|----------|
 | 客户端代理 | `client/ClientProxy.java` |
-| Ponder 插件 / 场景 / 标签 | `client/ponder/`（10 个类；`electric/` 与 `kinetic/` 两组场景） |
+| Ponder 插件 / 场景 / 标签 | `client/ponder/`（10 个类；`electric/` 与 `kinetic/` 两组场景）；`kinetic/` 仓室演示经 CTNH-Lib `MachineUI` |
 | 渲染器 | `client/renderer/`（7 个：工具箱、线剪、接线柱、发射器光束，以及两套 RenderType 常量） |
 | 顶层 Visual / 渲染 | `client/{CarbonBrushesRenderer, CarbonBrushesVisual, GeneratorCoilRenderer, GeneratorCoilVisual, SplitShaftVisual}` |
 | 方块实体渲染 | `client/KineticMachineBlockEntityRenderer.java` |
@@ -36,6 +36,7 @@ client/
 ## CONVENTIONS
 - 客户端类不得进入 common 的构造路径；`CTPP.java` 经 `DistExecutor` 只在客户端创建 `ClientProxy`。
 - Ponder 场景经 `CTNHPonderLang.init(new CTPPPonderPlugin())` 在 `CommonProxy.gatherData()` 的 `includeClient()` 分支做 lang 提取。
+- Ponder 仓室界面经 CTNH-Lib `MachineUI` 构造，机器坐标必须 `.machinePos(pos)` 显式指定：`BigDam`、`KineticGenerator`、`WindmillControlCenter` 演示流体输入仓灌入润滑油，`SmashingFactory` 演示物品输入/输出总线。
 - 方块实体渲染注册在 `registry/CTPPBlockEntities.java` 的对应条目上，不在 `client/` 内自行注册。
 - 接线柱线缆几何必须调用 `api/terminal/TerminalWireGeometry`，渲染器内不重复实现。
 

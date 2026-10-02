@@ -19,7 +19,7 @@ integration/
 | 风扇类别 | `integration/jei/category/`（`FanAcidWashingCategory`, `FanBreathingCategory`） |
 | Jade 插件 | `integration/jade/CTPPJadePlugin.java`（`IWailaPlugin` + 内部 `PlaceableEmitterProvider`） |
 | LDLib 插件 | `integration/ldlib/CTPPLDLibPlugin.java`（`@LDLibPlugin`；`onLoad()` 把 `TerminalLinkStateAccessor` 注册进 `TypedPayloadRegistries`，优先级 50） |
-| EMI（已迁出） | CTNH-Core `integration/emi/`——不要在本模块重建 `integration/emi/CTPPEmiPlugin.java` |
+| EMI 对接 | CTNH-Core `integration/emi/`；本模块不建 `integration/emi` |
 
 ## CONVENTIONS
 - 集成类保持隔离与可选，不得成为 `common/` 的硬依赖。
