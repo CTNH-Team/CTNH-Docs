@@ -30,7 +30,7 @@ ctpp/
 |-- registry/                 # 12: Registrate 物品/方块/BE/机器/多方块/菜单/网络/配方类型与修饰符、
 |                              CreateMaterials、GTMaterialAddon
 |-- syncdata/                 # 1: TerminalLinkStateAccessor
-`-- util/                     # 6: CommonTooltips, ICustomSlot, IMatrix3dAccessor, IWorkingMachineStep,
+`-- util/                     # 6: CommonTooltips, ICustomSlot, IMatrix3dAccess, IWorkingMachineStep,
                               ItemAxisBuilder, MathUtil
 ```
 

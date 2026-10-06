@@ -1,7 +1,7 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（25 个 Java 文件）。
+客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（26 个 Java 文件）。
 
 ## STRUCTURE
 ```text
@@ -13,7 +13,8 @@ client/
 |   |-- Electric/              # GregTechMultiblocks, NeutronActivator, ChemicalPlant
 |   |-- Kinetic/               # Meadow, MechanicalExporter
 |   |-- Misc/                  # Drum
-|   `-- example/               # ChemicalReactorUi（机器界面 Ponder 示例）
+|   |-- example/               # ChemicalReactorUi（机器界面 Ponder 示例）
+|   `-- machine/               # NeutronSensorChange（MachineEdit：反射改中子传感器输出反转与动能门限）
 |-- renderer/                  # ArcBlockRender, AstralPlanetSpecialEffects, DynamicCasingRender, HyperPlasmaTurbineRender, MartialMoralityEyeRender, TurbineRotorRender
 |-- renderer/utils/            # RenderUtils
 `-- util/                      # SnowOverlayQuadOffset
@@ -26,6 +27,8 @@ client/
 | 客户端引导 | `client/ClientProxy.java`, `client/ClientUtil.java` |
 | Ponder 插件/场景/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
 | Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（GregTechMultiblocks, NeutronActivator, ChemicalPlant）, `client/ponder/Misc/`（Drum） |
+| 中子活化器场景 | `client/ponder/Electric/NeutronActivator.java`（以 Naquadria 活化配方为示例：传感器动能区间、机器控制覆盖板闭环、流体输入仓与输出总成） |
+| 场景机器状态写入 | `client/ponder/machine/NeutronSensorChange.java`（实现 CTNH-Lib `MachineEdit`，反射写入中子传感器输出反转与动能门限；`ramp` 按 tick 铺设门限） |
 | 机器界面 Ponder 示例 | `client/ponder/example/ChemicalReactorUi.java`（LV 化学反应釜，用 Lib 的 `MachineUI`/`MachineUiPlacement` 演示槽位、储罐、配方与配置器开关） |
 | Ponder 适配构建器 | `client/ponder/CTNHCorePonderSceneBuilder.java` |
 | 模型 | `client/model/`（ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel） |
@@ -35,7 +38,7 @@ client/
 ## CONVENTIONS
 - Ponder 场景用 `scene.title(sceneId, headerEn, headerCn, titleEn, titleCn)`（仅要标题时用 `title(sceneId, en, cn)`）/ `scene.showText(tick, en, cn)`，文案直接内嵌在场景文件里。
 - `CTNHCorePonderSceneBuilder` 只是 Lib 共享构建器之上的 Core 适配层；可复用的构建器/文本行为留在 CTNH-Lib。
-- 机器界面 Ponder 用 CTNH-Lib 的 `MachineUI`（`MachineUI.of(机器)`）与 `MachineUiPlacement` 链：`scene.showUI(MY_MACHINE_UI).at(anchor).machinePos(pos).slot(0).withItem(stack).show(200)`；`CTNHPonderSceneBuilder.showUI(MachineUI)` 转 `ui.in(this)`，`MachineUI.in(SceneBuilder)` 返回 `MachineUiPlacement`。`ChemicalReactorUi` 是覆盖槽位、储罐、配方、输出口与配置器开关红框的完整示例。
+- 机器界面 Ponder 用 CTNH-Lib 的 `MachineUI`（`MachineUI.of(机器)`）与 `MachineUiPlacement` 链：`scene.showUI(MY_MACHINE_UI).at(anchor).machinePos(pos).slot(0).withItem(stack).show(200)`；`CTNHPonderSceneBuilder.showUI(MachineUI)` 转 `ui.in(this)`，`MachineUI.in(SceneBuilder)` 返回起点态 `MachineUiStart`。`ChemicalReactorUi` 是覆盖槽位、储罐、配方、输出口与配置器开关红框的完整示例。
 - 一个 storyboard 可注册到多个组件：`drum/common` 经 `GTMachines` 的 8 种桶（木 / 青铜 / 钢 / 铝 / 不锈钢 / 金 / 钛 / 钨钢）共用 `Drum::Common`；`chemical_plant/common` 绑定 `GTNNMultiblocks.CHEMICAL_PLANT` 的 7x7x7 塔体，绑定组件与 storyboard 一一对应。
 - Ponder 注册发生在 `ClientProxy.onClientSetupEvent()`；客户端 datagen 的语言提取在 `CommonProxy.gatherData()` 中经 `CTNHPonderLang.init(new CTNHCorePonderPlugin())` 完成。
 - 引用物品/方块/流体**必须**使用静态注册对象，**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。

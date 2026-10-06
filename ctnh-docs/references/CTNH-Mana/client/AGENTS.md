@@ -1,7 +1,7 @@
 # CTNH-MANA CLIENT DOMAIN
 
 ## OVERVIEW
-`client/` 是 CTNH-Mana 的客户端面（45 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
+`client/` 是 CTNH-Mana 的客户端面（46 个 Java 文件）：ClientProxy 编排（动态渲染注册 / shader / 物品属性 / Ponder 插件 / 烘焙模型包装）、Caduceus 轮盘菜单、模型、Mana 自有 Ponder 插件与场景、渲染器与粒子，以及虚境入侵的客户端镜像。
 
 ## STRUCTURE
 ```text
@@ -10,6 +10,7 @@ client/
 ├── gui/radial/                # CaduceusRadialMenu, RadialMenu, RadialMenuScreen, RadialMenuSlot
 ├── model/                     # 8: CMModels, GiantBeeModel, MagicCubeModel, ModelBase, ModelDefinition, RoyalServantBeeModel, StarCakeBlockModel, StarCakeItemModel
 ├── ponder/                    # CTNHManaPonderPlugin, CTNHManaPonderSceneBuilder, CTNHManaPonderScenes, CTNHManaPonderTags
+│   ├── machine/               # SpireModeChange
 │   └── mana/                  # 5: IndustrialAltar, MagicRituals, MysticSpire, PonderParticleUtil, TerraPlate
 ├── render/                    # 19: AntagonismRender, BeeNukeProjectileRenderer, DeltaSparkRenderer, DemonWillRender, EternalGardenRender, GiantBeeRenderer, MaliciousThermalilyProjectileRenderer, ManaCondenserRender, ManaReactorRender, OmegaSparkRenderer, RoyalServantBeeRenderer, ShroudGazingRender, StarCakeItemRender, StarCakeMachineBERProvider, StarCakeRender, UltraManaMistModel, UltraManaMistRenderType, WitherAconiteProjectileRenderer, ZenithMatrixRender
 │   └── particle/              # IconParticle
@@ -28,6 +29,9 @@ client/
 | Ponder 插件 | `client/ponder/CTNHManaPonderPlugin.java`（`getModId` → `CTNHMana.MODID`；注册 `CTNHManaPonderScenes` 与 `CTNHManaPonderTags`） |
 | Ponder 场景/标签 | `client/ponder/CTNHManaPonderScenes.java`, `CTNHManaPonderTags.java` |
 | 尖塔 / 仪式场景 | `client/ponder/mana/`（`MysticSpire` 奥法尖塔、`MagicRituals` 烈焰人 / 符文仪式 / 仪式推测杖、`IndustrialAltar` 工业血之祭坛、`TerraPlate` 泰拉凝聚板、`PonderParticleUtil`） |
+| Ponder 机器界面 | `client/ponder/mana/IndustrialAltar.java`（`MachineUI.of(GTMachines.FLUID_IMPORT_HATCH[GTValues.EV])`，摆 EV 流体输入仓面板、`tank(0)` 演示生命源质）、`client/ponder/mana/MysticSpire.java`（`MachineUI.of(CMMultiblockMachines.MysticSpire).forceMultiblockActivated()`，摆尖塔主方块面板、`slot(0)` 演示升级符文） |
+| 尖塔模式讲解 | `client/ponder/mana/MysticSpire.Scene3`：`showModeUi(...)` 先经 `SpireModeChange.apply` 把 `MysticSpire.MODE` 切到该模式，再用 `outlineButton` 框住对应按钮（聚焦 0→0、火花扩散 1→3、凝聚扩散 2→1、中转 3→2） |
+| Ponder 机器编辑 | `client/ponder/machine/SpireModeChange.java`（`MachineEdit`；`apply` 写 `MysticSpire.MODE`，`revert` 写回改动前的值） |
 | Ponder 构建器适配 | `client/ponder/CTNHManaPonderSceneBuilder.java` |
 | 模型 | `client/model/`（8） |
 | 渲染器 | `client/render/`（19）+ `render/particle/IconParticle` |
@@ -40,6 +44,7 @@ client/
 - Ponder 插件由 `ClientProxy.onClientSetup()` 经 `PonderIndex.addPlugin(new CTNHManaPonderPlugin())` 挂载；插件本身不含注册逻辑。
 - 动态渲染类型必须在 `ClientProxy.init()` 注册，渲染类本身只提供 `TYPE`。
 - Caduceus / Saber 的客户端行为由「网络包 + 物品属性谓词」两处共同决定，改动需成对检查。
+- `scene.showUI(MachineUI)` 链用三段式摆放 API 在编译期强制机器位置：`at(Vec3)` 只定箭头、返回的 `MachineUiAnchor` 必须再写 `machinePos(pos)` 才能继续 `slot` / `tank` / `show`；`at(BlockPos)` 一步到位。缺少机器位置的面板只记一行错误、不绘制；`IndustrialAltar` 与 `MysticSpire` 的面板都按 `at(...).machinePos(...)` 摆放。
 
 ## ANTI-PATTERNS
 - 把 Mana 的 Ponder 场景/标签/插件搬到 CTNH-Core 或 CTNH-Lib（共享 builder 才归 Lib）。
