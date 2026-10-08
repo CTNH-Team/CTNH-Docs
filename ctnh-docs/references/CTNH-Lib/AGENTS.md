@@ -1,7 +1,7 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（68 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **79 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
+CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（75 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **86 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Lib/src/main/java/`（括号内为该域 Java 文件数）
@@ -10,15 +10,15 @@ CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（68 
 com/ctnhlang/ (11)
 ├── CN, EN, Lang, LangFactory, Key, Prefix, Suffix, Domain, Category, IgnoreLang
 └── langprovider/LangKeyBuilder
-tech/vixhentx/mcmod/ctnhlib/ (68)
+tech/vixhentx/mcmod/ctnhlib/ (75)
 ├── CTNHLib.java
 ├── api/         (3)  CTNHValues, CrossParallelRecipeLogic, ICrossParallelRecipeLogicMachine
-├── client/      (26) ClientProxy；ponder/{CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, PonderUiButtons}；
+├── client/      (33) ClientProxy；ponder/{ButtonRow, CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, FrameGuard, PonderUiButtons}；
 │                     ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange,
 │                                      AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}；
 │                     ponder/ui/{MachineUI, MachineUiStart, MachineUiAnchor, MachineUiPlacement, MachineUiElement, MachineUiOverlay, MachineUiPanel,
 │                                MachineUiPanelBuilder, MachineUiInteraction, MachineUiWrites, RecipeFiller,
-│                                ConfiguratorTabs, CircuitSlots, ShowMachineUiInstruction}；
+│                                ConfiguratorTabs, CircuitSlots, ShowMachineUiInstruction, StackWrite}；
 │                     render/ColorData；render/highlight/{HighlightHandler, HighlightRender}
 ├── command/     (3)  CTNHCommands, CTNHCommandChatHelper, CTNHCommandInspector
 ├── common/      (2)  CommonProxy, MultiblockHelper
@@ -45,7 +45,7 @@ src/main/resources/ctnhlib.mixins.json
 | 双语 lang 管线 | `com/ctnhlang/*`, `langprovider/{Lang, LangProcessor}`, `registrate/lang/RegistrateCNLangProvider`, `registrate/data/ProviderTypes` |
 | 网络与方块高亮 | `registrate/CTNHLibNetworking`, `network/packets/BlockHighlightPacket`, `client/render/highlight/*` |
 | 共享命令 | `command/CTNHCommands`, `command/CTNHCommandInspector`, `command/CTNHCommandChatHelper` |
-| 客户端 Ponder 框架 / 机器 UI 栈 | `client/ponder/{CTNHPonderSceneBuilder, CTNHPonderLang, CTNHPonderTagHelper, PonderUiButtons}`；`client/ponder/ui/*`（`MachineUI` 门面 + `MachineUiPlacement` 链式 API）；`client/ponder/machine/*` |
+| 客户端 Ponder 框架 / 机器 UI 栈 | `client/ponder/{CTNHPonderSceneBuilder, CTNHPonderLang, CTNHPonderTagHelper, PonderUiButtons, ButtonRow, FrameGuard}`；`client/ponder/ui/*`（`MachineUI` 门面 + `MachineUiPlacement` 链式 API）；`client/ponder/machine/*` |
 | 通用工具 | `utils/*` |
 | Mixin 配置 | `src/main/resources/ctnhlib.mixins.json` |
 
@@ -72,7 +72,7 @@ src/main/resources/ctnhlib.mixins.json
 - **`ProviderTypes.CNLANG` 的注册 id 必须是 `ctnhlib_cnlang`**（裸 `cnlang` 会被第三方 mod `ae2pw` 的同名拷贝顶掉，静默产出空 `zh_cn.json`）。
 - **新增 mixin 必须登记** `src/main/resources/ctnhlib.mixins.json` 的 `mixins`（或 `client`）数组。
 - **Ponder 机器 UI 栈集中在 `client/ponder`**：门面 `MachineUI`（`of(MachineDefinition)` / `of(Block)`）经 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`，链式 API 完成摆放（`at` / `machinePos` / `scale` / `pointing`）、物品与流体写入（`slot(index).withItem(...)` / `tank(index).withFluid(...)`）、配方回放（`recipe(recipeId)`）、红框（`outline*`）与 `show(ticks)`；面板构建、写入时间线、点击转发、配方填充分别由 `MachineUiPanelBuilder`、`MachineUiWrites`、`MachineUiInteraction`、`RecipeFiller` 承担，`ponder/machine/*` 的 `MachineEdits` / `MachineEdit` 负责盖板、自动输出与工作模型的施加与还原。使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。
-- **思索「查看 UI 详情」按钮**：`client/ponder/PonderUiButtons` 把按钮挂进 `PonderUI` 自己的控件表，点击与开关状态经 `mixin/PonderUIMixin` 转给 `MachineUiInteraction`；`ctnhlib.tooltip.slot_index` / `ctnhlib.tooltip.tank_index` / `ctnhlib.tooltip.button_index` / `ctnhlib.ponder.ui.ui_details` 为对应 lang key。
+- **思索「查看 UI 详情」按钮**：`client/ponder/PonderUiButtons` 把按钮挂进 `PonderUI` 自己的控件表，点击与开关状态经 `mixin/PonderUIMixin` 转给 `MachineUiInteraction`；按钮文案 lang key 为 `ctnhlib.ponder.ui.ui_details`，思索编辑模式下的槽位 / 储罐 / 机器页按钮序号提示用 `ctnhlib.tooltip.slot_index` / `ctnhlib.tooltip.tank_index` / `ctnhlib.tooltip.button_index`。
 - **Lib 不做游戏内容**：模块专属命令、包、构建器、Ponder 场景、Jade provider 一律放所属模块。
 
 ## ANTI-PATTERNS
