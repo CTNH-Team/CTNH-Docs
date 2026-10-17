@@ -16,6 +16,7 @@ Core 运行时行为的 Forge 事件处理器与后台任务管理器（5 个 Ja
 - 事件订阅者与注册表回调是生命周期入口；顺着注解追踪，不要按普通 Java 调用方找。
 - Capability 挂载钩子（EIO 电容 capability、命名空间/remap 辅助）经由 `common/capability/` 从这里接线。
 - `ProvidableNetEventHandler` 与 `common/machine/trait/providable_net/` 的机器配合。
+- `BuildTaskManager.onServerTick` 仅在 `Phase.END` 调 `tickAllTasks()`，按注册玩家逐个推进 `AsynBlockPattern`；单个任务抛 `RuntimeException` 时移除该任务并记录日志，不让异常打断整个服务端 tick。
 - `DimensionFlightHandler.onPlayerTick` 只在 `TARGET_DIM`（`javd:void`）且 `player.gameMode.isSurvival()` 时给 `ALObjects.Attributes.CREATIVE_FLIGHT` 附加固定 UUID 的 modifier（授予创造飞行），其余维度或非生存模式移除同一 UUID 的 modifier。
 - `ForgeEventHandler` 还承载灵魂火把彩蛋（`onSoulTorchEasterEgg`），会生成烟花并播放 `easter_egg_clown` 音效事件。
 

@@ -55,6 +55,7 @@ registry/
 - 音效经 `CommonProxy.init()` 中的 `CTNHSoundEvents.SOUND_EVENTS` 注册；对应 `sounds.json` 与音频资源在 `src/main/resources/assets/ctnhcore/`。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries.ITEMS/BLOCKS/FLUIDS.getValue(...)`；字符串 ID 仅限无注册对象的场景（上游 mod 专属 ID、配方 ID、tag key、维度 ID）。
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。
+- **材料集初始化顺序**：`registry/material/CTNHMaterials.init()` 先调用 `NaquadahMaterials.init()`，再调用 `AdastraMaterials.init()`（其 `addOre` 直接读取 `NaquadahMaterials.EnrichedNaquadahOxideMixture` / `NaquadriaOxideMixture` 静态字段），随后是 `SecondMaterials`、`PlatinumLineMaterials` 等。`CTNHMaterials.addOre` 收到 null 伴生矿时打 error 日志（`addOre(...) passed a null companion material...`）并直接返回，不写入直熔/伴生/分离产物。
 - **配方驱动多方块基类**：需要配方类型/机器模式页签的电力多方块，注册 factory 的类必须是 `RecipeElectricMultiblockMachine` 或其子类（无自定义行为时直接用 `RecipeElectricMultiblockMachine::new`，否则用 `FactoryMachine::new`、`BioMachine::new` 等自定义子类），并照常在链上 `.recipeTypes(...)`。`RecipeElectricMultiblockMachine extends RecipeMultiblockMachine`，后者 `implements IRecipeLogicMachine`。`WorkableElectricMultiblockMachine` 只 `extends WorkableMultiblockMachine`、**不**实现 `IRecipeLogicMachine`，用它注册会导致模式页签不显示、已注册配方类型不生效（`IFancyUIMachine.attachSideTabs()` 仅在 `instanceof IRecipeLogicMachine && getRecipeTypes().length > 1` 时挂 `MachineModeFancyConfigurator`）。线圈多方块用其子类 `CoilWorkableElectricMultiblockMachine::new`（`extends RecipeElectricMultiblockMachine`）。
 - `CTNHRecipeModifiers.ebfOverclock()` 的类型判断对象为 `RecipeElectricMultiblockMachine`；线圈机器匹配失败时经 `RecipeModifier.nullWrongType(CoilWorkableElectricMultiblockMachine.class, machine)` 报类型错误。
 - **产出型 / 发电机配方修饰符链**：`utils/CTNHMachineUtils.registerEfficiencyGeneratorMachines(name, recipeType, recipeModifier, ...)` 在链上写 `.recipeModifiers(GTRecipeModifiers.TIER_CHECK, recipeModifier)`，调用方传 `EfficiencyGeneratorMachine::recipeModifier`（`CTNHMachines.NAQUADAH_REACTOR`）。需要显式覆盖配方类型的产出型多方块用 `.recipeModifiers(true, GTRecipeModifiers.TIER_CHECK, <MachineClass>::recipeModifier)`：`HyperPlasmaTurbineRegister` 的 `hyper_plasma_turbine`（`HyperPlasmaTurbineMachine::recipeModifier`）与 `MultiblocksA` 的 `CHEMICAL_GENERATOR`（`ChemicalGeneratorMachine::recipeModifier`）。
@@ -67,6 +68,7 @@ registry/
 - 给已支持注册处声明中文名的方块/多方块再补 `@Key("block.ctnhcore.*")` + `Lang` 字段伪造翻译。
 - 删除注册对象后留下悬空 lang 条目。
 - 用 `WorkableElectricMultiblockMachine::new` 注册需要配方类型的多方块（不实现 `IRecipeLogicMachine`，模式页签不显示、配方类型不生效）；正确做法是用 `RecipeElectricMultiblockMachine` 或其子类。
+- 调整 `CTNHMaterials.init()` 中材料集的调用顺序，使依赖其它材料字段的 `addOre` 在字段赋值前运行（伴生矿为 null，该矿的直熔/伴生/分离产物全部丢失）。
 
 ## SCOPE
 `modules/CTNH-Core/src/main/java/io/github/cpearl0/ctnhcore/registry/` 及其全部子包。

@@ -1,7 +1,7 @@
 # CTNH-CORE CLIENT DOMAIN
 
 ## OVERVIEW
-客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（26 个 Java 文件）。
+客户端引导、模型、渲染器，以及 Core 自有的 Create Ponder 场景、tags 与插件（27 个 Java 文件）。
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,7 @@ client/
 |-- ClientUtil.java
 |-- model/                     # ModelBase, ModelDefinition, TemplateModel, TurbineRotorModel
 |-- ponder/                    # CTNHCorePonderPlugin, CTNHCorePonderSceneBuilder, CTNHCorePonderScenes, CTNHCorePonderTags
-|   |-- Electric/              # GregTechMultiblocks, NeutronActivator, ChemicalPlant
+|   |-- Electric/              # AssemblyLine, CokeOven, ChemicalPlant, NeutronActivator
 |   |-- Kinetic/               # Meadow, MechanicalExporter
 |   |-- Misc/                  # Drum
 |   |-- example/               # ChemicalReactorUi（机器界面 Ponder 示例）
@@ -26,7 +26,7 @@ client/
 |---------|----------|
 | 客户端引导 | `client/ClientProxy.java`, `client/ClientUtil.java` |
 | Ponder 插件/场景/tags | `client/ponder/CTNHCorePonderPlugin.java`, `CTNHCorePonderScenes.java`, `CTNHCorePonderTags.java` |
-| Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（GregTechMultiblocks, NeutronActivator, ChemicalPlant）, `client/ponder/Misc/`（Drum） |
+| Core Ponder 场景 | `client/ponder/Kinetic/`（Meadow, MechanicalExporter）, `client/ponder/Electric/`（AssemblyLine, CokeOven, ChemicalPlant, NeutronActivator）, `client/ponder/Misc/`（Drum） |
 | 中子活化器场景 | `client/ponder/Electric/NeutronActivator.java`（以 Naquadria 活化配方为示例：传感器动能区间、机器控制覆盖板闭环、流体输入仓与输出总成） |
 | 场景机器状态写入 | `client/ponder/machine/NeutronSensorChange.java`（实现 CTNH-Lib `MachineEdit`，反射写入中子传感器输出反转与动能门限；`ramp` 按 tick 铺设门限） |
 | 机器界面 Ponder 示例 | `client/ponder/example/ChemicalReactorUi.java`（LV 化学反应釜，用 Lib 的 `MachineUI`/`MachineUiPlacement` 演示槽位、储罐、配方与配置器开关） |

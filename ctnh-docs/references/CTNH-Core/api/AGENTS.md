@@ -24,10 +24,11 @@ api/
 | 线圈处理 | GTCEu `com.gregtechceu.gtceu.common.machine.trait.multiblock.CoilMachineTrait`，经 `getTraitOrThrow()` 获取（本模块无 `ICoilMachine`） |
 | 图案辅助 | `api/Pattern/`（`AsynBlockPattern`, `CTNHBlockMaps`, `CTNHPredicates`） |
 | AE 图案 NPE 修复 | `api/Pattern/AsynBlockPattern.java` —— `extractInventory` / `searchAEStorage` 在 `AEItemKey.of` 前先判 `context.foundItemStack != null && !isEmpty()` |
+| 构建异常兜底 | `api/Pattern/AsynBlockPattern.java#tick()` —— 捕获 `RuntimeException` 后清空 `buildQueue`、置 `completed` 并记录失败坐标，不向 `ServerTickEvent` 抛出 |
 | 材料数据 | `api/data/material/`（icon set/type、property key、catalyst property） |
 | GUI 贴图 | `api/gui/CTNHGuiTextures.java` |
 | Jade provider | `api/jade/`（多线程配方/输出/线程状态，三份文件整体注释；见下节） |
-| 配方 API | `api/recipe/`（`DigitalMinerLogic`） |
+| 配方 API | `api/recipe/DigitalMinerLogic.java`（`speed` 经 `Math.max(1, ...)` 兜底，用作 `serverTick` 取模除数） |
 
 ## CONVENTIONS
 - API 类不得把仅客户端类泄漏进 common 构造路径。
@@ -36,6 +37,7 @@ api/
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。详见模块主文档 CONVENTIONS。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
 - 线圈处理：线圈经 GTCEu `CoilMachineTrait` 查询（`getTraitOrThrow(CoilMachineTrait.class)`，示例：`BlazeBlastFurnaceMachine`, `FermentingTankMachine`）；本模块无 `ICoilMachine`。
+- `api/recipe/DigitalMinerLogic` 构造函数把 `speed` 经 `Math.max(1, speed)` 兜底后存储，`serverTick()` 用它作取模除数（`getOffsetTimer() % speed`）；`speed` 为 0 会抛 `ArithmeticException`。
 
 ## JADE PROVIDERS
 `api/jade/` 的 `MultithreadRecipeLogicProvider`、`MultithreadRecipeOutputProvider`、`ThreadStatusProvider` 是 GTCEu `RecipeLogicProvider` / `RecipeOutputProvider` 的多线程变体，整体被注释；`registry/jade/CTNHJadePlugin` 的 `init()` 方法体同样整体注释，没有任何注册调用生效。
