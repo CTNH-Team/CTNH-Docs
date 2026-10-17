@@ -62,6 +62,7 @@ common/
 ## CONVENTIONS
 - `CommonProxy.java` 注册 config、registrate、配方条件、机器、配方类型、datagen、创造栏，以及客户端/服务端 setup 监听器。
 - 机器实现放在本域；其 registrate 条目在 `registry/machines/` 与 `registry/CTNHMachines.java`。
+- `common/machine/simple/DigitalMiner` 以 `Math.max(1, (int) (40 / Math.pow(2, getTier())))` 计算 `speed` 并传入 `api/recipe/DigitalMinerLogic`（tier 较高时 `40 / 2^tier` 会取整为 0，`speed` 是 `serverTick` 的取模除数，至少保留 1）。
 - 电力多方块遵循 `*Machine` 命名；`WPA_old.java` 整文件注释、不提供可用实现，勿作为模板；部件实现 `CTNHPartAbility`。
 - electric 下的 `rareearth/` 子包是过程控制机器抽象与其 profile，属于电力多方块层级的一部分。
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。
