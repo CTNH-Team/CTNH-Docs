@@ -60,7 +60,8 @@ data/
 - `src/generated/resources` 由 `:modules:CTNH-Core:runData` 产出；绝不手工编辑生成的 JSON。
 - 经 `CTNHCoreGTAddon.addRecipes()` 注册的 GT/GMT 配方属运行时动态数据包（`GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`）：`runData` 对其**不产出 JSON**，它们不出现在 `src/generated/resources` 是预期行为，不是失败。完整声明见模块主文档 CONVENTIONS。
 - 配方生成器按 age、chain、Create/联动、迁移脚本、mod 修改、mana 桥接、多方块与木材域拆分。
-- 配方删除：`data/recipe/RecipeRemoval.java` 只登记过滤规则（`id`/`idRegex`/`mod`/`type`/`not`/`or`），通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper`（`mixin/RecipeManagerApplyMixin`）提供，Core 侧不重复实现。动态配方刻意不过滤。
+- 配方删除：`data/recipe/RecipeRemoval.java` 只登记过滤规则（`id`/`idRegex`/`mod`/`type`/`not`/`or`），通用过滤与 `RecipeManager.apply()` 注入由 CTNH-Lib `RecipeRemovalHelper`（`mixin/RecipeManagerApplyMixin`）提供，Core 侧不重复实现。动态配方刻意不过滤。GT 配方删除的 id 含配方类型路径（GT `FinishedRecipe#getId()` 为 `gtceu:<recipeType>/<name>`），按 `gtceu:centrifuge/<name>`、`gtceu:shaped/<name>` 这类完整 id 登记。
+- 覆写 GTCEu 工作台配方经 `VanillaRecipeHelper.addShapedRecipe`：它会给 id 自动补配方类型前缀（`shaped/`），所以传 `CTNHCore.id("crafttable/<name>")` 这类不含前缀、且与 `RecipeRemoval.gtceuRemovals()` 删除的 `gtceu:shaped/<name>` 不重名的值（如 ULV 机器外壳、LV 热力离心机）。同一产物不同来源的配方 id 必须唯一，否则 Forge provider 以 `Duplicate recipe ignored with ID` 丢弃后注册的那条；`PrimitiveKineticAgeRecipes` 的焦炉砖与焦黑砖两条烧炼各自用独立 id。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。见模块主文档 CONVENTIONS。
 - `CreateRecipeTypes` 的 mechanicalTier 换算为 `Math.min(GTUtil.getTierByVoltage(EUt), 5)`，适用于 MECHANICAL_PRESSOR/MIXER/CENTRIFUGE/SIFTER/LATHE。
 - 铝土矿材料：`IMPURE_SODIUM_ALUMINATE_SOLUTION` 公式 `(TiO2)(?)+4NaAl(OH)4+nH2O`、`PURE_SODIUM_ALUMINATE_SOLUTION` `NaAl(OH)4+H2O`、`RED_MUD` `(TiO2)(Fe(OH)3)(?)+nH2O`、`SODIUM_HYDROXIDE_BAUXITE` `(TiO2)(?)(Al2O3)2+4NaOH+nH2O` 等；lang 键 `impure/pure_sodium_aluminate_solution`。
@@ -73,6 +74,8 @@ data/
 - 把宽泛的跨 mod 配方塞进 feature 模块；Core 才是聚合方。
 - 新增加工链却不注册进分发根（`CTNHCoreRecipeAddition`）。
 - 在 Core 侧重新实现配方删除的通用过滤逻辑（已由 CTNH-Lib `RecipeRemovalHelper` 提供）。
+- 用无输入输出的空 `recipeBuilder(id).save()` 冒充删除上游配方；删除一律走 `RecipeRemoval` 按真实 id 登记。
+- 直接把方块标签（如 `minecraft:soul_fire_base_blocks`）当物品 `Ingredient` 传入；`Registries.ITEM` 下的同名标签为空，会生成匹配不到任何输入的 `Ingredient`，须引用标签内的方块物品或其物品标签。
 
 ## SCOPE
 适用于 `src/main/java/io/github/cpearl0/ctnhcore/data` 及其子包。

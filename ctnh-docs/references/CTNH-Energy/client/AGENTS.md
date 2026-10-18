@@ -26,7 +26,7 @@ client/
 | Ponder 场景 / tag | `client/ponder/CTNHEnergyPonderScenes`, `CTNHEnergyPonderTags`（tag `AEOriginal` = `ctnhenergy:ae_original`） |
 | AE2 思索场景 | `client/ponder/ae2/`（14 个场景类） |
 | Ponder 场景适配器 | `client/ponder/CTNHEnergyPonderSceneBuilder`（继承 CTNH-Lib `CTNHPonderSceneBuilder`） |
-| AE2 线缆可视化辅助 | `client/ponder/ae2/AE2CablePonderHelper` |
+| AE2 线缆可视化辅助 | `client/ponder/ae2/AE2CablePonderHelper`（构造器与 `connectAllVisibleCableBuses` / `connectVisibleCableBuses` 以 CTNH-Lib `CTNHPonderSceneBuilder` 为参数类型，接收场景构造的 `CTNHEnergyPonderSceneBuilder`） |
 | EU 键渲染 | `client/render/EUKeyRenderHandler` |
 
 ## CONVENTIONS

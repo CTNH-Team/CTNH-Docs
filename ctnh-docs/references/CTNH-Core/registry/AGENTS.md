@@ -59,6 +59,7 @@ registry/
 - `CTNHRecipeModifiers.ebfOverclock()` 的类型判断对象为 `RecipeElectricMultiblockMachine`；线圈机器匹配失败时经 `RecipeModifier.nullWrongType(CoilWorkableElectricMultiblockMachine.class, machine)` 报类型错误。
 - **产出型 / 发电机配方修饰符链**：`utils/CTNHMachineUtils.registerEfficiencyGeneratorMachines(name, recipeType, recipeModifier, ...)` 在链上写 `.recipeModifiers(GTRecipeModifiers.TIER_CHECK, recipeModifier)`，调用方传 `EfficiencyGeneratorMachine::recipeModifier`（`CTNHMachines.NAQUADAH_REACTOR`）。需要显式覆盖配方类型的产出型多方块用 `.recipeModifiers(true, GTRecipeModifiers.TIER_CHECK, <MachineClass>::recipeModifier)`：`HyperPlasmaTurbineRegister` 的 `hyper_plasma_turbine`（`HyperPlasmaTurbineMachine::recipeModifier`）与 `MultiblocksA` 的 `CHEMICAL_GENERATOR`（`ChemicalGeneratorMachine::recipeModifier`）。
 - 精准装配线：`GTMachineModify` 在 `modifyGTAssembly()` 改写原版 `GCYMMachines.LARGE_ASSEMBLER` 定义 —— supplier 替换必须在机器注册之后、tooltip 构建之前。
+- **材料集初始化顺序**：`CTNHMaterials.init()` 按依赖顺序调用各材料集的 `init()`；`NaquadahMaterials.init()` 先于 `AdastraMaterials.init()`，因为后者的 `addOre` 直接把 `NaquadahMaterials.EnrichedNaquadahOxideMixture` / `NaquadriaOxideMixture` 当伴生矿传入，这些字段在各自 `init()` 里才赋值。`CTNHMaterials.addOre(main, companion)` 在 `companion == null` 时经 `CTNHCore.LOGGER.error` 报错并返回，避免 `OreProperty` 丢掉直熔/伴生/分离产物；新增依赖伴生矿字段的材料集时按同样方式排到其前置材料集之后。
 
 ## ANTI-PATTERNS
 - 手工重排受 spotless 开关保护的大型多方块注册段。
