@@ -51,7 +51,7 @@ common/
 | 发电机多方块 | `common/machine/multiblock/generator/`（12） |
 | 动力多方块 | `common/machine/multiblock/kinetic/`（5） |
 | 机器部件 | `common/machine/multiblock/part/`（12） |
-| 单方块机器 | `common/machine/simple/`（4） |
+| 单方块机器 | `common/machine/simple/`（4）；`DigitalMiner` 的 `speed` 有下限 1（`serverTick` 取模除数） |
 | 机器 trait | `common/machine/trait/`, `common/machine/trait/providable_net/` |
 | 算力机器 | `common/machine/multiblock/MultiblockComputationMachine.java`（`attachTrait(new NetworkedComputationContainer(...))`） |
 | 流体瓶机器 | `common/machine/multiblock/LargeBottleMachine.java`（`attachTrait(new MultiblockFluidRendererTrait(this, this::saveOffsets))`，`saveOffsets()` 返回 `Set<BlockPos>`） |

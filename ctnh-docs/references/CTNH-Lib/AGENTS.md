@@ -1,7 +1,7 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（75 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **86 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
+CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（78 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **89 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Lib/src/main/java/`（括号内为该域 Java 文件数）
@@ -10,15 +10,16 @@ CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（75 
 com/ctnhlang/ (11)
 ├── CN, EN, Lang, LangFactory, Key, Prefix, Suffix, Domain, Category, IgnoreLang
 └── langprovider/LangKeyBuilder
-tech/vixhentx/mcmod/ctnhlib/ (75)
+tech/vixhentx/mcmod/ctnhlib/ (78)
 ├── CTNHLib.java
 ├── api/         (3)  CTNHValues, CrossParallelRecipeLogic, ICrossParallelRecipeLogicMachine
-├── client/      (33) ClientProxy；ponder/{ButtonRow, CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, FrameGuard, PonderUiButtons}；
+├── client/      (36) ClientProxy；ponder/{ButtonRow, CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, FrameGuard, PonderUiButtons}；
 │                     ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange,
 │                                      AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}；
 │                     ponder/ui/{MachineUI, MachineUiStart, MachineUiAnchor, MachineUiPlacement, MachineUiElement, MachineUiOverlay, MachineUiPanel,
 │                                MachineUiPanelBuilder, MachineUiInteraction, MachineUiWrites, RecipeFiller,
-│                                ConfiguratorTabs, CircuitSlots, ShowMachineUiInstruction, StackWrite}；
+│                                ConfiguratorTabs, CircuitSlots, ShowMachineUiInstruction, StackWrite,
+│                                ShowToolGridInstruction, ToolGridElement, ToolGridPlacement}；
 │                     render/ColorData；render/highlight/{HighlightHandler, HighlightRender}
 ├── command/     (3)  CTNHCommands, CTNHCommandChatHelper, CTNHCommandInspector
 ├── common/      (2)  CommonProxy, MultiblockHelper
@@ -45,7 +46,7 @@ src/main/resources/ctnhlib.mixins.json
 | 双语 lang 管线 | `com/ctnhlang/*`, `langprovider/{Lang, LangProcessor}`, `registrate/lang/RegistrateCNLangProvider`, `registrate/data/ProviderTypes` |
 | 网络与方块高亮 | `registrate/CTNHLibNetworking`, `network/packets/BlockHighlightPacket`, `client/render/highlight/*` |
 | 共享命令 | `command/CTNHCommands`, `command/CTNHCommandInspector`, `command/CTNHCommandChatHelper` |
-| 客户端 Ponder 框架 / 机器 UI 栈 | `client/ponder/{CTNHPonderSceneBuilder, CTNHPonderLang, CTNHPonderTagHelper, PonderUiButtons, ButtonRow, FrameGuard}`；`client/ponder/ui/*`（`MachineUI` 门面 + `MachineUiPlacement` 链式 API）；`client/ponder/machine/*` |
+| 客户端 Ponder 框架 / 机器 UI 栈 / 九宫格工具覆盖层 | `client/ponder/{CTNHPonderSceneBuilder, CTNHPonderLang, CTNHPonderTagHelper, PonderUiButtons, ButtonRow, FrameGuard}`；`client/ponder/ui/*`（`MachineUI` 门面 + `MachineUiPlacement` 链式 API + `ToolGridPlacement` 九宫格覆盖层）；`client/ponder/machine/*` |
 | 通用工具 | `utils/*` |
 | Mixin 配置 | `src/main/resources/ctnhlib.mixins.json` |
 
@@ -53,7 +54,7 @@ src/main/resources/ctnhlib.mixins.json
 | Source area | Guide | Read before |
 |-------------|-------|-------------|
 | `api/**` | `ctnh-docs/references/CTNH-Lib/api/AGENTS.md` | 新增共享常量或跨并行配方逻辑 |
-| `client/**` | `ctnh-docs/references/CTNH-Lib/client/AGENTS.md` | 改高亮渲染 / Ponder 场景基类 / tag 助手 / 机器 UI 栈 |
+| `client/**` | `ctnh-docs/references/CTNH-Lib/client/AGENTS.md` | 改高亮渲染 / Ponder 场景基类 / tag 助手 / 机器 UI 栈 / 九宫格工具覆盖层 |
 | `command/**` | `ctnh-docs/references/CTNH-Lib/command/AGENTS.md` | 改 `/ctnh` 检查命令或 `showores` 开发工具 |
 | `common/**` | `ctnh-docs/references/CTNH-Lib/common/AGENTS.md` | 改 Lib 引导、数据包注册或辅助物品 |
 | `data/**` | `ctnh-docs/references/CTNH-Lib/data/AGENTS.md` | 改动态包 / 过滤 / 配方移除 |
@@ -72,6 +73,7 @@ src/main/resources/ctnhlib.mixins.json
 - **`ProviderTypes.CNLANG` 的注册 id 必须是 `ctnhlib_cnlang`**（裸 `cnlang` 会被第三方 mod `ae2pw` 的同名拷贝顶掉，静默产出空 `zh_cn.json`）。
 - **新增 mixin 必须登记** `src/main/resources/ctnhlib.mixins.json` 的 `mixins`（或 `client`）数组。
 - **Ponder 机器 UI 栈集中在 `client/ponder`**：门面 `MachineUI`（`of(MachineDefinition)` / `of(Block)`）经 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`，链式 API 完成摆放（`at` / `machinePos` / `scale` / `pointing`）、物品与流体写入（`slot(index).withItem(...)` / `tank(index).withFluid(...)`）、配方回放（`recipe(recipeId)`）、红框（`outline*`）与 `show(ticks)`；面板构建、写入时间线、点击转发、配方填充分别由 `MachineUiPanelBuilder`、`MachineUiWrites`、`MachineUiInteraction`、`RecipeFiller` 承担，`ponder/machine/*` 的 `MachineEdits` / `MachineEdit` 负责盖板、自动输出与工作模型的施加与还原。使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。
+- **九宫格工具覆盖层**：`CTNHPonderSceneBuilder.showToolGrid(BlockPos, Direction)` 返回 `ToolGridPlacement`，在指定面画出 GT 手持工具时的 3x3 覆盖层（`ToolGridElement` 负责网格、格子动作图标与红框渲染，`ShowToolGridInstruction` 负责淡入淡出显隐）。默认工具为 `GTToolType.WRENCH`；格子内容由方块实现的 `IToolGridHighlight.sideTips(...)` 提供，`shouldRenderGrid(...)` 为 false 的工具（软锤 / 硬锤这类整面只有一个动作）只在面中央画一个图标，此时 `outline(...)` 不生效。`tool(GTToolType)` 换工具、`toolItem(ItemStack)` 换工具图标物品、`toolIcon(Pointing)` / `toolIconLift(double)` / `hideTool()` 调整外侧工具图标，`hideTips()` 去掉格子动作图标，`outline(cell[, delayTicks])` 给行优先编号的格子套红框（0 左上、4 中心、8 右下），`show(ticks)` 落地。
 - **思索「查看 UI 详情」按钮**：`client/ponder/PonderUiButtons` 把按钮挂进 `PonderUI` 自己的控件表，点击与开关状态经 `mixin/PonderUIMixin` 转给 `MachineUiInteraction`；按钮文案 lang key 为 `ctnhlib.ponder.ui.ui_details`，思索编辑模式下的槽位 / 储罐 / 机器页按钮序号提示用 `ctnhlib.tooltip.slot_index` / `ctnhlib.tooltip.tank_index` / `ctnhlib.tooltip.button_index`。
 - **Lib 不做游戏内容**：模块专属命令、包、构建器、Ponder 场景、Jade provider 一律放所属模块。
 
