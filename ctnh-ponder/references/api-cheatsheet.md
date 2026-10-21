@@ -313,6 +313,37 @@ delay 都可省略；机器不支持时每条报一行 error 并跳过，场景�
 编程电路是 `ProgrammableCircuitSlotTrait`、自动输出在 `AutoOutputTrait`、`RecipeHelper` 多一个 `simulate` 参数。
 详见 [../SKILL.md](../SKILL.md) 工作流 E。
 
+## 九宫格工具覆盖层（`CTNHPonderSceneBuilder.showToolGrid`）
+
+手持 GT 工具对准方块时面上浮出的 3x3 格子。几何与图标都取自方块自己的 `IToolGridHighlight`，
+场景只负责「在哪个面、框哪一格、演多久」。
+
+```java
+scene.showToolGrid(machinePos, Direction.NORTH)
+        .outline(4)                    // 中心格 = 正在看的这一面
+        .show(140);
+```
+
+| 调用 | 说明 |
+|------|------|
+| `showToolGrid(BlockPos, Direction)` | 返回 `ToolGridPlacement`；面写观众实际看到的那一面（默认镜头只见 NORTH/WEST/UP） |
+| `.tool(GTToolType)` | 问方块要哪个工具的图标（`WRENCH` 转向 / `SOFT_MALLET` 启停 / `HARD_HAMMER` 静音），默认 `WRENCH` |
+| `.toolItem(ItemStack)` | 工具图标改用指定物品（电动工具没有普通物品形态时） |
+| `.toolIcon(Pointing)` / `.toolIconLift(blocks)` | 图标落在指向点哪一侧 / 再抬几格；默认 `0.5`，`Direction.UP` 面为 `1.0` |
+| `.hideTool()` / `.hideTips()` | 不画工具图标 / 不画格子里的动作图标 |
+| `.outline(cell[, delayTicks])` | 第 `cell` 格套红框（可多格），都是场景元素，淡出时一起收 |
+| `.show(ticks)` | 持续多久；**非阻塞**，与 `showText` / `idle` 并行 |
+
+格子编号**行优先、从面外侧看**：`0` 左上、`1` 上、`2` 右上、`3` 左、`4` 中心、`5` 右、`6` 左下、`7` 下、`8` 右下。
+越界自动 clamp 到 `0..8`。编号对应的方向是 GT 的 `RelativeDirection`：四角 `BACK`、四边 `UP/LEFT/RIGHT/DOWN`、中心 `FRONT`。
+
+两条与"画出来是什么样"有关的前提：
+
+- 铺不铺格子由方块决定（`shouldRenderGrid`）。扳手铺格子；软锤、硬锤这类「整面一个动作」的工具只在面中央放一个图标，
+  这时 `.outline(...)` 无处可框，日志给一行 warn 后忽略。
+- 图标由 `sideTips` 按面逐个给，机器上的覆盖板与自动输出口会照实反映；给不出图标的格子留空。
+  九宫格正对的那一格是实色，其余压暗——与实机一致。
+
 ## 调试命令（Ponder 自带）
 
 `/ponder`（打开 tags）、`/ponder index`、`/ponder tags`、`/ponder <scene id>`、

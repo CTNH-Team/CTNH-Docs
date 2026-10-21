@@ -7,7 +7,8 @@ description: >-
   assets/模块 id/ponder/场景路径.nbt storyboard 资源，以及双语 lang 的 datagen 规则。
   新增或修改思索场景、调整 PonderTag、给模块补齐 Ponder 适配层、按上游 Create/GTCEu 补场景、
   或排查场景不显示 / 文案显示成 lang key 时使用。Triggers: Ponder, 思索, pondering, storyboard,
-  CTNHPonderSceneBuilder, PonderTag, addStoryBoard, ponder nbt, 场景不显示
+  CTNHPonderSceneBuilder, PonderTag, addStoryBoard, ponder nbt, 场景不显示, MachineUI,
+  showToolGrid, 九宫格, ToolGrid
 ---
 
 # CTNH Ponder
@@ -19,6 +20,7 @@ CTNH 的思索（Ponder）不是 Create 原生写法的直接复制：**共享�
 
 - 给某台机器/方块新增一个思索场景。
 - 要把**机器自己在游戏里的那套界面**画进思索、并按真实槽位序号写入（`MachineUI`，见工作流 E）。
+- 要演「手持工具对准方块这一面」的九宫格覆盖层（`showToolGrid`，见工作流 E〈九宫格工具覆盖层〉）。
 - 修改或扩展已有场景（文案、步骤、镜头、结构展示）。
 - 新增或调整 PonderTag，或把组件挂到 tag 上。
 - 给一个还没有 Ponder 的模块补齐适配层。
@@ -77,7 +79,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 
 | 层 | 位置 | 职责 |
 |----|------|------|
-| 共享栈 | CTNH-Lib `client/ponder/` | `CTNHPonderSceneBuilder`（双语标题/正文、底板与缩放、`rotateAround`）、`CTNHPonderLang`（lang 抽取）、`CTNHPonderTagHelper`（tag lang）；**机器 UI 层**在 `ui/`（`MachineUI`、`MachineUiPlacement`、`MachineUiElement`、`MachineUiOverlay`、`MachineUiPanel`、`MachineUiPanelBuilder`、`MachineUiWrites`、`RecipeFiller`、`ConfiguratorTabs`、`MachineUiInteraction`、`CircuitSlots`）与 `machine/`（`MachineEdit` 指令体系与 `MachineEdits`）；思索界面按钮在 `PonderUiButtons` + `mixin/PonderUIMixin` |
+| 共享栈 | CTNH-Lib `client/ponder/` | `CTNHPonderSceneBuilder`（双语标题/正文、底板与缩放、`rotateAround`）、`CTNHPonderLang`（lang 抽取）、`CTNHPonderTagHelper`（tag lang）；**机器 UI 层**在 `ui/`（`MachineUI`、`MachineUiPlacement`、`MachineUiElement`、`MachineUiOverlay`、`MachineUiPanel`、`MachineUiPanelBuilder`、`MachineUiWrites`、`RecipeFiller`、`ConfiguratorTabs`、`MachineUiInteraction`、`CircuitSlots`、`ToolGridPlacement`、`ToolGridElement`、`ShowToolGridInstruction`）与 `machine/`（`MachineEdit` 指令体系与 `MachineEdits`）；思索界面按钮在 `PonderUiButtons` + `mixin/PonderUIMixin` |
 | 模块适配层 | `<Module>/client/ponder/` | 每模块一个 `*PonderPlugin` / `*PonderScenes` / `*PonderTags` / `*PonderSceneBuilder` + 场景类 |
 | 资源与文案 | `src/main/resources/assets/<modid>/ponder/**/*.nbt`、`src/generated/resources/assets/<modid>/lang/{en_us,zh_cn}.json` | storyboard 结构；lang 由 datagen 生成，禁止手改 |
 
@@ -85,7 +87,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 
 | 模块 | 包 | 场景分组 |
 |------|----|----------|
-| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/`、`Misc/`（不属于前两类的通用内容，如桶）、`example/`（机器 UI 示例：`ChemicalReactorUi`，八段覆盖画界面/写入/配方/机器状态/整套 UI 红框） |
+| CTNH-Core | `io.github.cpearl0.ctnhcore.client.ponder` | `Electric/`、`Kinetic/`、`Misc/`（不属于前两类的通用内容，如桶）、`example/`（机器 UI 示例：`ChemicalReactorUi`，十段覆盖画界面/写入/配方/机器状态/整套 UI 红框/九宫格工具覆盖层） |
 | CTNH-Energy | `tech.luckyblock.mcmod.ctnhenergy.client.ponder` | `ae2/` |
 | CTNH-Mana | `com.magicbee.ctnhmana.client.ponder` | `mana/`（含 `PonderParticleUtil`） |
 | CTPP | `com.mo_guang.ctpp.client.ponder` | `electric/`、`kinetic/` |
@@ -125,6 +127,7 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 8. **机器 UI 场景只用 Lib 的封装。** 画面板、写入、配方、红框、机器状态指令一律走 `MachineUI` + 构建器的 `scene.showUI(...)` + `MachineEdits`；
    不要在场景里自己搭控件树、自己摆「查看 UI 详情」按钮，也不要绕过 `MachineUiElement` 直接画。
    这条同时保证每段结束的还原（物品/流体/开关）与冻结后的点击转发仍然有效。
+   演「手持工具对准这一面」的九宫格覆盖层用构建器的 `scene.showToolGrid(pos, face)`，同样不要自己画。
 
 ## 经验证的场景设计经验（跨机器通用）
 
@@ -285,6 +288,10 @@ sceneId 的取名习惯、要讲的步骤，这些本来就不在代码里，搜
 | 点编程电路的格子没反应 | `ClickData` 的 `isRemote` 恒为 true，格子回调只在非远程时改本地槽位 | `MachineUiInteraction` 用反射造 `isRemote=false` 的 `ClickData` 直接调按钮回调，不要在场景里自己转发 |
 | 「查看 UI 详情」按钮位置不对、或多出一个 | 锚点每帧重算、只有贴好那一刻才可见；重挂后旧对象要收起 | 交给 Lib 的 `PonderUiButtons`，场景里不要自己摆按钮 |
 | 关掉详情后机器开关没还原 | 开关备份取的是**上一帧**登记的面板 | 面板必须每段都经 `MachineUiElement` 渲染登记；没有登记就无从还原 |
+| 九宫格覆盖层**完全不出现** | 这一段没写 `scene.showToolGrid(...)`；`show(ticks)` 太短；或面选错了 | 覆盖层是**逐段**登记的，每段自己写；面写观众实际看到的那一面（默认镜头只见 NORTH/WEST/UP），其余面先 `rotateCameraY(180)` |
+| 格子出来了但**格子里没有图标** | 方块没实现 `IToolGridHighlight#sideTips`，或这个工具在该面上本来就没有动作 | 这是方块给的，不是场景给的；空格子是合法结果。想确认有没有图标就换 `.tool(GTToolType.SOFT_MALLET)` 看面中央那个 |
+| `.outline(cell)` **没有红框** | 这个工具不铺格子（软锤 / 硬锤这类「整面一个动作」的工具） | 日志里有 `does not open the 3x3 grid` 那行 warn；换 `.tool(GTToolType.WRENCH)`，格子才是旋转控制 |
+| 工具图标**挡住格子** / 飘得太高 | 图标默认按面方向抬 1.0 格（朝上的面）或 0.5 格，落点与镜头角度有关 | `.toolIconLift(blocks)` 调高度（`0` 贴面中心），或 `.toolIcon(Pointing.UP)` 换到另一侧；只要格子就 `.hideTool()` |
 | 改了 Lib 的 UI 类，游戏里没变化 | 客户端还在跑旧类 | `:modules:CTNH-Lib:compileJava` 后**完整重启**客户端（退出重进思索界面不够） |
 | `runData` 报 `fml.toml` 的 `Not enough data available` | 模块 `run/config/fml.toml` 被截断或填成零字节，属于可再生的运行目录文件 | 删除对应模块的 `run/config` 后重新运行 `runData`，不要为此修改源码或生成的语言文件 |
 
@@ -390,12 +397,52 @@ scene.showUI(FULL_UI).at(machinePos)
 | `machine instanceof IHasCircuitSlot` | 编程电路是 `ProgrammableCircuitSlotTrait` 这个 trait | `CircuitSlots` 反射取 trait 里的 `storage`，拿不到就报一行 error 并跳过电路 UI |
 | `IAutoOutputItem` / `IAutoOutputFluid` | 物品与流体都在 `AutoOutputTrait` 里 | 用 `machine.getTrait(AutoOutputTrait.class)` 加 `hasAutoOutputItem()` / `hasAutoOutputFluid()` 守卫 |
 
+### 九宫格工具覆盖层（ToolGrid）
+
+手持 GT 工具对准方块时，那一面会浮出 3x3 格子，格子里是「点这里会做什么」的图标。演这套交互用构建器的
+`scene.showToolGrid(pos, face)`，它返回一个摆放对象，链式写法与 `showUI` 一致：
+
+```java
+scene.showToolGrid(machinePos, Direction.NORTH)
+        .outline(4)                       // 框住中心格：正在看的这一面
+        .show(140);
+
+scene.showToolGrid(machinePos, Direction.NORTH)
+        .tool(GTToolType.SOFT_MALLET)     // 换成软锤：不铺格子，整面只有一个启停图标
+        .show(140);
+```
+
+| 调用 | 说明 |
+|------|------|
+| `showToolGrid(BlockPos, Direction)` | 在 `pos` 的这个面上铺覆盖层；面就是观众看到的那一面，不存在"机器正面"的隐含推断 |
+| `.tool(GTToolType)` | 问方块要哪个工具的图标：扳手转向、软锤启停、硬锤静音，默认 `WRENCH`。工具图标也随之换成这一把 |
+| `.outline(cell[, delayTicks])` | 给第 `cell` 格套红框，可套多格；`delayTicks` 之后才亮 |
+| `.toolItem(ItemStack)` | 工具图标改用指定物品（电动工具没有对应的普通物品时用这个） |
+| `.toolIcon(Pointing)` / `.toolIconLift(blocks)` | 图标落在哪一侧 / 再抬多高。默认抬 1.0 格（朝上的面）、0.5 格（其余面），挡住格子就往上调 |
+| `.hideTool()` / `.hideTips()` | 不画工具图标 / 不画格子里的动作图标 |
+| `.show(ticks)` | 这一段持续多久，同为**非阻塞**指令 |
+
+**格子编号**按行优先、从面外侧看：`0` 左上、`1` 上、`2` 右上、`3` 左、`4` 中心、`5` 右、`6` 左下、`7` 下、`8` 右下。
+四角对应「背面」（点下去把背面转过来），四边是相邻面，正中是这一面——这就是实机那套旋转控制的布局，
+不要按自己的直觉重排。
+
+**铺不铺格子由方块说了算**（`IToolGridHighlight#shouldRenderGrid`）：扳手铺格子，软锤 / 硬锤这类
+「整面只有一个动作」的工具只在面中央放一个图标。这种情况下 `.outline(...)` 无处可框，日志会给一行 warn，
+红框被忽略——要框格子就换扳手。
+
+**图标是方块自己给的**（`IToolGridHighlight#sideTips`）：机器上的覆盖板、自动输出口都会照实反映，
+给不出图标的格子留空。因此这段覆盖层讲的是「这台机器现在长什么样」，机器状态改动要排在它前面。
+
+**工具图标**默认取该工具类型的普通材质物品（`ToolItemHelper.getToolItem`），取不到就只留格子并在日志里给一行 warn；
+它浮在面外、箭头指向这一面，标出观众要拿的是哪把工具。
+
 ### 验证纪律
 
 - 改 Lib 的 UI 类之后跑 `:modules:CTNH-Lib:compileJava`，然后**完整重启客户端**：类被换掉了，重启思索界面不够。
 - 场景里的配方 id 必须在本包里真实存在（用 JEI 复制）；填不上时日志会写 `there is no GT recipe with this id`，
   先确认 id 再怀疑代码。
 - 面板每段结束都会把写进去的物品/流体还原，所以**不要**靠上一段的残留来做下一段，每段都要自己写。
+
 ## 上游 Ponder 改动边界
 
 需要给上游对象（Create 方块、GTCEu 多方块）加场景时，**默认只读**：在模块的 `*PonderScenes` 里

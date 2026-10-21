@@ -5,6 +5,7 @@
 package <模块包>.client.ponder.<分组>;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 
@@ -76,6 +77,20 @@ public class <场景类> {
                 .show(160);
         scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
         scene.idle(180);
+
+        // 6. 九宫格工具覆盖层：持扳手对准这一面时浮出的 3x3 格子，框住中心格（正在看的这一面）
+        scene.showToolGrid(machinePos, Direction.NORTH)
+                .outline(4)
+                .show(140);
+        scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(160);
+
+        // 7. 换成软锤：不铺格子，整面只有一个启停图标（这时 outline(...) 无处可框）
+        scene.showToolGrid(machinePos, Direction.NORTH)
+                .tool(GTToolType.SOFT_MALLET)
+                .show(140);
+        scene.showText(80, "<EN>", "<CN>").attachKeyFrame();
+        scene.idle(160);
 
         scene.markAsFinished();
     }
