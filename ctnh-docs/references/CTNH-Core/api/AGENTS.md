@@ -36,6 +36,7 @@ api/
 - GT/GMT 配方属运行时动态数据包（`*GTAddon.addRecipes()` → `GTDynamicPackContents` / CTNH-Lib `CTNHDynamicDataPack`），`runData` 对其不产出 JSON。详见模块主文档 CONVENTIONS。
 - 引用物品/方块/流体**必须**使用静态注册对象（`GTMaterials.Iron`, `CTNHBlocks.*`, `TagPrefix.ingot`, `AEItems.X` 等），**禁止** `ResourceLocation` 字符串解析 + `ForgeRegistries` 查找，除非该对象不存在。
 - 线圈处理：线圈经 GTCEu `CoilMachineTrait` 查询（`getTraitOrThrow(CoilMachineTrait.class)`，示例：`BlazeBlastFurnaceMachine`, `FermentingTankMachine`）；本模块无 `ICoilMachine`。
+- `DigitalMinerLogic` 的 `speed` 是 `serverTick` 的取模除数，必须 ≥ 1：构造器做 `Math.max(1, speed)` 兜底，`DigitalMiner.createWorkLogic()` 传入的 `(int) (40 / Math.pow(2, tier))` 同样夹到 `Math.max(1, ...)`，tier ≥ 6 时不会取整为 0。
 
 ## JADE PROVIDERS
 `api/jade/` 的 `MultithreadRecipeLogicProvider`、`MultithreadRecipeOutputProvider`、`ThreadStatusProvider` 是 GTCEu `RecipeLogicProvider` / `RecipeOutputProvider` 的多线程变体，整体被注释；`registry/jade/CTNHJadePlugin` 的 `init()` 方法体同样整体注释，没有任何注册调用生效。
