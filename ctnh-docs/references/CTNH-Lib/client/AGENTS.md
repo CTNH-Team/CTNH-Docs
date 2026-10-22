@@ -1,7 +1,7 @@
 # CTNH-LIB CLIENT DOMAIN
 
 ## OVERVIEW
-客户端共享基础设施（36 个 Java 文件）：`ClientProxy` 引导、方块高亮渲染、共享 Ponder 框架（场景基类 / lang 抽取 / tag 助手 / 机器 UI 栈 / 九宫格工具覆盖层 / 思索内「查看 UI 详情」按钮）。
+客户端共享基础设施（37 个 Java 文件）：`ClientProxy` 引导、方块高亮渲染、共享 Ponder 框架（场景基类 / lang 抽取 / tag 助手 / 机器 UI 栈 / 九宫格工具覆盖层 / 思索内「查看 UI 详情」按钮）。
 
 ## STRUCTURE
 ```text
@@ -10,7 +10,8 @@ client/
 ├── ponder/                    # ButtonRow, CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper,
 │   │                          # FrameGuard, PonderUiButtons
 │   ├── machine/               # MachineEdit, MachineEditInstruction, MachineEdits, CoverChange,
-│   │                          # AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange
+│   │                          # AutoOutputChange, WorkingModelChange, FrontFacingChange, ParallelChange,
+│   │                          # MaintenanceChange
 │   └── ui/                    # MachineUI, MachineUiPlacement, MachineUiStart, MachineUiAnchor, MachineUiElement,
 │                              # MachineUiOverlay, MachineUiPanel, MachineUiPanelBuilder, MachineUiInteraction,
 │                              # MachineUiWrites, RecipeFiller, ConfiguratorTabs, CircuitSlots,
@@ -30,8 +31,8 @@ client/
 | Ponder tag 助手 | `client/ponder/CTNHPonderTagHelper.java` |
 | 机器 UI 门面与摆放 API | `client/ponder/ui/MachineUI.java`（`of(...)` / `showFullUI()` / `scale()` / `fitToPanel()` / `showCircuit()` / `forceMultiblockActivated()` / `in(SceneBuilder)`）、`MachineUiPlacement.java`（`at` / `machinePos` / `scale` / `pointing` / `slot` / `tank` / `recipe` / `outline*` / `show`） |
 | 机器 UI 面板 / 写入 / 点击 / 配方填充 | `client/ponder/ui/MachineUiPanelBuilder.java`, `MachineUiWrites.java`, `MachineUiInteraction.java`, `RecipeFiller.java`, `MachineUiElement.java`, `MachineUiOverlay.java`, `ConfiguratorTabs.java`, `CircuitSlots.java`, `ShowMachineUiInstruction.java`, `StackWrite.java` |
-| 九宫格工具覆盖层 | `client/ponder/ui/ToolGridPlacement.java`（`tool` / `toolItem` / `toolIcon` / `toolIconLift` / `hideTool` / `hideTips` / `outline` / `show`）、`ToolGridElement.java`（3x3 网格、格子动作图标、红框渲染）、`ShowToolGridInstruction.java`（淡入淡出显隐） |
-| 机器编辑指令 | `client/ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange, AutoOutputChange, WorkingModelChange, ParallelChange, MaintenanceChange}.java` |
+| 九宫格工具覆盖层 | `client/ponder/ui/ToolGridPlacement.java`（`tool` / `toolItem` / `toolIcon` / `toolIconLift` / `sneakClick` / `hideTool` / `hideTips` / `highlight(int[, delayTicks])` / `show`）、`ToolGridElement.java`（3x3 网格、格子动作图标、点名格高亮）、`ShowToolGridInstruction.java`（淡入淡出显隐） |
+| 机器编辑指令 | `client/ponder/machine/{MachineEdit, MachineEditInstruction, MachineEdits, CoverChange, AutoOutputChange, WorkingModelChange, FrontFacingChange, ParallelChange, MaintenanceChange}.java` |
 | 思索「查看 UI 详情」按钮 | `client/ponder/PonderUiButtons.java`（`attach` / `beforeRender` / `afterRender` / `clickPanel` / `tick`，挂到 `PonderUI` 控件表）、`ButtonRow.java`（底部按钮锚点判定）、`FrameGuard.java`（一帧只处理一次的标记） |
 | 颜色数据 | `client/render/ColorData.java` |
 
@@ -44,9 +45,10 @@ client/
 - `CTNHPonderTagHelper.registerTag(...)` 用 `CNRegistrate.genLang` 写 tag 名与描述，key 为 `<namespace>.ponder.tag.<path>` 与 `<...>.description`。
 - 机器 UI 入口 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`；`MachineUI.of(MachineDefinition)` / `of(Block)` 建门面，`showFullUI()` / `hideTitleBar()` / `hideSideTabs()` / `showPlayerInventory()` / `showConfigurators()` / `showCircuit()` / `showNavigationButtons()` 调界面形态，`forceMultiblockActivated()` 让控制器在思索里按成型显示（只调 `onStructureFormed()`，不跑结构校验），`scale(float)` / `fitToPanel(float)` 定尺寸。
 - 三段式摆放 API（编译期强制给机器位置）：`MachineUiStart`（`showUI` 的返回值，只有 `at(BlockPos)` 一步到位 / `at(Vec3)` 只定箭头 / `scale` / `pointing`）→ `at(Vec3)` 得到 `MachineUiAnchor`（只有 `machinePos(BlockPos)` / `scale` / `pointing`）→ 拿到 `MachineUiPlacement` 后才能链 `slot` / `tank` / `recipe` / `outline*` / `show(ticks)`；写入 `slot(int).withItem(ItemStack[, delayTicks])`、`tank(int).withFluid(FluidStack[, delayTicks])`；配方 `recipe(String[, delayTicks])`；红框具名方法 `outlineSlot` / `outlineTank` / `outlineProgress` / `outlineCircuit` / `outlinePowerToggle` / `outlineAutoOutput` / `outlineCircuitButton` / `outlineDistinct` / `outlineButton(index)`，或通用入口 `outline(Part, index[, delayTicks])`（`Part` 是红框控件的公开扩展点）；最后 `show(int ticks)` 落地。
-- 九宫格工具覆盖层入口 `CTNHPonderSceneBuilder.showToolGrid(BlockPos, Direction)` 返回 `ToolGridPlacement`，在指定面上画 GT 手持工具时的 3x3 覆盖层：`ToolGridElement` 每帧向方块问一次内容（`IToolGridHighlight.shouldRenderGrid(...)` 决定铺不铺格子、`sideTips(...)` 提供各面图标），`ShowToolGridInstruction` 控制淡入淡出。默认工具 `GTToolType.WRENCH`；不铺格子的工具（软锤 / 硬锤这类整面只有一个动作）只在面中央画一个图标且 `outline(...)` 不生效。链式 API：`tool(GTToolType)` 换工具、`toolItem(ItemStack)` 换外侧图标物品、`toolIcon(Pointing)` / `toolIconLift(double)` / `hideTool()` 调整外侧工具图标，`hideTips()` 去掉格子动作图标，`outline(cell[, delayTicks])` 给行优先编号的格子套红框（0 左上、4 中心、8 右下），`show(ticks)` 落地。
+- 九宫格工具覆盖层入口 `CTNHPonderSceneBuilder.showToolGrid(BlockPos, Direction)` 返回 `ToolGridPlacement`，在指定面上画 GT 手持工具时的 3x3 覆盖层：`ToolGridElement` 每帧向方块问一次内容（`IToolGridHighlight.shouldRenderGrid(...)` 决定铺不铺格子、`sideTips(...)` 提供各面图标），`ShowToolGridInstruction` 控制淡入淡出。默认工具 `GTToolType.WRENCH`；不铺格子的工具（软锤 / 硬锤这类整面只有一个动作）只在面中央画一个图标且 `highlight(...)` 不生效（只报一行 warn）。链式 API：`tool(GTToolType)` 换工具、`toolItem(ItemStack)` 换外侧图标物品、`toolIcon(Pointing)` / `toolIconLift(double)` / `hideTool()` 调整外侧工具图标、`sneakClick()` 在按键提示前加「蹲下 +」、`hideTips()` 去掉格子动作图标；`highlight(cell[, delayTicks])` 按行优先编号点名格子（0 左上、4 中心、8 右下），被点名格按各自 `delayTicks` 画满、其余压到 `ICON_ALPHA_DIM`（`0x44`），一格都不点名时亮正对这一面的中心格，`show(ticks)` 落地。
 - `MachineUiInteraction` 维护当前帧的面板视图（`publish` / `beginFrame` / `hasPanel` / `hasFullPanel`）、转发面板点击（`click`，只放行页签与配置器页签）、给冻住的场景继续 `tickPanels`；`enabled()` / `setEnabled(boolean)` 表示「查看 UI 详情」开关状态，开启时记下电源 / 自动输出 / 电路的开关值、关闭时还原并收起配置器；`PonderUIMixin` 在 `tick` / `getPartialTicks` 里读它来冻结场景。
-- `MachineEdits` 提供按机器坐标施加与还原的指令（`add` / `placeCover` / `setWorkingModel` / `setItemOutput` / `setFluidOutput` / `setAutoOutput` / `setParallel` / `fixMaintenance` / `fixMaintenanceWithoutTape`），`MachineEdit` 的 `apply` / `revert` 由 `CoverChange`、`AutoOutputChange`、`WorkingModelChange`、`ParallelChange`、`MaintenanceChange` 实现；`redraw(PonderScene)` 强制场景方块重画，`requestRebuild()` / `rebuildGeneration()` 用递增代际让每块面板各自重建一次。
+- `MachineEdits` 提供按机器坐标施加与还原的指令（`add` / `placeCover` / `setWorkingModel` / `setItemOutput` / `setFluidOutput` / `setAutoOutput` / `setFrontFacing` / `setParallel` / `fixMaintenance` / `fixMaintenanceWithoutTape`），`MachineEdit` 的 `apply` / `revert` 由 `CoverChange`、`AutoOutputChange`、`WorkingModelChange`、`FrontFacingChange`、`ParallelChange`、`MaintenanceChange` 实现；`redraw(PonderScene)` 强制场景方块重画，`requestRebuild()` / `rebuildGeneration()` 用递增代际让每块面板各自重建一次。
+- `setFrontFacing(scene, machinePos, facing[, delayTicks])` 是蹲下右键转正面那一下：`FrontFacingChange` 走 `MetaMachine.setFrontFacing`（自动输出面 / 覆盖板 / 旋转状态会拦），随后从世界回读方块状态经 `machine.holder.getSelf().setBlockState(...)` 同步，因为 Ponder 世界不会把新状态写回方块实体；被拦下时只记一行 error、不改状态，回退时转回原来的正面。没有正面（`hasFrontFacing()` 为 false）或该坐标没有机器同样只记 error，场景继续播。
 - `MachineUiWrites` 是一次摆放的写入时间线：数量在 `FILL_TICKS`（20 tick）内从 0 叠到目标值，摆放自带的写入排在配方追加的写入之前，面板收起或场景回退时按写入前的内容还原；空流体的取空规则集中在 `StackWrite.normalized(...)`。
 - `RecipeFiller` 按配方 id 找配方（`byId` 是唯一取配方链条，内部 `runtime(Recipe)` 同时接受 `GTRecipeDefinition` 与 `GTRecipe`；`needsCircuit` 预判配方是否要编程电路），按 GT 的 `IngredientIO` 标签把入料写进输入槽 / 输入储罐，配方里的编程电路经 `CircuitSlots` 摘进机器的电路槽，进度条走完后把成品写进输出槽 / 输出储罐，并在运行与待机之间切机器模型；时间线为入料 1 秒 → 进度条 1 秒 → 成品 1 秒。
 - `PonderUiButtons` 把「查看 UI 详情」按钮挂进 `PonderUI` 自己的控件表，随底部一排淡入淡出、被派发点击；按钮锚点（该排第一个不贴边、在左半边的按钮）由 `ButtonRow.anchor(...)` 判定，「一帧只处理一次」由 `FrameGuard` 保证；点击转 `MachineUiInteraction`，`PonderUIMixin` 在 `init` / `renderWindow` / `mouseClicked` / `tick` / `getPartialTicks` 上接线。
@@ -67,7 +69,7 @@ client/
 
 ## SOURCE OF TRUTH
 - `client/ClientProxy.java`（引导）、`client/ponder/CTNHPonderSceneBuilder.java`（场景契约）、`client/render/highlight/HighlightHandler.java`。
-- `client/ponder/ui/MachineUI.java` / `MachineUiPlacement.java`（机器 UI 门面与摆放契约）、`client/ponder/ui/ToolGridPlacement.java`（九宫格工具覆盖层契约）、`client/ponder/PonderUiButtons.java`（按钮接线）。
+- `client/ponder/ui/MachineUI.java` / `MachineUiPlacement.java`（机器 UI 门面与摆放契约）、`client/ponder/ui/ToolGridPlacement.java`（九宫格工具覆盖层契约）、`client/ponder/machine/MachineEdits.java`（机器改动契约）、`client/ponder/PonderUiButtons.java`（按钮接线）。
 
 ## WORKFLOW
 1. 先确认改动确实跨模块共享，再动 Lib 客户端代码。
