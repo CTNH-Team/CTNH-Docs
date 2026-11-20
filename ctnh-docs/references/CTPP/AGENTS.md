@@ -34,19 +34,20 @@ ctpp/
                               ItemAxisBuilder, MathUtil
 ```
 
-本模块没有 `CTPPValues`（机械等级经 `GTValues.VNF`）与 `integration/emi`（EMI 对接归 CTNH-Core）；转子支架与 `OreProcessingRecipes` 在 CTNH-Core `data/recipe` 侧，本模块不含。
+本模块没有 `CTPPValues`：机械等级与电压名一律经 `GTValues.VNF` / `GTValues.V`。
 
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
 | mod 入口 / GT addon / Registrate | `CTPP.java`, `CTPPGTAddon.java`, `CTPPRegistration.java`, `CTPPRegistrate.java` |
 | 公共 API 面 | `api/`（17），含 `api/terminal/TerminalWireGeometry.java` |
-| 动态 contraption | `dynamicPart/`（10） |
+| 动态 contraption | `dynamicPart/`（10）；机器侧契约 `dynamicPart/rotation/IContraptionMultiblock.java`，实体内核 `dynamicPart/rotation/SimpleRotatingContraptionEntity.java` |
 | 配方实现 | `data/recipe/`（顶层 12，不在 `common/` 下） |
 | 风扇催化处理 | 类型 `data/recipe/fanprocessing/`；配方类 `common/kinetic/fan/{acidwashing,breathing,oiling}/` |
 | 工具箱系统 | `common/toolbox/`（13）、`common/menu/`、`network/packet/` 工具箱包、`client/toolbox/` UI |
 | 可放置发射器 | `common/machine/simple/PlaceableEmitterMachine.java`、`event/PlaceableEmitterEventHandler.java`、`data/recipe/PlaceableEmitterRecipes.java` |
-| 反射镜与光束 | `common/block/MirrorBlock.java`、`common/beam/` |
+| 反射镜与光束 | `common/block/MirrorBlock.java`（`IBeamRedirector`）、`common/beam/{EmitterBeam, IBeamRedirector}.java` |
+| 光束追踪与下发 | 服务端 `common/beam/EmitterBeamTracker.java` + `common/beam/BeamChunkIndex.java`，包 `network/packet/{SetEmitterBeamPacket, DelEmitterBeamPacket, PickEmitterPacket}.java`，客户端 `client/renderer/EmitterBeamRenderer.java` |
 | 接线柱与线缆 | `api/terminal/`、`common/terminal/`、`common/blockentity/VoltageTerminalBlockEntity.java`、`client/renderer/VoltageTerminalRenderer.java`、`syncdata/` |
 | 客户端 Ponder / 渲染 | `client/ponder/`（10）、`client/renderer/`（7） |
 | Mixin | `mixin/`、`src/main/resources/ctpp.mixins.json` |

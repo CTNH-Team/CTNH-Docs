@@ -1,7 +1,7 @@
 # CTNH-CORE MIXIN DOMAIN
 
 ## OVERVIEW
-跨 mod Mixin 补丁（47 个 Java 文件，全部为 `@Mixin` 类）：AECs、Apotheosis、Ars Nouveau、Avaritia、Create、Create Diesel、EIO、EMI、Ecliptic Seasons、FTB Chunks、FTB Essentials、GTCEu、JAVD、Legendary Survival、Minecraft（区块/刷怪/服务器）、TMRV、Vintage Improvements。
+跨 mod Mixin 补丁（50 个 Java 文件，全部为 `@Mixin` 类）：AECs、Apotheosis、Ars Nouveau、Avaritia、Create、Create Diesel、EIO、EMI、Ecliptic Seasons、FTB Chunks、FTB Essentials、GTCEu、JAVD、Legendary Survival、Minecraft（区块/刷怪/服务器）、ModernFix、Ponder UI、TMRV、Vintage Improvements。
 
 ## STRUCTURE
 ```text
@@ -24,6 +24,8 @@ mixin/
 |   `-- orevein/               # ClientProxyAccessor
 |-- javd/                      # PortalBlockMixin
 |-- legendarysurvival/         # AltitudeModifierMixin
+|-- modernfix/                 # SimpleItemModelViewMixin
+|-- ponder/                    # PonderUIPreviousScreenMixin, PonderUISpeederMixin
 |-- tmrv/                      # RecipeManagerMixin
 `-- vintageimprovements/       # LatheMovingBlockMixin
 ```
@@ -40,6 +42,8 @@ mixin/
 | AECs / EIO / EMI | `mixin/aecs/`, `mixin/eio/`, `mixin/emi/`（含 JemiRecipeMixin, JemiStackSerializerMixin） |
 | Apotheosis / Ars / Avaritia | `mixin/apotheosis/`, `mixin/ars_nouveau/`, `mixin/avaritia/` |
 | FTB Chunks / FTB Essentials / JAVD / TMRV | `mixin/ftbchunks/`, `mixin/ftbessentials/`, `mixin/javd/`, `mixin/tmrv/` |
+| ModernFix 动态资源 | `mixin/modernfix/SimpleItemModelViewMixin.java`（`mixin.perf.dynamic_resources` 下 `SimpleItemModelView` 只按 `Direction` 选 quad；对 `IMachineBlock` 重定向 `isCorrectDirectionForType` 返回 `true`，让视图返回包裹模型自身的 quad，恢复 GT 机器物品朝向） |
+| Ponder UI 增强 | `mixin/ponder/PonderUISpeederMixin.java`（Z 复位、X 减速、C 加速的 1..10 倍速档，额外补 tick 场景并在底部渲染 `Nx` 与 `X-`/`C+` 提示）、`mixin/ponder/PonderUIPreviousScreenMixin.java`（B 键经 `ScreenOpener.openPreviousScreen` 返回上一界面） |
 | Datagen mixin | `mixin/dategen/` |
 | 区块重载 | `mixin/ChunkMixin.java`, `mixin/ChunkSerializerMixin.java`, `mixin/TagLoaderMixin.java` |
 | FTB Essentials accessor | `mixin/mc/ServerChunkCacheAccessor.java`（供 `integration/ftbessentials/AsyncRtpManager` 使用） |
@@ -47,11 +51,12 @@ mixin/
 
 ## CONVENTIONS
 - mixin JSON 与包内条目必须同步；两者齐备 Mixin 才会加载。
-- `ctnhcore.mixins.json` 的 `mixins` 段（common）与 `client` 段分开登记；客户端类（`creatediesel.DistillationCategoryMixin`、`emi.JemiRecipeMixin`、`emi.JemiStackSerializerMixin`、`eclipticseasons.*`）只在 `client` 段出现。
+- `ctnhcore.mixins.json` 的 `mixins` 段（common）与 `client` 段分开登记；客户端类（`creatediesel.DistillationCategoryMixin`、`emi.JemiRecipeMixin`、`emi.JemiStackSerializerMixin`、`eclipticseasons.*`、`modernfix.SimpleItemModelViewMixin`、`ponder.*`）只在 `client` 段出现。
 - 改注入签名前先确认目标 mod 版本。
 - `ServerChunkCacheAccessor` 暴露私有的主线程区块 future 方法，供异步 RTP 管理器使用。
 - `creatediesel.DistillationCategoryMixin` 与 `emi.JemiRecipeMixin`/`JemiStackSerializerMixin` 是客户端 mixin：前者居中可变高度蒸馏配方，后者修复 EMI 收藏夹中 JEI 自定义渲染器堆栈的往返。
 - `mixin/tmrv/RecipeManagerMixin` 修复 TooManyRecipeViewers 的 `addRecipe` 忽略配方检查（重定向 `Set.contains`，`@Redirect` + `@Local`），与配方删除无关。
+- 生效范围以 `ctnhcore.mixins.json` 为准：`ChunkSerializerMixin`、`mc/MobMixin`、`mc/MinecraftServerMixin`（方法体整体注释）、`create/ChainConveyorRidingHandlerMixin`、`create/StockKeeperRequestScreenMixin` 存在于包内但未登记，不参与加载。
 
 ## ANTI-PATTERNS
 - 不核对上游目标成员就改注入点。

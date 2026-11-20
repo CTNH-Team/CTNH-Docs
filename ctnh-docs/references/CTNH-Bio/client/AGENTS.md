@@ -30,7 +30,7 @@ client/
 | Ponder 插件 | `client/ponder/CTNHBioPonderPlugin.java`（`registerScenes` → `CTNHBioPonderScenes`；`registerTags` → `CTNHBioPonderTags`） |
 | Ponder 场景注册 | `client/ponder/CTNHBioPonderScenes.java`：`CBMultiblocks.COGNI_ASSEMBLER` 绑定 `cogni_assembler/common`；`CBMultiblocks.GREAT_FLESH` 绑定 `great_flesh/growth` 与 `great_flesh/differentiation`；均挂 `CTNHBioPonderTags.BioMultiblock` |
 | Ponder 场景类 | `client/ponder/CogniAssembler.java`（`common`）、`client/ponder/GreatFlesh.java`（`growth` / `differentiation`） |
-| Ponder 机器界面 | `client/ponder/CogniAssembler.java`、`client/ponder/GreatFlesh.java`（CTNH-Lib `MachineUI`：意识装配机演 I 位数据模型接口、LV 输入总成与 LV 物品输出总线；巨型肉块分化演 MV 输入总成） |
+| Ponder 机器界面 | `client/ponder/CogniAssembler.java`（`NEURAL_MODEL_ACCESSOR_UI` = `MachineUI.of(CBMachines.NEURAL_MODEL_ACCESSOR).scale(0.6f)`，演 `Hostile.Items.DATA_MODEL` 进唯一 I 位槽；`INPUT_HATCH_UI` 演 LV 双输入总成、`ITEM_OUTPUT_BUS_UI` 演 LV 物品输出总线，另演 IV 并行仓）、`client/ponder/GreatFlesh.java`（`INPUT_HATCH_UI` 演 MV 双输入总成，另演 ZPM 能量输入仓） |
 | Ponder tag | `client/ponder/CTNHBioPonderTags.java`（`BioMultiblock` = `ctnhbio:bio_multiblock`，经 `CTNHPonderTagHelper` 注册并加入 `COGNI_ASSEMBLER` / `GREAT_FLESH`） |
 | Ponder 场景适配器 | `client/ponder/CTNHBioPonderSceneBuilder.java`（继承 CTNH-Lib `CTNHPonderSceneBuilder`，构造传入 `CTNHBio.MODID`，datagen 时经 `REGISTRATE.genLang` 产出 lang） |
 
@@ -38,7 +38,8 @@ client/
 - 可染色渲染器族服务于可染色的活体机器内容：实体 / 方块实体 / 物品三种渲染器共用同一套模型与颜色参数。
 - `LivingMetaMachineBERProvider` 是机器与模型的唯一绑定入口，模型按 key 从 `CBModels.MODELS` 取；新增机器模型在 `CBModels` 注册，不要在机器类里直接 new 渲染器。
 - `ClientProxy` 只在客户端分发路径构造（`CTNHBio` 经 `DistExecutor.unsafeRunForDist` 选择 `ClientProxy` / `CommonProxy`），客户端专属类不得进入 common 构造路径。
-- Ponder 场景文案用 `scene.title(..., en, cn)` / `scene.showText(..., en, cn)` 双语直接内联在场景类里；datagen 时由 `CTNHBioPonderSceneBuilder.registerLang` 经 `REGISTRATE.genLang(key, en, cn)` 写入 lang（仅 `GTCEu.isDataGen()` 时）。
+- Ponder 场景文案用 CTNH-Lib 重载 `scene.title(sceneId, 页眉英, 页眉中, 标题英, 标题中)` / `scene.showText(duration, en, cn)` 双语直接内联在场景类里；datagen 时由 `CTNHBioPonderSceneBuilder.registerLang` 经 `REGISTRATE.genLang(key, en, cn)` 写入 lang（仅 `GTCEu.isDataGen()` 时）。
+- 场景网格用 `scene.init5x5(util)` / `scene.init7x7(util)`（CTNH-Lib 另有 `init9x9`），结束处调 `scene.markAsFinished()`；场景 id 与 `CTNHBioPonderScenes` 的 storyboard 路径一致（`cogni_assembler/common`、`great_flesh/growth`、`great_flesh/differentiation`）。
 - Ponder 机器界面经 CTNH-Lib `MachineUI` 摆放：`scene.showUI(ui).at(anchor).machinePos(pos)` 把面板绑定到 `pos` 处的机器方块；`at(Vec3)` 后必须补 `machinePos(pos)`，`MachineUiAnchor` 在编译期强制（缺了无法调 `slot` / `show`）。面板常量以 `MachineUI.of(机器).scale(0.6f)` 的静态字段声明。
 - Ponder 插件注册在 `ClientProxy.onClientSetup(FMLClientSetupEvent)`；思索 lang 抽取在 `common/CommonProxy.gatherData()` 调 CTNH-Lib `CTNHPonderLang.init(new CTNHBioPonderPlugin())`。场景 / tag / 插件均属 Bio 专属，不放 CTNH-Lib。
 
