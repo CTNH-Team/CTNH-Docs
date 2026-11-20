@@ -121,10 +121,8 @@ jobs:
           # _npx 目录名是 npx 自己算的哈希，跨 npx 版本可能变化；_cacache 更稳。
           # 命中时 npx 直接从缓存解压，省掉 ~246 MB 的下载。
           path: ~/.npm/_cacache
+          # 按 DSH 版本匹配，避免新版首次运行时恢复旧版缓存。
           key: dsh-npm-${{ runner.os }}-${{ env.DSH_VERSION }}-v1
-          restore-keys: |
-            dsh-npm-${{ runner.os }}-${{ env.DSH_VERSION }}-
-            dsh-npm-${{ runner.os }}-
 
       - name: Preflight dsh
         if: steps.plan.outputs.has_modules == 'true'
