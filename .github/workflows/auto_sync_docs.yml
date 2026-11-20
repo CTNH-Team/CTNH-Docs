@@ -30,10 +30,11 @@ concurrency:
 env:
   # 任何非空值都会关闭 OTel 上报（基座行按该变量禁用遥测）
   DSH_TELEMETRY_DISABLED: '1'
-  # both = 原生工具 schema + run_code(PTC) 同时可见；ptc = 只暴露 run_code
-  DSH_TOOLS_MODE: ${{ vars.DSH_TOOLS_MODE || 'both' }}
+  # native = 原生工具 schema（默认）；ptc = 只暴露 run_code。
+  # 0.2.x 的两种 executor 互斥，原先的 both 已不可用，见 prompts/headless.ci.patch.yml。
+  DSH_TOOLS_MODE: ${{ vars.DSH_TOOLS_MODE || 'native' }}
   DSH_MODEL: ${{ vars.DSH_MODEL || 'deepseek-flash' }}
-  DSH_VERSION: ${{ vars.DSH_VERSION || '0.1.5-rc.2' }}
+  DSH_VERSION: ${{ vars.DSH_VERSION || '0.2.2-rc.5' }}
   MODULES_ROOT: workspace/modules-src/modules
 
 jobs:

@@ -14,11 +14,20 @@
     provider: deepseek-official
     model: !!js process.env.DSH_MODEL || 'deepseek-flash'
 
-- id: tools
-  config:
-    # both = 原生 schema + run_code（PTC）同时可见；ptc = 只暴露 run_code。
-    mode: !!js process.env.DSH_TOOLS_MODE || 'both'
-    maxParallelSubCalls: 10
+# 工具呈现模式。0.1.x 用 tools.config.mode（both/ptc）+ maxParallelSubCalls 表达；
+# 0.2.x 把这两个字段改成了 z.never()（写进 overlay 会直接
+# "ValidationError: $.mode expected nullable but got both"），改为挂载两个 executor：
+# tool-executor-native（原生工具 schema）与 tool-executor-ptc（只暴露 run_code）。
+# 两者互斥——同一作用域只允许注册一个（"Only one tool executor may be registered
+# in each scope"），因此 0.2.x 没有 both 模式，必须二选一。
+# DSH_TOOLS_MODE=ptc 选 PTC；其余取值保持 headless 默认（原生工具 schema）。
+# 0.1.x 没有这两个 id，--patch 只会打印 'entry ... not found' 并继续，所以同一份
+# overlay 同时兼容两个大版本（代价是老版本拿不到 both，只剩 base 默认呈现）。
+- id: tool-executor-native
+  disabled: !!js process.env.DSH_TOOLS_MODE === 'ptc'
+
+- id: tool-executor-ptc
+  disabled: !!js process.env.DSH_TOOLS_MODE !== 'ptc'
 # 瞬时模型请求失败的重试：dsh 自带 dsh-llm-retry 执行器，但提供方默认策略只对
 # EMPTY_RESPONSE / RATE_LIMIT / SERVER / TIMEOUT / TRANSPORT 重试（默认 5 次）。
 # 实测 CI 会撞上 "dsh: STREAM_CLOSED: SSE stream ended without [DONE]" —— 该 code
