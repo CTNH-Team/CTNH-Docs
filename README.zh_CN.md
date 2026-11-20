@@ -82,6 +82,8 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 流水线：`check_pending.py`（轮询秒退）→ `prepare_sync.py`（写 `workspace/sync-plan.json`）→ dsh agent 运行 → `verify_docs.py`（小节 / 中文 / 路由链接 / 写入范围守卫）→ `advance_state.py`（推进 `scripts/state.json`）→ 仅提交 `ctnh-docs/references/**` 与 `scripts/state.json` 的 PR。写入范围限定 `references/<Module>/**`；`references/_architecture/` 属人工维护，闸门会拒绝任何改动。模型与版本由仓库变量 `DSH_MODEL` / `DSH_VERSION` 控制，凭据为 `DEEPSEEK_API_KEY`。
 
+可选仓库变量 `DSH_REASONING_EFFORT` 控制文档同步 CI 的思考强度，支持 `off`、`high` 和 `max`。未设置或留空时沿用默认行为。
+
 ## 自动发布（Auto Release Docs）
 
 为默认分支的每个新提交发布 GitHub Release。每个技能目录各打成一个附件，命名为 `<技能>-skill-<YYYY-MM-DD>-<提交hash前8位>.zip`；tag 为 `ctnh-docs-skill-<YYYY-MM-DD>-<提交hash前8位>`，只表示「该提交已发布」，因此两个附件始终同源同提交。

@@ -34,6 +34,8 @@ env:
   # 0.2.x 的两种 executor 互斥，原先的 both 已不可用，见 prompts/headless.ci.patch.yml。
   DSH_TOOLS_MODE: ${{ vars.DSH_TOOLS_MODE || 'native' }}
   DSH_MODEL: ${{ vars.DSH_MODEL || 'deepseek-flash' }}
+  # 留空时沿用适配器默认行为。
+  DSH_REASONING_EFFORT: ${{ vars.DSH_REASONING_EFFORT }}
   DSH_VERSION: ${{ vars.DSH_VERSION || '0.2.2-rc.5' }}
   MODULES_ROOT: workspace/modules-src/modules
 
@@ -142,6 +144,14 @@ jobs:
             echo "::error::缺少 DEEPSEEK_API_KEY（或 LLM_API_KEY）"
             exit 1
           fi
+
+          case "$DSH_REASONING_EFFORT" in
+            ''|off|high|max) ;;
+            *)
+              echo "::error::DSH_REASONING_EFFORT 只接受 off、high、max 或留空"
+              exit 1
+              ;;
+          esac
 
           # 使用正式运行的插件和模型网关，验证实际协议与 watchdog 启动钩子。
           mkdir -p workspace/.watchdog

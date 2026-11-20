@@ -13,6 +13,7 @@
   config:
     provider: ci-gateway
     model: !!js process.env.DSH_MODEL || 'deepseek-flash'
+    reasoningEffort: !!js process.env.DSH_REASONING_EFFORT || undefined
 
 # 工具呈现模式。0.1.x 用 tools.config.mode（both/ptc）+ maxParallelSubCalls 表达；
 # 0.2.x 把这两个字段改成了 z.never()（写进 overlay 会直接

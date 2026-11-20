@@ -82,6 +82,8 @@ https://raw.githubusercontent.com/CTNH-Team/CTNH-Docs/main/ctnh-docs/references/
 
 Pipeline: `check_pending.py` (fast-exit poll) → `prepare_sync.py` (writes `workspace/sync-plan.json`) → the dsh agent run → `verify_docs.py` (sections, Chinese text, routing links, write-scope guard) → `advance_state.py` (advances `scripts/state.json`) → PR limited to `ctnh-docs/references/**` + `scripts/state.json`. Writes are restricted to `references/<Module>/**`; `references/_architecture/` is hand-maintained and the gate rejects any change to it. Model/version come from repo variables `DSH_MODEL` / `DSH_VERSION`; the key is `DEEPSEEK_API_KEY`.
 
+The optional repository variable `DSH_REASONING_EFFORT` sets the docs sync CI reasoning effort to `off`, `high`, or `max`. Leave it unset or empty to use the default behavior.
+
 ## Auto Release (Auto Release Docs)
 
 Publishes a GitHub Release for each new commit on the default branch. Every skill directory ships as its own asset, named `<skill>-skill-<YYYY-MM-DD>-<short-sha>.zip`; the tag is `ctnh-docs-skill-<YYYY-MM-DD>-<short-sha>` and only marks "this commit is published", so both assets always come from the same commit.
