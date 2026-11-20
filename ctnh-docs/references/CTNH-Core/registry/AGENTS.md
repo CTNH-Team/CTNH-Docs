@@ -1,7 +1,7 @@
 # CTNH-CORE REGISTRY DOMAIN
 
 ## OVERVIEW
-Core 的 Registrate 注册面（50 个 Java 文件：根包 27 + 子包 23）：物品、方块、方块实体、创造栏、tags、模型、配方类型/修饰符/条件、GTCEu 机器与多方块、材料、矿石、流体矿脉、世界生成层与音效。精准装配线改写落在 `GTMachineModify`。
+Core 的 Registrate 注册面（49 个 Java 文件：根包 27 + 子包 22）：物品、方块、方块实体、创造栏、tags、模型、配方类型/修饰符/条件、GTCEu 机器与多方块、材料、矿石、流体矿脉、世界生成层与音效。GT/GCYM 机器的定义改写与精准装配线装在 `GTMachineModify`。
 
 ## STRUCTURE
 ```
@@ -21,7 +21,7 @@ registry/
 |-- machines/                  # CTNHMachines, GTMachineModify（LARGE_ASSEMBLER -> MultiblockComputationMachine + PRECISION_ASSEMBLY_RECIPES）
 |   `-- multiblock/            # GTNNMultiblocks, HyperPlasmaTurbineRegister, Mechanical, MultiblocksA/B/C, WindPowerArrayRegister；配方驱动多方块基类为 RecipeElectricMultiblockMachine 或其子类
 |-- material/                  # CTNHMaterialBlocks, CTNHMaterialFlags, CTNHMaterials, GTMaterialAddon
-|-- ores/                      # AdAstraOres, AetherOres, AlfheimOres, EndOres, NetherOres, OverworldOres, TwilightForestOres
+|-- ores/                      # AetherOres, AlfheimOres, EndOres, NetherOres, OverworldOres, TwilightForestOres
 `-- sound/                     # CTNHSoundEvents（easter_egg_clown）
 ```
 
@@ -32,7 +32,9 @@ registry/
 | 物品/方块/方块实体 | `registry/CTNHItems.java`, `registry/CTNHBlocks.java`, `registry/CTNHBlockEntities.java` |
 | 创造栏/tags/模型 | `registry/CTNHCreativeModeTabs.java`, `registry/CTNHTags.java`, `registry/CTNHModels.java`, `registry/CTNHModelLayers.java` |
 | GTCEu 机器 | `registry/machines/CTNHMachines.java`；多方块在 `registry/machines/multiblock/` 与 `registry/CTNHMultiblockMachines.java` |
-| 精准装配线 | `registry/machines/GTMachineModify.java#modifyGTAssembly()` —— `GCYMMachines.LARGE_ASSEMBLER` 的 supplier 为 `MultiblockComputationMachine::new`，并把 `CTNHRecipeTypes.PRECISION_ASSEMBLY_RECIPES` 追加进 recipeTypes |
+| 精准装配线 | `registry/machines/GTMachineModify.java#modifyGTAssembly()` —— `GCYMMachines.LARGE_ASSEMBLER` 的 supplier 为 `MultiblockComputationMachine::new`，把 `CTNHRecipeTypes.PRECISION_ASSEMBLY_RECIPES` 追加进 recipeTypes，并装专属图案与 `assemblyRecipeModifier`（精密组装走 `OC_NON_PERFECT`，其余先 `PARALLEL_HATCH` 再超频） |
+| GT/GCYM 机器改写 | `registry/machines/GTMachineModify.java`：`init()` 给 22 台 GCYM 机器设 `{GCYM_REDUCTION, PARALLEL_HATCH, OC_NON_PERFECT, BATCH_MODE}` 并追加 `gcymReduction`（配方耗时 ×0.8、耗能 ×0.6）tooltip；`modifyCleanroom()` 使清洁室高度超过长或宽时停工；`modifyOxygenGenerators()` 给燃烧/燃气/蒸汽轮机家族追加 CTNH-Astral `CARecipeModifiers.environmentRequirements(OxygenCondition::new)`；`PRIMITIVE_BLAST_FURNACE` 的配方类型为单一 `DUMMY_RECIPES` |
+| 物品 tooltip 声明 | `registry/CTNHItems.java` 的 `@CN`/`@EN` + `Lang` 字段（类级 `@Suffix("tooltip")` 拼 lang 键），经 `.onRegister(attach(new TooltipBehavior(...)))` 挂载；`GTMachineModify` 的 `@Prefix("multiblock")` + `@Suffix("tooltip")` 同理 |
 | 配方驱动多方块基类 | `registry/machines/multiblock/*.java` 的 `REGISTRATE.multiblock(name, factory)`：factory 为 `RecipeElectricMultiblockMachine` 或其子类（如 `FactoryMachine`, `BioMachine` 等自定义机器直接注册；无自定义行为时用 `RecipeElectricMultiblockMachine::new`）；线圈机 `CoilWorkableElectricMultiblockMachine::new`；类型判断在 `registry/CTNHRecipeModifiers.java#ebfOverclock()` |
 | 材料/世界生成 | `registry/material/CTNHMaterials.java`, `registry/material/GTMaterialAddon.java`, `registry/CTNHTagPrefixes.java`, `registry/CTNHOres.java`, `registry/CTNHFluidVeins.java`, `registry/CTNHWorldgenLayers.java` |
 | 配方类型/修饰符/条件 | `registry/CTNHRecipeTypes.java`, `registry/CTNHRecipeModifiers.java`, `registry/CTNHRecipeConditions.java`, `registry/CTNHRecipeCategories.java` |
@@ -59,7 +61,7 @@ registry/
 - `CTNHRecipeModifiers.ebfOverclock()` 的类型判断对象为 `RecipeElectricMultiblockMachine`；线圈机器匹配失败时经 `RecipeModifier.nullWrongType(CoilWorkableElectricMultiblockMachine.class, machine)` 报类型错误。
 - **产出型 / 发电机配方修饰符链**：`utils/CTNHMachineUtils.registerEfficiencyGeneratorMachines(name, recipeType, recipeModifier, ...)` 在链上写 `.recipeModifiers(GTRecipeModifiers.TIER_CHECK, recipeModifier)`，调用方传 `EfficiencyGeneratorMachine::recipeModifier`（`CTNHMachines.NAQUADAH_REACTOR`）。需要显式覆盖配方类型的产出型多方块用 `.recipeModifiers(true, GTRecipeModifiers.TIER_CHECK, <MachineClass>::recipeModifier)`：`HyperPlasmaTurbineRegister` 的 `hyper_plasma_turbine`（`HyperPlasmaTurbineMachine::recipeModifier`）与 `MultiblocksA` 的 `CHEMICAL_GENERATOR`（`ChemicalGeneratorMachine::recipeModifier`）。
 - 精准装配线：`GTMachineModify` 在 `modifyGTAssembly()` 改写原版 `GCYMMachines.LARGE_ASSEMBLER` 定义 —— supplier 替换必须在机器注册之后、tooltip 构建之前。
-- **材料集初始化顺序**：`CTNHMaterials.init()` 按依赖顺序调用各材料集的 `init()`；`NaquadahMaterials.init()` 先于 `AdastraMaterials.init()`，因为后者的 `addOre` 直接把 `NaquadahMaterials.EnrichedNaquadahOxideMixture` / `NaquadriaOxideMixture` 当伴生矿传入，这些字段在各自 `init()` 里才赋值。`CTNHMaterials.addOre(main, companion)` 在 `companion == null` 时经 `CTNHCore.LOGGER.error` 报错并返回，避免 `OreProperty` 丢掉直熔/伴生/分离产物；新增依赖伴生矿字段的材料集时按同样方式排到其前置材料集之后。
+- **材料集初始化顺序**：`CTNHMaterials.init()` 按依赖顺序调用各材料集的 `init()`，`NaquadahMaterials` 排在最前（其 `EnrichedNaquadahOxideMixture` / `NaquadriaOxideMixture` 字段被 `Naquadah` 的 `OreProperty` 与多条加工链引用）。`CTNHMaterials.addOre(main, companion)` 的两参形式把伴生矿同时设为直熔产物、伴生矿与分离产物；`companion == null` 说明前置材料集的 `init()` 还没跑，此时经 `CTNHCore.LOGGER.error` 报错并返回，避免 `OreProperty` 丢掉这三类产物；新增依赖伴生矿字段的材料集要排到其前置材料集之后。
 
 ## ANTI-PATTERNS
 - 手工重排受 spotless 开关保护的大型多方块注册段。

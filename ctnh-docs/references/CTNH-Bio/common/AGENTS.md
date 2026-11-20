@@ -18,6 +18,8 @@ Bio 的公共装配与通用内容（7 个 Java 文件）：`CommonProxy` 注册
 - `CommonProxy` 通过 `addGenericListener` 接管 GT 注册事件：`MachineDefinition`（`CBMachines.init()` + `CBMultiblocks.init()`）、`GTRecipeType`（`CBRecipeTypes.init()`）、`RecipeConditionType`（`CBRecipeConditions.init()`）、`GTRecipeCategory`（`CBRecipeCategories.init()`）、`SoundEntry`（`CBSoundEntries.init()`）。
 - 材料注册走 `MaterialEvent` → `CBMaterials.init()`；`MaterialRegistryEvent` 创建 `ctnhbio` 材料注册表；`FMLCommonSetupEvent` 中把 Biomancy `DECOMPOSING_RECIPE_TYPE` 挂到 `CBRecipeTypes.DECOMPOSER_RECIPES.getProxyRecipes()`。
 - 磨碎配方是 Bio 自有配方面（配 `integration/jei/MobCrushingCategory` 与 EMI Mixin），数据来自 `src/main/resources/data/ctnhbio/mob_crushing_recipes/`。
+- `OrganicVialItem` 继承 GTCEu `ComponentItem` 并实现 Biomancy `SerumContainer`：`SERUM_FLUID_MAP` 把有机流体映射到血清（`Primordial_Serum` → `CBSerums.PRIMORDIAL_SERUM`，其余为 Biomancy `ModSerums`），`getSerumFromStack(stack)` 按所含流体查表、查不到返回 `Serum.EMPTY`，`getSerum()` 恒返回 `Serum.EMPTY`（血清取自物品流体而非实例状态）。
+- `AssemblyStepItem` 是湿件 / 幽匿组装中间品的物品类：tooltip 从物品 NBT 读 `COGNI_AESSEMBLY_STEP` 常量（键字符串 `cogin_assembly_step`，与 `data/recipe/CogniRecipeBuilder` 同键）取得步骤号，并固定追加「必须通过联体桥输入或输出」一行。
 
 ## ANTI-PATTERNS
 - 绕过 `CommonProxy` 的初始化顺序，去用依赖 `PropertyOperators` / `EntityProperties` 的注册表。

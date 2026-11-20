@@ -31,7 +31,7 @@ data/
 | 活体机器配方 | `data/recipe/living/`（BioReactor, BioelectricForge, Decomposer, Digester, BasicLiving） |
 | 多方块配方 | `data/recipe/multi/`（Cogni, GreatFlesh, HostileObservation） |
 | lang | `data/lang/`, `data/lang/utils/EntityPropertyLangUtil.java`（中文经 CTNH-Lib `ProviderTypes.CNLANG` 走 `@CN` 处理器） |
-| 掉落表 | `data/loot/CBLootTableProvider.java`（类存在，当前不在 `CBDatagen.init()` 中注册） |
+| 掉落表 | `data/loot/CBLootTableProvider.java`（为 Biomancy 血肉方块生成空战利品表以移除其掉落；未在 `CBDatagen.init()` 中注册） |
 | 材料 | `data/materials/`（CommonMaterials, OrganicMaterials；由 `registry/CBMaterials.init()` 触发 `register()`） |
 | tag | `data/tags/`（BlockTags, FluidTags, ItemTags） |
 
