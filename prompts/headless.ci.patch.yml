@@ -1,5 +1,5 @@
 # CTNH-Docs CI overlay：叠加在 headless profile 之上（--patch 层最后应用）。
-# 只解决模型选择与 PTC 呈现模式；沙箱与审批保持 base 默认。
+# 配置 CI 的模型网关与工具执行器，沙箱和审批沿用 headless 默认值。
 #
 # 注意（踩过的坑）：不要单独覆盖 id: approval 的 policy。
 # 权限预设要求「沙箱模式 + 审批策略」的组合命中 presets 表中的一项，否则
@@ -11,7 +11,7 @@
 
 - id: agent-default-model
   config:
-    provider: deepseek-official
+    provider: ci-gateway
     model: !!js process.env.DSH_MODEL || 'deepseek-flash'
 
 # 工具呈现模式。0.1.x 用 tools.config.mode（both/ptc）+ maxParallelSubCalls 表达；
@@ -28,24 +28,41 @@
 
 - id: tool-executor-ptc
   disabled: !!js process.env.DSH_TOOLS_MODE !== 'ptc'
-# 瞬时模型请求失败的重试：dsh 自带 dsh-llm-retry 执行器，但提供方默认策略只对
-# EMPTY_RESPONSE / RATE_LIMIT / SERVER / TIMEOUT / TRANSPORT 重试（默认 5 次）。
-# 实测 CI 会撞上 "dsh: STREAM_CLOSED: SSE stream ended without [DONE]" —— 该 code
-# 不在默认集合里，于是整轮直接失败、文档一个都没写。这里把它加进可重试集合并把
-# 上限提到 10 次，让这类瞬时断流在同一个轮次内自愈，而不是让整轮作废。
+
+# DSH 0.2.2 的官方适配器使用 Messages。CI 中转允许 Chat Completions。
 - id: llm-deepseek
+  disabled: true
+
+- id: llm-pi-ai
   config:
-    retryPolicy:
-      mode: normal
-      maxRetries: 10
-      retryableCodes:
-        - STREAM_CLOSED
-        - EMPTY_RESPONSE
-        - RATE_LIMIT
-        - SERVER
-        - TIMEOUT
-        - TRANSPORT
-      backoff:
-        initialDelayMs: 1000
-        maxDelayMs: 30000
-        jitterRatio: 0.2
+    providers:
+      ci-gateway:
+        apiKeyEnv: DEEPSEEK_API_KEY
+        api: openai-completions
+        baseURL: !!js (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').replace(/\/+$/, '')
+        compat:
+          maxTokensField: max_tokens
+          supportsDeveloperRole: false
+          supportsStore: false
+          thinkingFormat: deepseek
+        models:
+          - id: !!js process.env.DSH_MODEL || 'deepseek-flash'
+            reasoningEfforts:
+              'off':
+              high: high
+              max: max
+        # 保留中转偶发断流或限流时的重试策略。
+        retryPolicy:
+          mode: normal
+          maxRetries: 10
+          retryableCodes:
+            - STREAM_CLOSED
+            - EMPTY_RESPONSE
+            - RATE_LIMIT
+            - SERVER
+            - TIMEOUT
+            - TRANSPORT
+          backoff:
+            initialDelayMs: 1000
+            maxDelayMs: 30000
+            jitterRatio: 0.2
