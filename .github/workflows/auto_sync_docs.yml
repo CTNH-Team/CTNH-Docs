@@ -144,15 +144,16 @@ jobs:
           fi
 
           # 使用正式运行的插件和模型网关，验证实际协议与 watchdog 启动钩子。
-          export WATCHDOG_STATE="$RUNNER_TEMP/ctnh-docs-watchdog-preflight.state"
+          mkdir -p workspace/.watchdog
+          rm -f workspace/.watchdog/state*
           log="$RUNNER_TEMP/dsh-preflight.log"
           code=0
           timeout 180 "$DSH_HOME/node_modules/.bin/dsh" --profile headless \
             --patch prompts/headless.ci.patch.yml \
             --patch prompts/watchdog.ci.patch.yml \
             "Reply with OK only. Do not use tools or modify files." > "$log" 2>&1 || code=$?
-          if [ "$code" -ne 0 ] || [ ! -s "$WATCHDOG_STATE.main" ]; then
-            echo "::error::DSH 预检失败（退出码 $code），请检查网关响应及 watchdog 启动钩子"
+          if [ "$code" -ne 0 ]; then
+            echo "::error::DSH 网关预检失败（退出码 $code）"
             text=$(tail -n 40 "$log")
             if [ -n "${DEEPSEEK_BASE_URL:-}" ]; then
               host="${DEEPSEEK_BASE_URL#*://}"
@@ -161,6 +162,10 @@ jobs:
               if [ -n "$host" ]; then text="${text//"$host"/***}"; fi
             fi
             printf '%s\n' "$text"
+            exit 1
+          fi
+          if [ ! -s workspace/.watchdog/state.main ]; then
+            echo "::error::网关请求已通过，但 watchdog 启动钩子未写入状态"
             exit 1
           fi
           echo "DSH $DSH_VERSION preflight OK (Chat Completions and watchdog)."
@@ -188,9 +193,9 @@ jobs:
           # 看门狗：由宿主在 agent 启动前盖下起始时刻，15/30 分钟各催促一次。
           # 催促经 prompts/watchdog.ci.patch.yml 挂载的 PostToolUse 钩子在 agent 进程内注入，
           # 只做进度自检——不阻塞、不终止、不降低产出要求。
-          export WATCHDOG_STATE="$RUNNER_TEMP/ctnh-docs-watchdog.state"
-          rm -f "$WATCHDOG_STATE" "$WATCHDOG_STATE.main" "$WATCHDOG_STATE".fired.*
-          date +%s > "$WATCHDOG_STATE"
+          mkdir -p workspace/.watchdog
+          rm -f workspace/.watchdog/state*
+          date +%s > workspace/.watchdog/state
           set +e
           timeout 2700 "$DSH_HOME/node_modules/.bin/dsh" --profile headless \
             --patch prompts/headless.ci.patch.yml \

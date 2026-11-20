@@ -34,9 +34,9 @@ def _state_path() -> str:
     base = os.environ.get("WATCHDOG_STATE")
     if base:
         return base
-    return os.path.join(
-        os.environ.get("TMPDIR") or "/tmp", "ctnh-docs-watchdog.state"
-    )
+    # 以脚本所在仓库为准，预检、主代理和子代理使用相同的工作区状态。
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "workspace", ".watchdog", "state")
 
 
 def _read(path: str) -> str:
