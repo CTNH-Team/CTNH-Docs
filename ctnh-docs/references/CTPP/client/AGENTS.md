@@ -1,7 +1,7 @@
 # CTPP CLIENT DOMAIN
 
 ## OVERVIEW
-CTPP 的客户端侧（34 个 Java 文件）：`ClientProxy`、Ponder 插件/场景/标签、方块与实体渲染器、工具箱 UI、接线柱选线，以及顶层 Visual 类。
+CTPP 的客户端侧（34 个 Java 文件）：`ClientProxy`、Ponder 插件/场景/标签、方块与实体渲染器、发射器光束渲染、工具箱 UI、接线柱选线，以及顶层 Visual 类。
 
 ## STRUCTURE
 ```text
@@ -30,6 +30,7 @@ client/
 | 机器界面演示（`MachineUI`） | `client/ponder/kinetic/`：流体输入仓（`BigDam` / `KineticGenerator` / `WindmillControlCenter`）与物品输入/输出总线（`SmashingFactory`） |
 | 风车控制中心结构与规则 | `client/ponder/kinetic/WindmillControlCenter.java`, `common/machine/multiblock/windmillController/WindMillControlMachine.java` |
 | 渲染器 | `client/renderer/`（7 个：工具箱、线剪、接线柱、发射器光束，以及两套 RenderType 常量） |
+| 发射器光束渲染 | `client/renderer/EmitterBeamRenderer.java`（`BEAMS` / `BEAM_DIMS` 缓存、`setBeam` / `removeBeam` 由 `SetEmitterBeamPacket` / `DelEmitterBeamPacket` 经 `DistExecutor` 调用）、`client/renderer/CTPPBeamRenderTypes.java`（`beamBody()` 半透明 `NO_CULL` 类型） |
 | 顶层 Visual / 渲染 | `client/{CarbonBrushesRenderer, CarbonBrushesVisual, GeneratorCoilRenderer, GeneratorCoilVisual, SplitShaftVisual}` |
 | 方块实体渲染 | `client/KineticMachineBlockEntityRenderer.java` |
 | 工具箱 UI | `client/toolbox/`（5 个类：客户端状态、按键、叠加层、轮盘界面、主界面） |
@@ -61,6 +62,8 @@ storyboard 位于 `src/main/resources/assets/ctpp/ponder/<scene>/common.nbt`；`
 - Ponder 场景经 `CTNHPonderLang.init(new CTPPPonderPlugin())` 在 `CommonProxy.gatherData()` 的 `includeClient()` 分支做 lang 提取。
 - 方块实体渲染注册在 `registry/CTPPBlockEntities.java` 的对应条目上，不在 `client/` 内自行注册。
 - 接线柱线缆几何必须调用 `api/terminal/TerminalWireGeometry`，渲染器内不重复实现。
+- `EmitterBeamRenderer` 只渲染服务端下发的光束：`BEAMS`（`id → EmitterBeam`）与 `BEAM_DIMS`（`id → 维度`）两份缓存由 `setBeam` / `removeBeam` 维护，逐帧按维度过滤；`ClientPlayerNetworkEvent.LoggingOut`（`onLogout`）清空两份缓存，防止上一条会话的光束漏进新世界（进入世界后服务端会在 chunk watch 时补发）。
+- 光束绘制挂在 `RenderLevelStageEvent` 的 `Stage.AFTER_TRANSLUCENT_BLOCKS`：第一遍用 `CTPPBeamRenderTypes.beamBody()` 画半透明彩色本体（普通 alpha 混合保住暗色等级色），第二遍用 `RenderType.lightning()` 画更细的附加发光核心。半径按 `BASE_RADIUS + RADIUS_PER_AMP × min(amps, PlaceableEmitterMachine.MAX_CONSUMPTION)` 计算，颜色按沿途电压衰减分带，每个内部顶点按一次镜面反射计入 `PlaceableEmitterMachine.bouncePenaltyBlocks(tier)`。
 
 ## ANTI-PATTERNS
 - 把渲染逻辑写进机器实现类。

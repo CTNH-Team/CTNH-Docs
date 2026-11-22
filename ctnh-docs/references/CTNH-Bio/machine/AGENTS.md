@@ -23,7 +23,7 @@ machine/
 | 多方块部件 | `machine/multiblock/part/NeuralModelAccessorMachine.java`, `ParabioticBridgePartMachine.java`（含内联 `ParabioticBridgeHandler`） |
 
 ## CONVENTIONS
-- 机器实现只依赖 `api/` 契约：单方块机器继承 `api/machine/BasicLivingMachine`，多方块继承 `api/machine/multiblock/WorkableLivingMultiblockMachine`。
+- 机器实现只依赖 `api/` 契约：单方块机器继承 `api/machine/BasicLivingMachine`；活体多方块继承 `api/machine/multiblock/WorkableLivingMultiblockMachine`（`GreatFleshMachine`、`CogniAssemblerMachine`，以及 `CBMultiblocks.CIRCULATORY_SYSTEM` / `WEATHERER` 直接用的基类）。`HostileObserverMachine` 例外：它继承 GT 的 `RecipeElectricMultiblockMachine`，不走活体基类与营养 / 模型 trait。
 - 多方块部件用 `api/machine/multiblock/CBPartAbility` 声明能力（`NEURAL_MODEL_ACCESSOR`），图案里通过 `Predicates.abilities(...)` 引用。
 - registrate 条目只在 `registry/CBMachines.java` / `registry/CBMultiblocks.java` 声明，机器类不自行注册，也不写 `@Mod.EventBusSubscriber`。
 - 机器特有规则放机器子类，通用规则放 `api/machine/` 基类；跨机器的营养 / 模型 / 实体状态由 `api/machine/trait/` 的 trait 持有。
@@ -43,5 +43,5 @@ machine/
 - `machine/` 下的实现与 `api/machine/` 的契约；注册以 `registry/CBMachines.java` / `registry/CBMultiblocks.java` 为准。
 
 ## WORKFLOW
-1. 先确认机器的注册条目与所属 API 契约（`BasicLivingMachine` 还是 `WorkableLivingMultiblockMachine`）。
+1. 先确认机器的注册条目与所属契约（`BasicLivingMachine`、`WorkableLivingMultiblockMachine`，或 GT 多方块基类）。
 2. 跑 `:modules:CTNH-Bio:build`；机器行为在游戏内验证。

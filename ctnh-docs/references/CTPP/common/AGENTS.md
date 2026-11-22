@@ -1,7 +1,7 @@
 # CTPP COMMON DOMAIN
 
 ## OVERVIEW
-CTPP 的共享实现（71 个 Java 文件）：`CommonProxy`、方块与方块实体、动能机器逻辑、风扇处理、工具箱系统、可放置发射器/反射镜/光束，以及接线柱线缆危害。
+CTPP 的共享实现（71 个 Java 文件）：`CommonProxy`、方块与方块实体、动能机器逻辑、风扇处理、工具箱系统、可放置发射器/反射镜/光束（服务端追踪与按区块下发），以及接线柱线缆危害。
 
 ## STRUCTURE
 ```text
@@ -49,7 +49,8 @@ common/
 | Create 手臂交互点 | `common/data/GTArmInteractionPointTypes.java`（在 `CommonProxy.commonSetup()` 注册） |
 | 配方条件实现 | `common/condition/{RPMCondition, MechanicalTierCondition}.java` |
 | 接线柱方块/实体 | `common/block/VoltageTerminalBlock.java`, `common/blockentity/VoltageTerminalBlockEntity.java`, `common/terminal/` |
-| 反射镜与光束 | `common/block/MirrorBlock.java`, `common/beam/{EmitterBeam, IBeamRedirector}.java` |
+| 反射镜与光束 | `common/block/MirrorBlock.java`（`IBeamRedirector` 实现）、`common/beam/{EmitterBeam, IBeamRedirector}.java`（`EmitterBeam` 为 `id/points/voltage/amps/tier` 不可变折线；`redirect(incoming, state)` 返回新方向或 `null` 表示吸收） |
+| 光束服务端追踪与下发 | `common/beam/EmitterBeamTracker.java`（心跳与孤儿清扫、按区块 watch 下发）、`common/beam/BeamChunkIndex.java`（每维已加载区块索引与射线区间） |
 | 可放置发射器 | `common/machine/simple/PlaceableEmitterMachine.java`（托管字段 `zenith` / `azimuth` / `transferDisabled` / `consumptionAmps`） |
 | 线缆危害与支付 | `common/terminal/TerminalWireHazardManager.java`, `common/terminal/TerminalWirePayment.java`, `api/terminal/TerminalWireGeometry.java` |
 | 线缆调试 | `common/terminal/TerminalWireDamageDebug.java`, `common/command/CTPPTerminalCommands.java`（`/ctpp wire_damage_debug on/off`） |
@@ -65,6 +66,9 @@ common/
 - `RPMCondition` 对 `IKineticMachine` 用 `getKineticHolder().getSpeed()`、对 `KineticWorkableMultiblockMachine` 用 `Math.abs(controller.speed)` 与要求转速比较。
 - `KineticGeneratorMachine`：`onStructureFormed()` 从 `KineticPartMachine`（`IO.IN`）取最大等级存入 `maxKineticInputTier`，`getTierPenalty() = (maxKineticInputTier - MV) * 0.1` 且仅在 `>= HV` 时生效；效率下限 10%（`Math.max(Math.min(base, 0.1), base - penalty)`）；`onStructureInvalid()` 重置等级与磁场强度；输出上限 `tier > 0 ? tier*4*V[tier] : 32`，显示行 `info0`–`info4`。
 - `PlaceableEmitterMachine` 的 `zenith` / `azimuth` / `transferDisabled` / `consumptionAmps` 是托管字段，依赖 LDLib 的 ref 更新完成同步与脏标记；`adjustAngle()` / `setAngles()` 等 setter 内不要手动 `markDirty()`。
+- `PlaceableEmitterMachine.beamTick()` 在服务端 tick 内推进光束：电压恒取 `GTValues.V[tier]`，安培取 `min(consumptionAmps, stored / voltage)`（不足一个 packet 时抽干余量并撤下光束）；路径追踪只在 `BeamChunkIndex.loadedRuns(...)` 给出的已加载区间内调 `level.clip`，命中 `IBeamRedirector` 时按 `redirect(dir, state)` 改向并累计 `bouncePenaltyBlocks(tier)`（`MAX_REFLECTIONS = 8`、`REFLECTION_VOLTAGE_KEEP = 0.95`），命中活体实体按 `DAMAGE_PER_TIER * tier` 造成魔法伤害，命中能量容器按到达电压 `acceptEnergyFromNetwork` 结算。光束与发射器可见性无关：`onLoad()` 订阅服务端 tick，`onUnload()` / `onMachineRemoved()` 撤下光束。
+- `EmitterBeamTracker` 是服务端光束的所有者：`BEAMS` 按维度存 `id → (EmitterBeam, lastSeen)`；`setBeam` / `removeBeam` 只向正在监听光束所经区块的玩家发送 `SetEmitterBeamPacket` / `DelEmitterBeamPacket`（经 `GTNetwork.sendToPlayer`）；内容未变的存活光束每 tick 走 `touchBeam` 心跳，`ServerTickEvent`（`Phase.END`）每 `SWEEP_INTERVAL_TICKS`（20）清掉超过 `BEAM_TIMEOUT_TICKS`（100）无心跳的光束。`ChunkWatchEvent.Watch` 补发、`UnWatch` 撤销并清理空 watch 集，`PlayerEvent.PlayerLoggedOutEvent` 丢弃该玩家的 watch 记录。
+- `BeamChunkIndex` 由 `ChunkEvent.Load` / `Unload` 维护每维已加载区块集合、`ServerStoppingEvent` 清空；`loadedRuns` 在「射线跨列 DDA」与「已加载集合扫描」间取成本更小者，`coveredLoadedChunks` / `chunkCovered` 供 watch 匹配，候选区块一律用 `Level.hasChunk` 复核。
 - `VoltageTerminalBlockEntity` 在 `addLink()` 与首次 `serverTick()`（`terminalWiresRegistered` 守卫）时把链路注册进 `TerminalWireHazardManager`，移除时反注册。
 - `OilingRecipe.matches()` 当前恒返回 `false`（1/12 槽位照常声明），涂油处理尚未接通。
 
@@ -87,6 +91,7 @@ common/
 - 绕过 `TerminalWirePayment` 直接扣线材；必须走计划以保证原子性。
 - 在 `PlaceableEmitterMachine` 的角度/功耗 setter 里手动 `markDirty()`。
 - 在 `VoltageTerminalRenderer` 或 `TerminalWireHazardManager` 中重复 `TerminalWireGeometry` 的数学。
+- 对未加载区块做光束命中判定：`level.clip` / `getBlockState` 必须限制在 `BeamChunkIndex.loadedRuns(...)` 给出的区间内，否则会同步加载甚至生成区块。
 - 在 `common/` 内用物品/方块 ID 字符串反查注册对象，而非 `CTPPBlocks.*` / `CTPPItems.*` 等静态对象。
 
 ## SCOPE
@@ -101,6 +106,7 @@ common/
 - `common/terminal/TerminalWirePayment.java` 与 `common/terminal/TerminalNetwork.java`。
 - `common/machine/multiblock/KineticGeneratorMachine.java` 的等级惩罚与效率。
 - `common/machine/simple/PlaceableEmitterMachine.java` 的托管字段。
+- `common/beam/EmitterBeamTracker.java` 的心跳/清扫与 `common/beam/BeamChunkIndex.java` 的已加载区块索引。
 
 ## WORKFLOW
 1. 加行为前先核对 `CommonProxy` 的初始化顺序。

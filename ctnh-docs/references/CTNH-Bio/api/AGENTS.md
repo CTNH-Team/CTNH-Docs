@@ -50,6 +50,7 @@ api/
 | 机器 API | `api/machine/`, `api/machine/multiblock/`, `api/machine/trait/` |
 | 机器 Jade 数据 | `api/machine/BasicLivingMachine.java` — 覆写 `writeMachineJadeData()` / `appendMachineJadeTooltip()` |
 | 机器配置器 | `api/machine/BasicLivingMachine.java#attachConfigurators` |
+| 物品基类 | `api/item/LivingMetaMachineItem.java`（活体机器物品，渲染器取 `CBModels.MODELS`）；`api/item/component/StyleItem.java`（Biomancy `ItemTooltipStyleProvider` 基类） |
 | Forge capability | `api/capability/forge/CBCapabilities.java` |
 | GUI | `api/gui/`, `api/gui/widget/` — `LivingMachineUIWidget` 设置 `BACKGROUND_BIO`, `SLOT`, `TITLE_BAR_BACKGROUND_BIO`, `TAB_LEFT_BIO` 与 `configuratorPanel` / `rightConfiguratorPanel` 的 `BACKGROUND_SMALL` |
 | 生长图案 | `api/pattern/GrowingBlockPattern.java` |
@@ -62,6 +63,8 @@ api/
 - Jade：`BasicLivingMachine.writeMachineJadeData` 写 `MaxHealth`/`Health`（float）、`NutrientAmount`/`NutrientCapacity`（double）、`StatusEffects`（ListTag，元素为 `Name` JSON、`Duration` 或 `Infinite`、`Bad`）；`appendMachineJadeTooltip` 用 `HealthElement` 渲染生命、用营养 `helper.progress()`（`ctnhbio.jade.nutrient_stored` + `FormattingUtil.formatNumbers`）渲染营养条、用 `jade.potion` 行汇总状态效果。只写客户端推导不出的数据。
 - 实体属性接口按 `I<Type>EntityProperty` 命名（`IBooleanEntityProperty`, `IIntEntityProperty`, `IStringEntityProperty` 等），工厂为 `SimpleEntityPropertyFactory`。
 - capability 的乘法方法签名是 `copyWithMultiplier(content, float multiplier)`（`EntityRecipeCapability`, `ModelRecipeCapability`, `NutrientRecipeCapability`）；`EntityIngredient` / `ChancedEntityIngredient` 同样接受 `float`，乘法结果按 `(int)` 截断；`CogniItemRecipeCapability extends ItemRecipeCapability`。
+- 湿件元件与湿件电路基板的物品基类是 GTCEu `ComponentItem`，tooltip 组件在 `registry/CBItems.java` 挂载，不进 `api/`；`api/item/component/` 只放 Bio 自有组件与基类（`StyleItem`, `IOrganicFluidHandler`, `OrganicFluidHandlerItemStack(+Simple)`, `OrganicFluidStats`）。
+- `StyleItem` 是继承原版 `Item` 并实现 Biomancy `ItemTooltipStyleProvider` 的最小基类，模块内无消费点；需要 Biomancy tooltip 风格的物品以它为基类，不要另写实现。
 - 没有 `api/recipe/content/` 子包；营养序列化位于 `api/capability/recipe/`。
 - `api/capability/forge/CBCapabilities` 声明 `ENTITY_CONTAINER` capability 与 `register(RegisterCapabilitiesEvent)`；模块内无调用点。
 

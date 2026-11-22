@@ -6,7 +6,7 @@ Bio 的事件层（3 个 Java 文件）：数据生成钩子、Forge 事件订�
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| 数据生成钩子 | `event/EventHandler.java` — `gatherData(GatherDataEvent)` 注册 `VanillaRecipeProvider`（`VanillaRecipes` 已被注释停用） |
+| 数据生成钩子 | `event/EventHandler.java` — `gatherData(GatherDataEvent)` 只注册 `VanillaRecipeProvider`；`VanillaRecipes` 由 `registry/CBRecipes.init(provider)` 挂载（GT 动态包），datagen 侧不重复注册 |
 | Forge 事件订阅 | `event/ForgeEventHandler.java` — `@Mod.EventBusSubscriber(modid = CTNHBio.MODID, bus = FORGE)` |
 | 血肉转换登记 | `event/TransformManager.java` — `FLESH_BLOB_LIST` 与 `addEntity(LivingEntity)` |
 

@@ -1,7 +1,7 @@
 # CTPP INTEGRATION DOMAIN
 
 ## OVERVIEW
-CTPP 的 Jade、JEI 与 LDLib 对接（5 个 Java 文件）；EMI 对接在 CTNH-Core。
+CTPP 的 Jade、JEI 与 LDLib 对接（5 个 Java 文件）：Jade 侧为可放置发射器提供名称与图标，JEI 侧注册两族风扇处理类别，LDLib 侧注册接线柱链路的 payload 访问器。
 
 ## STRUCTURE
 ```text
@@ -17,9 +17,8 @@ integration/
 |---------|----------|
 | JEI 插件 | `integration/jei/CTPPJeiPlugin.java`（`IModPlugin`；注册 `CTPPRecipeTypeInfo.BREATHING` / `ACIDWASHING` 的配方类别） |
 | 风扇类别 | `integration/jei/category/`（`FanAcidWashingCategory`, `FanBreathingCategory`） |
-| Jade 插件 | `integration/jade/CTPPJadePlugin.java`（`IWailaPlugin` + 内部 `PlaceableEmitterProvider`） |
+| Jade 插件 | `integration/jade/CTPPJadePlugin.java`（`IWailaPlugin`；`registerClient` 里把内部 `PlaceableEmitterProvider` 挂到 `MetaMachineBlock`，取 `PlaceableEmitterMachine.emitterItem(tier)` 作为图标与标题） |
 | LDLib 插件 | `integration/ldlib/CTPPLDLibPlugin.java`（`@LDLibPlugin`；`onLoad()` 把 `TerminalLinkStateAccessor` 注册进 `TypedPayloadRegistries`，优先级 50） |
-| EMI（已迁出） | CTNH-Core `integration/emi/`——不要在本模块重建 `integration/emi/CTPPEmiPlugin.java` |
 
 ## CONVENTIONS
 - 集成类保持隔离与可选，不得成为 `common/` 的硬依赖。
@@ -28,8 +27,7 @@ integration/
 
 ## ANTI-PATTERNS
 - 让集成类成为 common 代码的硬依赖。
-- 在 CTPP 中重新引入 `CTPPEmiPlugin`（它在 Core）。
-- 重新加回 `KineticOutputMachineProvider`；Jade 侧只用 `CTPPJadePlugin`。
+- 为其他机器另建 Jade provider：Jade 侧只有 `CTPPJadePlugin` 内的 `PlaceableEmitterProvider`，且只在客户端 `registerClient` 注册。
 - 在 Jade provider 中重复序列化客户端已能推导的数据（如 `lastRecipe`）。
 
 ## SCOPE

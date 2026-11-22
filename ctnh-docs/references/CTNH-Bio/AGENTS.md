@@ -37,6 +37,7 @@ ctnhbio/
 | 生物 recipe capability | `api/capability/recipe/`（CogniItem / Entity / Model / Nutrient），注册在 `registry/CBRecipeCapabilities.java` |
 | 实体 / 模型原料与属性匹配 | `api/recipe/ingredient/`, `api/recipe/matcher/PropertyOperators.java` |
 | 注册对象 | `registry/`（`CBItems`, `CBBlocks`, `CBEntities`, `CBMachines`, `CBMultiblocks`, `CBMaterials`, `CBRecipeTypes` 等） |
+| 物品与 tooltip | `registry/CBItems.java`（湿件元件 / 湿件电路基板 / 生物核心 / 流体容器的 `ComponentItem` 条目，文案为类顶部 `@CN` / `@EN` 的 `Lang` 字段，经 `TooltipBehavior` 挂载） |
 | 配方与数据生成 | `data/recipe/`, `data/CBDatagen.java` |
 | 磨碎配方 | `common/recipe/MobCrushingRecipe.java`, `common/recipe/MobCrushingRecipeManager.java`, `integration/jei/MobCrushingCategory.java` |
 | 集成 | `integration/`（EMI / Jade / JEI / XEI） |
@@ -69,7 +70,7 @@ ctnhbio/
 - 把生物 recipe capability 合并进 Core；活体机器抽象归本模块所有。
 - 假定所有配方 JSON 都是生成的；先确认文件在 `src/main/resources` 还是 `src/generated/resources`。
 - 新增实体/模型配方匹配时绕过 `PropertyOperators` / `EntityProperties`；这两个注册表在 `CommonProxy.init()` 中显式初始化。
-- despoil 战利品催化剂展示由 CTNH-Core 的 `CTNHExtraEmiPlugin` 处理（`ctnhbio:despoil_loot`）；本模块不加 `mixin/ali/EmiCompatibilityMixin`。
+- despoil 战利品催化剂展示由 CTNH-Core 的 `CTNHExtraEmiPlugin` 处理（`ctnhbio:despoil_loot`）；本模块 `mixin/ali/` 只放 `EmiGamePlayLootMixin` 与 `EmiScrollWidgetMixin`。
 - 期望 `runData` 产出 GT 配方 JSON 并据此验证配方。
 
 ## COMMANDS

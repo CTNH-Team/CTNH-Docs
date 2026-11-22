@@ -15,7 +15,7 @@ Bio 的共享工具类（7 个 Java 文件）：机器名解析、配方修饰�
 
 ## CONVENTIONS
 - 工具类保持无状态、可用静态方法调用；不要在这里持有注册对象或机器状态。
-- `utils/CBRecipeModifiers.BASIC_LIVING_MODIFIER` 当前所有分支都返回 `null`（不修改配方）；活体机器实际使用的修饰符在 `api/recipe/CBRecipeModifiers.java`，两处不要混淆。
+- `utils/CBRecipeModifiers.BASIC_LIVING_MODIFIER` 按宿主实体的药水效果改写 `recipe.multiplyDuration(...)`（`DIG_SPEED` 乘 `max(0, 1 - 0.2 * 等级)`、`DIG_SLOWDOWN` 乘 `1 + 等级`，等级取效果 amplifier），但无条件返回 `null`，模块内无调用点；活体机器实际使用的修饰符在 `api/recipe/CBRecipeModifiers.java`，两处不要混淆。
 - `CBMachineNames` 的名字表在静态初始化时填充，只做查表，不要在其中触发注册。
 
 ## ANTI-PATTERNS

@@ -4,13 +4,13 @@
             "last_sha": "b7c1f13fc0bdafea46e912ea59678fca2bdd5e99"
         },
         "CTNH-Core": {
-            "last_sha": "eac0030a2745b875278c2d45374e1494b916d9fd"
+            "last_sha": "ee14c8b161a57e0668444fd120859f4ae4ceaec8"
         },
         "CTNH-Lib": {
-            "last_sha": "447297b5c37e4ed796b95fc789e0b5c6469fd710"
+            "last_sha": "f1abca97fabb3850d836d22b0ebdaa4ef130b9f5"
         },
         "CTNH-Bio": {
-            "last_sha": "2e447b83bec286d622c4c24df44a3a5a47af6329"
+            "last_sha": "6ed16498b4536f391a6bdde9ebc555ee2bfa0324"
         },
         "CTNH-Energy": {
             "last_sha": "f2c0d2e989d7c265d6f780132d18a71a54c994d9"
@@ -19,10 +19,10 @@
             "last_sha": "e3688bb2d4d25b808fb2397054fc55887f9182d6"
         },
         "CTNH-Astral": {
-            "last_sha": "8cc6d06439118f09731b74a80a7a529c3518aabd"
+            "last_sha": "20e9bc6802ada7f8ecdbaa7f9eb44e054024303d"
         },
         "CTPP": {
-            "last_sha": "cf94f33a7ddf1cc20f41c766ee89a9e5ce82cd26"
+            "last_sha": "13434323a9e430215caeffe088388e72d73f38d5"
         },
         "Create-Enough-Items": {
             "last_sha": "de5bc0e18d9a02637f2cf2429c67ac12fb6b09c5"

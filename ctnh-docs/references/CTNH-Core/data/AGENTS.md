@@ -1,7 +1,7 @@
 # CTNH-CORE DATA DOMAIN
 
 ## OVERVIEW
-`src/generated/resources` 的数据生成源码（149 个 Java 文件）：按 age/chain/域拆分的配方生成器、tags、材料（26 个材料集）与世界生成 provider。
+`src/generated/resources` 的数据生成源码（147 个 Java 文件）：按 age/chain/域拆分的配方生成器、tags、材料（25 个材料集）与世界生成 provider。
 
 ## STRUCTURE
 ```text
@@ -11,14 +11,14 @@ data/
 |-- CreateRecipeTypes.java        # mechanicalTier 用 Math.min(tier, 5)，不是 *2
 |-- item/                         # CrystalItems
 |-- machines/                     # GTNNMachines
-|-- materials/                    # 26 个材料集：BauxiteProcessingMaterials、BoronChainMaterials、GoldChainMaterials、NaquadahMaterials、PlatinumLineMaterials、RareEarthMaterials、SecondMaterials、SpecialMaterials、WetWareLineMaterials、ZrHfSeparationMaterials ...
+|-- materials/                    # 25 个材料集：BauxiteProcessingMaterials、BoronChainMaterials、GoldChainMaterials、NaquadahMaterials、PlatinumLineMaterials、RareEarthMaterials、SecondMaterials、SpecialMaterials、WetWareLineMaterials、ZrHfSeparationMaterials ...
 |-- tags/                         # CTNHBiomeTagsProvider, CTNHEntityTypeTagsProvider, CTNHExtraBlockTagsProvider, CTNHExtraFluidTagsProvider, CTNHExtraItemTagsProvider, ItemTags, StoneTags, TagClearHelper
 |-- worldgen/                     # CTNHBiomeModifiers
 `-- recipe/
     |-- CTNHCoreRecipeAddition.java  # addRecipes() 分发根
     |-- RecipeRemoval.java           # 只登记 ID 过滤规则（通用过滤在 CTNH-Lib）
     |-- WaferRecipes.java            # 精密电路晶圆掩膜
-    |--（34 个顶层类）
+    |--（33 个顶层类）
     |-- age/                      # 10：LV..ZPM, PrimitiveKinetic
     |-- chain/                    # 30：AlumiumChain, BoronChain, BrineChain ...
     |-- cogniassembly/            # WetwareCircuit
@@ -53,7 +53,7 @@ data/
 | Mana 桥接配方 | `data/recipe/mana/` |
 | 生成的配方 Java | `data/recipe/generated/` |
 | 配方辅助 | `data/recipe/utils/` |
-| 材料 | `data/materials/`（26 个材料集）, `data/CTNHMaterialFlags.java` |
+| 材料 | `data/materials/`（25 个材料集）, `data/CTNHMaterialFlags.java` |
 | Tags/世界生成 | `data/tags/`, `data/worldgen/` |
 
 ## CONVENTIONS
