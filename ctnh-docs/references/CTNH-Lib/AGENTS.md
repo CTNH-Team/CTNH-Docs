@@ -1,7 +1,7 @@
 # CTNH-LIB MODULE
 
 ## OVERVIEW
-CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（79 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **90 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
+CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（80 个 Java 文件）+ `com.ctnhlang`（11 个 Java 文件），合计 **91 个 Java 文件**。入口 `CTNHLib`（`@Mod("ctnhlib")`），代理 `common/CommonProxy` / `client/ClientProxy`。只放共享基础设施，无游戏内容；消费方为 CTNH-Core、CTNH-Energy、CTNH-Bio、CTNH-Mana、CTNH-Astral、CTPP、Create-Enough-Items。
 
 ## STRUCTURE
 源码根 `modules/CTNH-Lib/src/main/java/`（括号内为该域 Java 文件数）
@@ -10,7 +10,7 @@ CTNH 全模块共享库，**两个包根**：`tech.vixhentx.mcmod.ctnhlib`（79 
 com/ctnhlang/ (11)
 ├── CN, EN, Lang, LangFactory, Key, Prefix, Suffix, Domain, Category, IgnoreLang
 └── langprovider/LangKeyBuilder
-tech/vixhentx/mcmod/ctnhlib/ (79)
+tech/vixhentx/mcmod/ctnhlib/ (80)
 ├── CTNHLib.java
 ├── api/         (3)  CTNHValues, CrossParallelRecipeLogic, ICrossParallelRecipeLogicMachine
 ├── client/      (37) ClientProxy；ponder/{ButtonRow, CTNHPonderLang, CTNHPonderSceneBuilder, CTNHPonderTagHelper, FrameGuard, PonderUiButtons}；
@@ -27,7 +27,8 @@ tech/vixhentx/mcmod/ctnhlib/ (79)
 ├── langprovider/ (2) Lang, LangProcessor
 ├── mixin/       (5)  GTRecipesMixin, MachineBuilderMixin, PonderUIMixin, RecipeManagerApplyMixin, TMRVMixin
 ├── network/     (1)  packets/BlockHighlightPacket
-├── registrate/  (14) CNRegistrate, CTNHLibNetworking；builders/*（10）；data/ProviderTypes；lang/RegistrateCNLangProvider
+├── registrate/  (15) CNRegistrate, CTNHCopyright, CTNHLibNetworking；builders/*（10）；
+│                     data/ProviderTypes；lang/RegistrateCNLangProvider
 └── utils/       (8)  AllBuilder2, ChunkList, CodecBuilder, EnvUtils, ExtendNbtUtils,
                      InfiniteMeteorTerrain, LockIdentityHashMap, MachineUtils
 src/main/resources/ctnhlib.mixins.json
@@ -42,7 +43,7 @@ src/main/resources/ctnhlib.mixins.json
 | 跨并行配方逻辑与共享常量 | `api/CrossParallelRecipeLogic`, `api/ICrossParallelRecipeLogicMachine`, `api/CTNHValues` |
 | 动态数据包 / 静态包过滤 / 配方移除 | `data/CTNHDynamicDataPack`, `data/DataFilterPack`, `data/recipe/RecipeRemovalHelper` |
 | Mixin 补丁 | `mixin/{RecipeManagerApplyMixin, GTRecipesMixin, MachineBuilderMixin, TMRVMixin, PonderUIMixin}` |
-| Registrate 与构建器 | `registrate/CNRegistrate`, `registrate/builders/*` |
+| Registrate 与构建器 | `registrate/CNRegistrate`, `registrate/CTNHCopyright`, `registrate/builders/*` |
 | 双语 lang 管线 | `com/ctnhlang/*`, `langprovider/{Lang, LangProcessor}`, `registrate/lang/RegistrateCNLangProvider`, `registrate/data/ProviderTypes` |
 | 网络与方块高亮 | `registrate/CTNHLibNetworking`, `network/packets/BlockHighlightPacket`, `client/render/highlight/*` |
 | 共享命令 | `command/CTNHCommands`, `command/CTNHCommandInspector`, `command/CTNHCommandChatHelper` |
@@ -70,6 +71,7 @@ src/main/resources/ctnhlib.mixins.json
 - **移除注册集中**：`data/recipe/RecipeRemovalHelper` 独占 `FILTERS`；`remove()` / `clear()` / `getFilters()` 是唯一入口，模块重载规则前先 `clear()`。
 - **静态包过滤集中**：`data/DataFilterPack` 的 `FILTERED` 与 `removeRecipe/removeRecipeType/removeData` 是静态数据包剔除的唯一入口，由 `mixin/GTRecipesMixin` 在 `GTRecipes.recipeRemoval` HEAD 清空。
 - **注册与 lang 统一走 `CNRegistrate`**：物品/方块/实体/机器/配方类型/材料全部经 `registrate/builders/*`；双语条目经 `com.ctnhlang` 注解 + `LangProcessor`，或 `CNRegistrate.genLang/addRawLang`。
+- **版权 tooltip 统一**：多方块底部 tooltip 未设 `addUnderTooltip(...)` 时回落到 `CNRegistrate.copyrightTooltip()`：构造时带 `CTNHCopyright` 输出 `CTNH` 品牌前缀 + 可选彩色后缀，否则用 `<modid>.copyright.info`；品牌行文案键 `ctnhlib.tooltip.added_by`。
 - **`ProviderTypes.CNLANG` 的注册 id 必须是 `ctnhlib_cnlang`**（裸 `cnlang` 会被第三方 mod `ae2pw` 的同名拷贝顶掉，静默产出空 `zh_cn.json`）。
 - **新增 mixin 必须登记** `src/main/resources/ctnhlib.mixins.json` 的 `mixins`（或 `client`）数组。
 - **Ponder 机器 UI 栈集中在 `client/ponder`**：门面 `MachineUI`（`of(MachineDefinition)` / `of(Block)`）经 `CTNHPonderSceneBuilder.showUI(MachineUI)` 返回起点态 `MachineUiStart`，链式 API 完成摆放（`at` / `machinePos` / `scale` / `pointing`）、物品与流体写入（`slot(index).withItem(...)` / `tank(index).withFluid(...)`）、配方回放（`recipe(recipeId)`）、红框（`outline*`）与 `show(ticks)`；面板构建、写入时间线、点击转发、配方填充分别由 `MachineUiPanelBuilder`、`MachineUiWrites`、`MachineUiInteraction`、`RecipeFiller` 承担，`ponder/machine/*` 的 `MachineEdits` / `MachineEdit` 负责盖板、自动输出、正面朝向与工作模型的施加与还原（`setFrontFacing` 走 `MetaMachine.setFrontFacing` 并在场景里回读方块状态确认）。使用示例见 CTNH-Core `client/ponder/example/ChemicalReactorUi`。

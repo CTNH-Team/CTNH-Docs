@@ -18,10 +18,10 @@ registry/
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Registrate 根 | `registry/CMRegistrate.java`（`CTNHMana.REGISTRATE = CMRegistrate.create()`，由 `CommonProxy.init()` 调 `registerRegistrate()`） |
+| Registrate 根 | `registry/CMRegistrate.java`（`CTNHMana.REGISTRATE = CMRegistrate.create()`，由 `CommonProxy.init()` 调 `registerRegistrate()`；构造把 `new CTNHCopyright("Mana", ...)` 传给 CTNH-Lib `CNRegistrate`） |
 | 物品 | `registry/CMItems.java`, `registry/items/CMFuelItems.java` |
 | 方块 / BE / 实体 | `registry/CMBlocks.java`, `registry/CMBlockEntities.java`, `registry/CMEntities.java` |
-| 机器与多方块 | `registry/CMMachines.java`, `registry/CMMultiblockMachines.java`，分组定义在 `registry/multiblock/`（BloodMagic 1276 行、Botania 2035 行、ManaMachine 538 行、Misc 3025 行、ZenithMachine 425 行）；`BloodMagic.DEMON_WILL_GENERATOR` 用 `.cnLangValue("觉恋贴贴发电机")`，实现类 `DemonWillMachine`、id `demon_will_generator` |
+| 机器与多方块 | `registry/CMMachines.java`, `registry/CMMultiblockMachines.java`，分组定义在 `registry/multiblock/`（BloodMagic 1277 行、Botania 2035 行、ManaMachine 539 行、Misc 3025 行、ZenithMachine 425 行）；`BloodMagic.DEMON_WILL_GENERATOR` 用 `.cnLangValue("觉恋贴贴发电机")`，实现类 `DemonWillMachine`、id `demon_will_generator` |
 | 材料 / 元素 / tag prefix | `registry/CMMaterials.java`, `registry/CMElements.java`, `registry/CMTagPrefixes.java`, `registry/GTMaterialAddon.java` |
 | 配方类型 / 条件 | `registry/CMRecipeTypes.java`（28 个 `GTRecipeType`）, `registry/CMRecipeConditions.java` |
 | 效果 / 音效 / 粒子 / 贴图 / 模型层 | `registry/CMMobEffects.java`, `registry/sounds/{CMSoundEvent, CMSoundDefinitionsProvider}`, `registry/CMParticleTypes.java`, `registry/CMGuiTextures.java`, `registry/CMModelLayers.java` |
@@ -34,6 +34,7 @@ registry/
   - `CommonProxy.init()` → `CMParticleTypes`, `CMMobEffects`, `CMSoundEvent` 的 DeferredRegister 注册，`CMEntities.init()`, `CMCreativeModeTabs.init()`, `CTNHMana.REGISTRATE.registerRegistrate()`, `CMDatagen.init()`, `CMConfig.init()`。
   - `CommonProxy` 的 GTCEu 泛型监听 → `CMMachines.init()` + `CMMultiblockMachines.init()`（`MachineDefinition`）、`CMRecipeTypes.init()`（`GTRecipeType`）、`CMRecipeConditions.init()`（`RecipeConditionType`）。
   - 材质：`registerMaterial` 建 `ctnhmana` 材质注册表，`registerMaterials`/`addMaterialFlag` → `CMMaterials.init()` / `GTMaterialAddon.init()`。
+- 署名 tooltip：`CMRegistrate` 构造把 `CTNHCopyright("Mana", ...)` 交给 `CNRegistrate`；`CTNHMultiblockMachineBuilder.register()` 在多方块 tooltip 末尾加分隔线与 `copyrightTooltip()`（lang key `ctnhlib.tooltip.added_by`，品牌色 `CTNH` + 逐字符着色的 `Mana`）。多方块定义不逐个手写署名。
 - 配方移除经 `CTNHManaGTAddon.removeRecipes(...)` → `data/recipe/ManaRecipeRemoval`，不在注册类里写删除逻辑。
 - 多方块图案、中文名、tooltip 与配方类型接线写在 `registry/multiblock/<分组>`，实现留在 `common/multiblock/`。
 - 新增 tag 常量放 `registry/CMTags`，tag 数据生成在 `data/tags/`。

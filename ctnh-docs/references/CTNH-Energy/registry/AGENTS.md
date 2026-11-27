@@ -6,7 +6,7 @@ CTNH-Energy 的注册中枢（9 个 Java 文件）：Registrate 根、物品与�
 ## WHERE TO LOOK
 | Concern | Location |
 |---------|----------|
-| Registrate 根 | `registry/CERegistrate`（继承 CTNH-Lib `CNRegistrate`，提供 `addLang(type, id, en, cn)` 便捷重载）；实例为 `CTNHEnergy.REGISTRATE` |
+| Registrate 根 | `registry/CERegistrate`（继承 CTNH-Lib `CNRegistrate`，构造向父类传 `CTNHCopyright("Energy", …)` 品牌调色板，`copyrightTooltip()` 输出 `CTNH Energy` 行；提供 `addLang(type, id, en, cn)` 便捷重载）；实例为 `CTNHEnergy.REGISTRATE` |
 | 物品 | `registry/CEItems`（`EU_CELL` 数组、`DYNAMO_CARD`、`PROGRAMMED_CIRCUIT_CARD`、`EU_CELL_HOUSING`、`EU_P2P`、`MAINTAINING_CARD`） |
 | 方块 | `registry/CEBlocks`（`QUANTUM_COMPUTER_ME_NETWORK_PORT`、`QUANTUM_COMPUTER_CASING`、`STEADY_STATE_COMPUTING_MATRIX_SHELL`、`QUANTUM_POINTING_BLOCK`、`ASSEMBLER_MATRIX_FRAME/WALL`） |
 | GT 机器 | `registry/CEMachines`（`me_input_bus` / `me_input_hatch` / `me_dual_input_hatch` / `me_stoking_input_bus` / `me_stoking_input_hatch` 等） |
