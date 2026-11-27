@@ -88,7 +88,7 @@ ctnhastral/                                     # 共 135 个 Java 文件
 | 供氧机 | `common/machine/simple/OxygenEnricherMachine.java`, `registry/CAMachines.java` |
 | 材料 / 元素 / tag prefix | `data/{CAMaterials, CAElements, CATagPrefixes, GTMateralAdjust}.java` |
 | 配方 | `data/CARecipes.java`, `registry/{CARecipeTypes, CARecipeConditions, CARecipeModifiers}.java` |
-| 世界生成键表 | `data/worldgen/WorldgenKeys.java`（`Biomes`, `Dimensions`, `DimensionTypes`, `NoiseSettings`, `Density`, `ConfiguredFeatures`, `PlacedFeatures`, `Structures`, `StructureSets`, `BiomeTags`） |
+| 世界生成键表 | `data/worldgen/WorldgenKeys.java`（`Biomes`, `Dimensions`, `DimensionTypes`, `NoiseSettings`, `Noise`, `Density`, `ConfiguredFeatures`, `PlacedFeatures`, `Structures`, `BiomeTags`, `StructureSets`, `VanillaDensity`） |
 | 世界生成注册与装配 | `data/worldgen/CAWorldgen.java`, `common/CommonProxy.gatherData()` |
 | 各世界数值预设 | `data/worldgen/preset/`（`MoonWorldgen`, `MarsWorldgen`, `VenusWorldgen`, `AstralWorldgen`, `VanillaWorldgen`, `PlanetTerrain`） |
 | 月球地形与流体分层 | `data/worldgen/terrain/`（`MoonSubsurfaceSea`, `MoonCanyonTerrain`, `MoonGeologyTerrain`, `LayeredFluidPicker`） |

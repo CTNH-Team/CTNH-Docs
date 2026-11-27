@@ -6,7 +6,7 @@ Core 的 Registrate 注册面（49 个 Java 文件：根包 27 + 子包 22）：
 ## STRUCTURE
 ```
 registry/
-|-- CTNHRegistrate.java        # registrate 根（extends CNRegistrate）
+|-- CTNHRegistrate.java        # registrate 根（extends CNRegistrate，构造传 CTNHCopyright）
 |-- CTNHRegistration.java      # 注册入口（abstract，提供 REGISTRATE 单例）
 |-- CTNHItems.java / CTNHBlocks.java / CTNHBlockEntities.java
 |-- CTNHCreativeModeTabs.java / CTNHTags.java / CTNHModels.java / CTNHModelLayers.java / CTNHRenders.java

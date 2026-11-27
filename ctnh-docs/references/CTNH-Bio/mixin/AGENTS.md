@@ -35,7 +35,7 @@ mixin/
 - 新增 Mixin 必须同步 `ctnhbio.mixins.json`：`client` 专用补丁放 `client` 数组（`InjectorScreenMixin`, `RecipeScreenMixin`, `ThermalFluidStatsMixin`），其余放 `mixins`。
 - 按目标 mod 分目录（`biomancy/`, `hostilenetworks/`, `emi/`, `ali/`, `create/`, `gtm/`），不要堆在单一目录。
 - GTCEu 目标成员一律 `remap = false`（见 `MultiblockDisplayText$BuilderMixin`）。
-- `mixin/gtm/MultiblockDisplayText$BuilderMixin.java` 目前整体为注释掉的注入代码，但仍在 `mixins` 数组中登记；改动模型输出行的显示逻辑时以该文件的注释代码为参考起点，并确认目标成员签名。
+- `mixin/gtm/MultiblockDisplayText$BuilderMixin.java` 只有 `@Mixin(value = MultiblockDisplayText.Builder.class, remap = false)` 声明，注入体整体注释、未登记进 `ctnhbio.mixins.json`；要接管模型输出行需先补 `@Inject` 并在 `mixins` 数组登记，再核对 `addOutputLines` 的目标成员签名。
 - 这些是兼容补丁而非通用工具：注入点必须对照目标 mod 的当前版本成员。
 
 ## ANTI-PATTERNS

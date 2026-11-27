@@ -9,10 +9,10 @@ CTNH-Mana 是 CTNH 的魔法内容模块，包根 `com.magicbee.ctnhmana`，mod 
 ```
 com.magicbee.ctnhmana/                        # 338 个 Java 文件
 ├── CTNHMana / CTNHManaGTAddon / CMConfig     # mod 入口、GT addon、配置
-├── api/        (35)  效果(16)、配方条件(4)、自定义配方逻辑(6)、图案、机器 trait(3)、Botania 网络扩展
-├── client/     (46)  代理、轮盘(4)、模型(8)、Ponder(4+1+5)、渲染(19+1)、Zenith 客户端镜像
-├── common/     (125) 代理、多方块(31)、物品(8 子包)、实体(5+ai8+nav2+proj3)、GUI(7)、仓室(5+3)、仪式(2+6)
-├── data/       (55)  CMDatagen、ManaData、配方(35)、builder(11)、lang(3)、tags(2)、materials(1)
+├── api/        (35)  效果(16)、配方条件(4)、自定义配方逻辑(6)、图案(2)、机器 trait(3)、宝石规则(1)、mixin 契约(1)、Botania 网络扩展(2)
+├── client/     (46)  代理(1)、轮盘(4)、模型(8)、Ponder(4+1+5)、渲染(19+1)、渲染工具(1)、Zenith 客户端镜像(2)
+├── common/     (125) 代理(1)、多方块(31)、物品(8 子包 28)、实体(5+ai8+nav2+proj3)、方块(5)、方块实体(9)、单方块机器(3)、GUI(7)、仓室(5+3)、仪式(2+6)、能力(1)、虚境事件(5)、DigitalWosMachine
+├── data/       (55)  CMDatagen、ManaData(2)、配方(35)、builder(11)、recipe utils(1)、lang(3)、tags(2)、materials(1)
 ├── event/      (16)  EventHandler(MOD 总线空标记) + 13 个 Forge 处理器 + 按键绑定 + Boss 池
 ├── integration/(3)   emi(1)、jade(2)
 ├── mixin/      (18)  ae2(2)、ars(4)、bloodmagic(4)、botania(6)、emi(1)、minecraft(1)
@@ -22,7 +22,7 @@ com.magicbee.ctnhmana/                        # 338 个 Java 文件
 ```
 
 细则：
-- `common/` 子包：`blockentity/{flower(7), machine(1)}`、`blocks(5)`、`capability(1)`、`entity/{ai(8), navigation(2), projectile(3)}`、`event/zenith(5)`、`gui(7)`、`item/{bloodmagicjade, bosssummoner, caduceus, dungeon, equipment, manafuelstick, manamachineupgrade, rune}`、`machine(3)`、`multiblock(31)`、`parts/{ManaHatches(3)}`、`ritual(2)`、`ritualtypes(6)`。
+- `common/` 子包：`blockentity/{flower(7), machine(1)}`（另有 `blockentity/WitherAconiteTrapBlockEntity.java`）、`blocks(5)`、`capability(1)`、`entity/{ai(8), navigation(2), projectile(3)}`、`event/zenith(5)`、`gui(7)`、`item/{bloodmagicjade, bosssummoner, caduceus, dungeon, equipment, manafuelstick, manamachineupgrade, rune}`、`machine(3)`、`multiblock(31)`、`parts/{ManaHatches(3)}`、`ritual(2)`、`ritualtypes(6)`。
 - `data/recipe/` 顶层 35 个文件 = `CTNHManaGTAddon.addRecipes()` 直接调用的 33 个配方类 + `ManaRecipeRemoval` + 由 `SalvagingRecipes` 间接调用的 `RuneSalvagingRecipes`。
 - Mixin 配置 `src/main/resources/ctnhmana.mixins.json`：17 条目，refmap `mixins.ctnhmana.refmap.json`；`mixin/ars/StoredItemStackMixin` 源码已整体注释、未注册。
 
